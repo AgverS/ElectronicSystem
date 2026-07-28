@@ -8,18 +8,20 @@ import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
 import { Metadata, Viewport } from "next";
 
-import { IosInstallProvider } from "@/components/ios-install-prompt";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { I18nProvider } from "@/lib/i18n/provider";
+import { DemoSessionProvider } from "@/lib/demo-session";
 
-// Inter — humanist grotesque optimised for screen UI; sharp at small sizes, full Cyrillic.
-// JetBrains Mono — for numbers, codes, and tabular data.
+// Inter — humanist grotesque optimised for screen UI; sharp at small sizes.
+// Latin, Latin-Extended and Cyrillic subsets, so every supported language
+// renders properly. JetBrains Mono — for numbers, codes, and tabular data.
 const inter = Inter({
-  subsets: ["latin", "cyrillic"],
+  subsets: ["latin", "latin-ext", "cyrillic"],
   variable: "--font-sans",
 });
 
 const interHeading = Inter({
-  subsets: ["latin", "cyrillic"],
+  subsets: ["latin", "latin-ext", "cyrillic"],
   weight: ["600", "700", "800"],
   variable: "--font-heading",
 });
@@ -30,24 +32,15 @@ const fontMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Электронный журнал",
-  description: "Электронный журнал успеваемости",
-  manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "Электронный Журнал",
-  },
-  icons: {
-    icon: "/icon.svg",
-    apple: "/logo.svg",
-  },
+  title: "Electronic Journal — Demo",
+  description:
+    "An interactive demonstration of a role-based electronic journal for attendance, grades, timetables and academic reporting.",
+  icons: { icon: "/icon.svg" },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
   viewportFit: "cover",
 };
 
@@ -58,7 +51,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="ru"
+      lang="en"
       suppressHydrationWarning
       className={cn(
         "antialiased",
@@ -71,11 +64,13 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <MotionProvider>
-            <QueryProvider>
-              <TooltipProvider>
-                <IosInstallProvider>{children}</IosInstallProvider>
-              </TooltipProvider>
-            </QueryProvider>
+            <I18nProvider>
+              <QueryProvider>
+                <DemoSessionProvider>
+                  <TooltipProvider>{children}</TooltipProvider>
+                </DemoSessionProvider>
+              </QueryProvider>
+            </I18nProvider>
             <Toaster richColors />
           </MotionProvider>
         </ThemeProvider>

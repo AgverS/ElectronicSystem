@@ -196,26 +196,26 @@ async function main() {
   check("upsert updates", upsertedExisting.hours === 77, upsertedExisting.hours);
 
   section("many-to-many writes");
-  const teacher = await db.user.findFirst({ where: { role: "TEACHER" } });
+  const teacher = (await db.user.findFirst({ where: { role: "TEACHER" } }))!;
   await db.subject.update({
     where: { id: created.id },
     data: { teachers: { connect: [{ id: teacher.id }] } },
   });
-  const linked = await db.subject.findUnique({
+  const linked = (await db.subject.findUnique({
     where: { id: created.id },
     include: { teachers: true },
-  });
+  }))!;
   check("m2m connect", linked.teachers.length === 1, linked.teachers.length);
 
   await db.subject.update({ where: { id: created.id }, data: { teachers: { set: [] } } });
-  const unlinked = await db.subject.findUnique({
+  const unlinked = (await db.subject.findUnique({
     where: { id: created.id },
     include: { teachers: true },
-  });
+  }))!;
   check("m2m set []", unlinked.teachers.length === 0, unlinked.teachers.length);
 
   section("compound unique lookup");
-  const anyEntry = await db.scheduleEntry.findFirst();
+  const anyEntry = (await db.scheduleEntry.findFirst())!;
   const byCompound = await db.scheduleEntry.findUnique({
     where: {
       groupId_dayOfWeek_lessonNumber_subgroup: {
@@ -229,10 +229,10 @@ async function main() {
   check("compound unique where", byCompound?.id === anyEntry.id, byCompound?.id);
 
   section("cascade delete");
-  const victim = await db.group.findFirst({
+  const victim = (await db.group.findFirst({
     where: { name: "BA-21" },
     include: { assignments: true, students: true },
-  });
+  }))!;
   const assignmentIds = victim.assignments.map((a: any) => a.id);
   const lessonsBefore = await db.lesson.count({
     where: { assignmentId: { in: assignmentIds } },

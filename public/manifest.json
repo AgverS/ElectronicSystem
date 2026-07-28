@@ -1,23 +1,10 @@
 {
-  "name": "Электронный журнал",
-  "short_name": "Журнал",
-  "description": "Электронный журнал успеваемости",
+  "name": "Electronic Journal — Demo",
+  "short_name": "EJ Demo",
+  "description": "Interactive demonstration of a role-based electronic journal.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#ffffff",
-  "icons": [
-    {
-      "src": "/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo.svg",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
-    }
-  ]
+  "theme_color": "#4f46e5",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
 }

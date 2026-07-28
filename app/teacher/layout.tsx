@@ -1,21 +1,16 @@
-import { redirect } from "next/navigation";
-import { requireRole } from "@/lib/session";
+"use client";
+
+import { RoleGate } from "@/components/layout/role-gate";
 import { Role } from "@/lib/prisma-client";
-import { AppShell } from "@/components/layout/app-shell";
 
-export default async function TeacherLayout({ children }: { children: React.ReactNode }) {
-  const user = await requireRole(Role.TEACHER, Role.ADMIN);
-  if (!user) redirect("/login");
-
-  const section = user.role === Role.ADMIN ? "teacher-admin" : "teacher";
-
+export default function TeacherLayout({ children }: { children: React.ReactNode }) {
   return (
-    <AppShell
-      section={section}
-      title="Преподаватель"
-      userName={user.username ?? user.name}
+    <RoleGate
+      allow={[Role.TEACHER, Role.ADMIN]}
+      section={(user) => (user.role === Role.ADMIN ? "teacher-admin" : "teacher")}
+      titleKey="role.teacher.section"
     >
-      {children}
-    </AppShell>
+      {() => children}
+    </RoleGate>
   );
 }

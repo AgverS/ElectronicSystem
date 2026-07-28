@@ -9,6 +9,7 @@
 
 import { DemoEngine, emptyDataset, type Dataset, type Row } from "./engine";
 import { MODEL_NAMES, modelDef, JOIN_TABLES, type ModelName } from "./schema";
+import type { ModelTypes } from "./types";
 import { buildSeed } from "./seed";
 
 const STORAGE_KEY = "electronic-system-demo-db";
@@ -121,26 +122,37 @@ export function resetDemoData() {
 
 /* -------------------------------- client --------------------------------- */
 
-type Delegate = {
-  findMany: (args?: Row) => Promise<any>;
-  findFirst: (args?: Row) => Promise<any>;
-  findFirstOrThrow: (args?: Row) => Promise<any>;
-  findUnique: (args?: Row) => Promise<any>;
-  findUniqueOrThrow: (args?: Row) => Promise<any>;
-  create: (args?: Row) => Promise<any>;
-  createMany: (args?: Row) => Promise<any>;
-  createManyAndReturn: (args?: Row) => Promise<any>;
-  update: (args?: Row) => Promise<any>;
-  updateMany: (args?: Row) => Promise<any>;
-  upsert: (args?: Row) => Promise<any>;
-  delete: (args?: Row) => Promise<any>;
-  deleteMany: (args?: Row) => Promise<any>;
-  count: (args?: Row) => Promise<any>;
-  groupBy: (args?: Row) => Promise<any>;
+interface BatchResult {
+  count: number;
+}
+
+/**
+ * `T` is the model's row type. Query arguments stay permissive — the engine
+ * validates them at runtime — while results are typed, so call sites get real
+ * completion and no implicit `any`.
+ */
+type Delegate<T> = {
+  findMany: (args?: Row) => Promise<T[]>;
+  findFirst: (args?: Row) => Promise<T | null>;
+  findFirstOrThrow: (args?: Row) => Promise<T>;
+  findUnique: (args?: Row) => Promise<T | null>;
+  findUniqueOrThrow: (args?: Row) => Promise<T>;
+  create: (args?: Row) => Promise<T>;
+  createMany: (args?: Row) => Promise<BatchResult>;
+  createManyAndReturn: (args?: Row) => Promise<T[]>;
+  update: (args?: Row) => Promise<T>;
+  updateMany: (args?: Row) => Promise<BatchResult>;
+  upsert: (args?: Row) => Promise<T>;
+  delete: (args?: Row) => Promise<T>;
+  deleteMany: (args?: Row) => Promise<BatchResult>;
+  count: (args?: Row) => Promise<number>;
+  groupBy: (args?: Row) => Promise<any[]>;
 };
 
-function delegate(model: ModelName): Delegate {
-  const ok = <T>(value: T) => Promise.resolve(value);
+function delegate<T>(model: ModelName): Delegate<T> {
+  // The engine works in untyped rows; the Delegate signature is what callers
+  // see, so the cast is confined to this one boundary.
+  const ok = (value: unknown): Promise<any> => Promise.resolve(value);
   const orThrow = (value: Row | null, op: string) => {
     if (!value) throw new Error(`demo-db: no ${model} found for ${op}`);
     return value;
@@ -168,14 +180,18 @@ function delegate(model: ModelName): Delegate {
   };
 }
 
-type DemoClient = Record<ModelName, Delegate> & {
-  /** Prisma's interactive transaction API, sufficient for demo purposes. */
+type DemoClient = {
+  [M in ModelName]: Delegate<ModelTypes[M]>;
+} & {
+  /** Prisma's transaction API, sufficient for demo purposes. */
   $transaction: <T>(work: T) => Promise<unknown>;
 };
 
 function createClient(): DemoClient {
   const client = {} as DemoClient;
-  for (const model of MODEL_NAMES) client[model] = delegate(model);
+  for (const model of MODEL_NAMES) {
+    (client as Record<ModelName, Delegate<unknown>>)[model] = delegate(model);
+  }
 
   client.$transaction = async (work: unknown) => {
     if (typeof work === "function") return (work as (c: DemoClient) => unknown)(client);

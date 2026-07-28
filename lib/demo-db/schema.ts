@@ -8,6 +8,33 @@
 
 export type ScalarType = "string" | "int" | "bool" | "date" | "json";
 
+/**
+ * Declared explicitly rather than inferred from SCHEMA: relations refer to model
+ * names, so inferring the names from the definitions that use them would be
+ * circular.
+ */
+export type ModelName =
+  | "user"
+  | "group"
+  | "subject"
+  | "specialty"
+  | "semester"
+  | "assignment"
+  | "lesson"
+  | "grade"
+  | "excusedAbsence"
+  | "scheduleEntry"
+  | "scheduleSubstitution"
+  | "auditLog"
+  | "studentRecord"
+  | "recordAttachment"
+  | "backupSetting"
+  | "bellTime"
+  | "bellOverride"
+  | "bellOverrideSlot"
+  | "extraLesson"
+  | "extraLessonRsvp";
+
 export interface FieldDef {
   type: ScalarType;
   optional?: boolean;
@@ -64,7 +91,7 @@ const int = (def?: number): FieldDef => ({ type: "int", default: def, optional: 
 const bool = (def = false): FieldDef => ({ type: "bool", default: def });
 const date = (optional = false): FieldDef => ({ type: "date", optional });
 
-export const SCHEMA = {
+export const SCHEMA: Record<ModelName, ModelDef> = {
   user: {
     fields: {
       id,
@@ -444,12 +471,10 @@ export const SCHEMA = {
       student: { kind: "one", model: "user", fk: "studentId" },
     },
   },
-} satisfies Record<string, ModelDef>;
-
-export type ModelName = keyof typeof SCHEMA;
+};
 
 export const MODEL_NAMES = Object.keys(SCHEMA) as ModelName[];
 
 export function modelDef(model: ModelName): ModelDef {
-  return SCHEMA[model] as ModelDef;
+  return SCHEMA[model];
 }

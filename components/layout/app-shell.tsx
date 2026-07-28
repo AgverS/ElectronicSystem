@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Sidebar } from "./sidebar";
 import type { SidebarSection } from "./sidebar";
 import { IconMenu2 } from "@tabler/icons-react";
+import { useT } from "@/lib/i18n/provider";
 
 interface AppShellProps {
   section: SidebarSection;
@@ -15,6 +16,7 @@ interface AppShellProps {
 export function AppShell({ section, title, userName, children }: AppShellProps) {
   const [open, setOpen] = useState(false);
   const [closing, setClosing] = useState(false);
+  const t = useT();
 
   const closeMenu = () => {
     setClosing(true);
@@ -57,7 +59,7 @@ export function AppShell({ section, title, userName, children }: AppShellProps) 
           <button
             onClick={() => setOpen(true)}
             className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            aria-label="Открыть меню"
+            aria-label={t("nav.openMenu")}
           >
             <IconMenu2 size={20} />
           </button>
