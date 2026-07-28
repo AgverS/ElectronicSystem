@@ -1,9 +1,7 @@
-"use server";
-
 import { randomBytes } from "crypto";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/demo-actor";
 
 async function baseUrl(): Promise<string> {
   const h = await headers();

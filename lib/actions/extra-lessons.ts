@@ -1,8 +1,6 @@
-"use server";
-
-import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireRole } from "@/lib/session";
+import { translate } from "@/lib/i18n/provider";
+import { requireRole, getCurrentUser } from "@/lib/demo-actor";
 import { Role } from "@/lib/prisma-client";
 import { logAction } from "@/lib/audit";
 import { fromISODate } from "@/lib/week";
@@ -10,7 +8,7 @@ import { sendPushNotifications } from "@/lib/push";
 
 async function checkTeacher() {
   const user = await requireRole(Role.TEACHER, Role.ADMIN);
-  if (!user) throw new Error("Доступ запрещён");
+  if (!user) throw new Error(translate("errors.accessDenied"));
   return user;
 }
 
@@ -43,9 +41,6 @@ export async function createExtraLesson(data: {
     meta: { date: data.date, lessonNumber: data.lessonNumber, room: data.room, groupId: data.groupId },
   });
 
-  revalidatePath("/teacher/schedule");
-  revalidatePath("/student/schedule");
-
   const notifTitle = "Дополнительное занятие";
   const notifBody = `${actor.name} — урок ${data.lessonNumber} (${data.date}), каб. ${data.room}`;
 
@@ -75,9 +70,9 @@ export async function deleteExtraLesson(id: string) {
   const actor = await checkTeacher();
 
   const lesson = await prisma.extraLesson.findUnique({ where: { id } });
-  if (!lesson) throw new Error("Занятие не найдено");
+  if (!lesson) throw new Error(translate("errors.extraLessonNotFound"));
   if (lesson.teacherId !== actor.id && actor.role !== Role.ADMIN) {
-    throw new Error("Нет прав для удаления");
+    throw new Error(translate("errors.noDeleteRights"));
   }
 
   await prisma.extraLesson.delete({ where: { id } });
@@ -89,14 +84,11 @@ export async function deleteExtraLesson(id: string) {
     entityId: id,
     meta: {},
   });
-
-  revalidatePath("/teacher/schedule");
-  revalidatePath("/student/schedule");
 }
 
 export async function toggleExtraLessonRsvp(extraLessonId: string): Promise<boolean> {
   const actor = await requireRole(Role.STUDENT, Role.ADMIN);
-  if (!actor) throw new Error("Доступ запрещён");
+  if (!actor) throw new Error(translate("errors.accessDenied"));
 
   const existing = await prisma.extraLessonRsvp.findUnique({
     where: { extraLessonId_studentId: { extraLessonId, studentId: actor.id } },
@@ -118,7 +110,7 @@ export async function getExtraLessonRsvps(extraLessonId: string) {
 
   const lesson = await prisma.extraLesson.findUnique({ where: { id: extraLessonId } });
   if (!lesson || (lesson.teacherId !== actor.id && actor.role !== Role.ADMIN)) {
-    throw new Error("Нет прав");
+    throw new Error(translate("errors.noRights"));
   }
 
   return prisma.extraLessonRsvp.findMany({

@@ -46,7 +46,7 @@ export function AddLessonDialog({
     return minDate;
   });
   const [topic, setTopic] = useState("");
-  const [type, setType] = useState(isPractical ? "практика" : "лекция");
+  const [type, setType] = useState(isPractical ? "practical" : "lecture");
   // Строка, а не число: иначе на каждое нажатие поле «зажимается» в диапазон и
   // не даёт стереть значение, чтобы ввести другое.
   const [count, setCount] = useState("1");
@@ -113,10 +113,10 @@ export function AddLessonDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="лекция">Лекция</SelectItem>
-                  <SelectItem value="практика">Практика</SelectItem>
-                  <SelectItem value="лабораторная">Лабораторная</SelectItem>
-                  {isOKRAllowed && <SelectItem value="ОКР">ОКР</SelectItem>}
+                  <SelectItem value="lecture">Лекция</SelectItem>
+                  <SelectItem value="practical">Практика</SelectItem>
+                  <SelectItem value="lab">Лабораторная</SelectItem>
+                  {isOKRAllowed && <SelectItem value="assessment">ОКР</SelectItem>}
                 </SelectContent>
               </Select>
             </div>

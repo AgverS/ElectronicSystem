@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { ABSENT } from "@/lib/grades";
 import { Role } from "@/lib/prisma-client";
 import Link from "next/link";
 import { IconArrowRight, IconArrowUpRight, IconArrowDownRight } from "@tabler/icons-react";
@@ -125,8 +126,8 @@ async function loadOverview(now: Date): Promise<OverviewData> {
     prisma.user.groupBy({ by: ["role"], where: { isMaster: false }, _count: true }),
     prisma.group.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
     prisma.subject.count(),
-    prisma.grade.count({ where: { value: "Н", lesson: { date: { gte: weekAgo } } } }),
-    prisma.grade.count({ where: { value: "Н", lesson: { date: { gte: twoWeekAgo, lt: weekAgo } } } }),
+    prisma.grade.count({ where: { value: ABSENT, lesson: { date: { gte: weekAgo } } } }),
+    prisma.grade.count({ where: { value: ABSENT, lesson: { date: { gte: twoWeekAgo, lt: weekAgo } } } }),
     prisma.grade.count({ where: { lesson: { date: { gte: weekAgo } } } }),
     prisma.grade.count({ where: { lesson: { date: { gte: twoWeekAgo, lt: weekAgo } } } }),
     prisma.grade.findMany({
@@ -134,7 +135,7 @@ async function loadOverview(now: Date): Promise<OverviewData> {
       select: { value: true },
     }),
     prisma.grade.findMany({
-      where: { value: "Н", lesson: { date: { gte: trendStart } } },
+      where: { value: ABSENT, lesson: { date: { gte: trendStart } } },
       select: { lesson: { select: { date: true, assignment: { select: { groupId: true } } } } },
     }),
     prisma.studentRecord.findMany({

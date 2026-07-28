@@ -1,8 +1,6 @@
-"use server";
-
-import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireRole } from "@/lib/session";
+import { translate } from "@/lib/i18n/provider";
+import { requireRole, getCurrentUser } from "@/lib/demo-actor";
 import { Role } from "@/lib/prisma-client";
 import { logAction } from "@/lib/audit";
 import { exec } from "child_process";
@@ -16,7 +14,7 @@ const BACKUP_DIR = process.env.BACKUP_DIR || path.join(process.cwd(), "backups")
 
 async function checkAdmin() {
   const user = await requireRole(Role.ADMIN);
-  if (!user) throw new Error("Доступ запрещён");
+  if (!user) throw new Error(translate("errors.accessDenied"));
   return user;
 }
 
@@ -51,8 +49,6 @@ export async function createBackupAction() {
       entityId: filename,
       meta: { filename },
     });
-
-    revalidatePath("/admin/backups");
     return { success: true, filename };
   } catch (error) {
     console.error("Backup failed:", error);
@@ -98,7 +94,6 @@ export async function deleteBackupAction(filename: string) {
       entity: "backup",
       entityId: filename,
     });
-    revalidatePath("/admin/backups");
     return { success: true };
   } catch (error) {
     console.error("Delete failed:", error);
@@ -123,8 +118,6 @@ export async function restoreBackupAction(filename: string) {
       entity: "backup",
       entityId: filename,
     });
-
-    revalidatePath("/", "layout");
     return { success: true };
   } catch (error) {
     console.error("Restore failed:", error);
@@ -167,7 +160,5 @@ export async function updateBackupSettingsAction(data: {
     entity: "backup_settings",
     meta: data,
   });
-
-  revalidatePath("/admin/backups");
   return settings;
 }

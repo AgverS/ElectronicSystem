@@ -181,6 +181,13 @@ const en = {
   "term.subgroup": "Subgroup",
   "term.year": "Academic year",
 
+  /* ------------------------------- student ------------------------------- */
+  "student.marks.title": "My grades",
+  "student.marks.empty": "No grades recorded for the current semester yet",
+  "student.noGroup": "You have not been added to a group yet.",
+  "student.noSemesters": "No semesters have been set up yet.",
+  "semester.fullName": "Year {course}, semester {number} ({year})",
+
   /* ---------------------------- lesson types ----------------------------- */
   "lessonType.lecture": "Lecture",
   "lessonType.practical": "Practical",

@@ -39,6 +39,20 @@ const I18nContext = React.createContext<I18nValue>({
   intlLocale: INTL_TAGS[DEFAULT_LOCALE],
 });
 
+/**
+ * The active catalog, mirrored outside React.
+ *
+ * Data-mutation modules are plain async functions, not components, so they
+ * cannot call a hook to translate the errors they throw. They use `translate()`
+ * below, which the provider keeps in step with the chosen language.
+ */
+let activeMessages: Messages = en;
+
+/** Translate outside a component — for errors thrown by mutation helpers. */
+export function translate(key: string, params?: Record<string, string | number>) {
+  return interpolate(activeMessages[key] ?? en[key] ?? key, params);
+}
+
 function interpolate(template: string, params?: Record<string, string | number>) {
   if (!params) return template;
   return template.replace(/\{(\w+)\}/g, (match, name) =>
@@ -60,17 +74,18 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   async function applyLocale(next: Locale) {
-    if (next === "en") {
-      setMessages(en);
-    } else {
+    let nextMessages: Messages = en;
+    if (next !== "en") {
       try {
         const loaded = await loaders[next]();
         // Fall back to English for any key a catalog has not translated yet.
-        setMessages({ ...en, ...loaded.default });
+        nextMessages = { ...en, ...loaded.default };
       } catch {
-        setMessages(en);
+        nextMessages = en;
       }
     }
+    activeMessages = nextMessages;
+    setMessages(nextMessages);
     setLocaleState(next);
     document.documentElement.lang = next;
   }

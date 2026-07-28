@@ -1,8 +1,6 @@
-"use server";
-
-import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireRole } from "@/lib/session";
+import { translate } from "@/lib/i18n/provider";
+import { requireRole, getCurrentUser } from "@/lib/demo-actor";
 import { Role } from "@/lib/prisma-client";
 import { logAction } from "@/lib/audit";
 import { fromISODate } from "@/lib/week";
@@ -10,7 +8,7 @@ import { sendPushNotifications } from "@/lib/push";
 
 async function checkAdmin() {
   const user = await requireRole(Role.ADMIN);
-  if (!user) throw new Error("Доступ запрещён");
+  if (!user) throw new Error(translate("errors.accessDenied"));
   return user;
 }
 
@@ -37,7 +35,7 @@ export async function upsertScheduleEntry(data: {
         },
       },
     });
-    if (existing) throw new Error("Это место в расписании уже занято");
+    if (existing) throw new Error(translate("errors.slotTaken"));
   }
 
   const entry = data.id
@@ -75,10 +73,6 @@ export async function upsertScheduleEntry(data: {
       room: data.room,
     },
   });
-
-  revalidatePath("/admin/schedule");
-  revalidatePath("/student/schedule");
-  revalidatePath("/schedule");
 }
 
 export async function getLastCreatedScheduleEntry() {
@@ -110,10 +104,6 @@ export async function deleteScheduleEntry(id: string) {
       lessonNumber: entry.lessonNumber,
     },
   });
-
-  revalidatePath("/admin/schedule");
-  revalidatePath("/student/schedule");
-  revalidatePath("/schedule");
 }
 
 export async function upsertSubstitution(data: {
@@ -165,10 +155,6 @@ export async function upsertSubstitution(data: {
     entityId: sub.id,
     meta: { groupId: data.groupId, date: data.date, lessonNumber: data.lessonNumber, subgroup, cancelled: data.cancelled },
   });
-
-  revalidatePath("/admin/schedule");
-  revalidatePath("/student/schedule");
-  revalidatePath("/schedule");
 
   const subgroupSuffix = subgroup ? `, подгр. ${subgroup}` : "";
   const notifBody = data.cancelled
@@ -241,8 +227,4 @@ export async function deleteSubstitution(id: string) {
     entityId: id,
     meta: { groupId: sub.groupId, lessonNumber: sub.lessonNumber },
   });
-
-  revalidatePath("/admin/schedule");
-  revalidatePath("/student/schedule");
-  revalidatePath("/schedule");
 }

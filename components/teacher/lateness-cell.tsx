@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition, useState } from "react";
+import { ABSENT } from "@/lib/grades";
 import {
   Popover,
   PopoverContent,
@@ -71,7 +72,7 @@ export function LatenessCell({
           baseStyle,
         )}
       >
-        {value !== null ? value : isAbsent ? "Н" : "-"}
+        {value !== null ? value : isAbsent ? ABSENT : "-"}
       </div>
     );
   }
@@ -90,7 +91,7 @@ export function LatenessCell({
               : "text-muted-foreground/30 hover:bg-muted hover:text-foreground",
           )}
         >
-          {value !== null ? value : isAbsent ? "Н" : "·"}
+          {value !== null ? value : isAbsent ? ABSENT : "·"}
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-40 p-3" align="center">

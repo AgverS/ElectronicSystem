@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, useRef } from "react";
+import { ABSENT } from "@/lib/grades";
 import { useRouter } from "next/navigation";
 import { GradeCell, type GradeEntry } from "@/components/teacher/grade-cell";
 import { LatenessCell } from "@/components/teacher/lateness-cell";
@@ -54,16 +55,16 @@ function avgColor(val: number) {
 }
 
 function calcAvg(grades: string[]) {
-  const nums = grades.filter((g) => g !== "Н" && g !== "").map(Number);
+  const nums = grades.filter((g) => g !== ABSENT && g !== "").map(Number);
   if (nums.length === 0) return null;
   return nums.reduce((a, b) => a + b, 0) / nums.length;
 }
 
 function lessonTypeAbbr(type: string) {
-  if (type === "лекция") return "Лек.";
-  if (type === "практика") return "ПР";
-  if (type === "лабораторная") return "ЛР";
-  if (type === "ОКР") return "ОКР";
+  if (type === "lecture") return "Лек.";
+  if (type === "practical") return "ПР";
+  if (type === "lab") return "ЛР";
+  if (type === "assessment") return "assessment";
   return type;
 }
 
@@ -256,7 +257,7 @@ export function JournalView({
 
   // У практических предметов каждый урок считается лабораторной работой.
   const labLessons = lessons.filter(
-    (l) => l.type === "лабораторная" || assignment.subject.isPractical,
+    (l) => l.type === "lab" || assignment.subject.isPractical,
   );
 
   const currentSemester = resolveCurrentSemester(semesters);
@@ -288,10 +289,10 @@ export function JournalView({
   for (const student of students) {
     for (const lesson of lessons) {
       const g = lastVal(lesson.id + ":" + student.id);
-      if (g === "Н") totalAbsences++;
+      if (g === ABSENT) totalAbsences++;
       else if (g !== "") {
         // Для практических и 1 курса считаем всё, для остальных исключаем ОКР из текущих
-        if (isPractical || isFirstYear || lesson.type !== "ОКР") {
+        if (isPractical || isFirstYear || lesson.type !== "assessment") {
           allNums.push(Number(g));
         }
       }
@@ -304,9 +305,9 @@ export function JournalView({
 
   const lessonStats = lessons.map((l) => {
     const vals = students.map((s) => lastVal(l.id + ":" + s.id));
-    const nums = vals.filter((g) => g !== "Н" && g !== "").map(Number);
+    const nums = vals.filter((g) => g !== ABSENT && g !== "").map(Number);
     const avg = nums.length > 0 ? nums.reduce((a, b) => a + b, 0) / nums.length : null;
-    const absCount = vals.filter((g) => g === "Н").length;
+    const absCount = vals.filter((g) => g === ABSENT).length;
     return { avg, absCount };
   });
 
@@ -456,7 +457,7 @@ export function JournalView({
                     {lessons.map((l) => (
                       <th
                         key={l.id}
-                        className={cn(thBase, "border-b-2 min-w-14", l.type === "ОКР" && "bg-amber-50 dark:bg-amber-950/30")}
+                        className={cn(thBase, "border-b-2 min-w-14", l.type === "assessment" && "bg-amber-50 dark:bg-amber-950/30")}
                       >
                         <LessonHeader
                           lessonId={l.id}
@@ -503,10 +504,10 @@ export function JournalView({
                     // Текущая: для практических и 1 курса - все, для остальных - кроме ОКР
                     const currentGrades = lessons
                       .filter(
-                        (l) => isPractical || isFirstYear || l.type !== "ОКР",
+                        (l) => isPractical || isFirstYear || l.type !== "assessment",
                       )
                       .map((l) => lastVal(l.id + ":" + student.id))
-                      .filter((g) => g !== "Н" && g !== "");
+                      .filter((g) => g !== ABSENT && g !== "");
 
                     const currentAvg = calcAvg(currentGrades);
 
@@ -514,9 +515,9 @@ export function JournalView({
                     const okrGrades =
                       !isPractical && !isFirstYear
                         ? lessons
-                          .filter((l) => l.type === "ОКР")
+                          .filter((l) => l.type === "assessment")
                           .map((l) => lastVal(l.id + ":" + student.id))
-                          .filter((g) => g !== "Н" && g !== "")
+                          .filter((g) => g !== ABSENT && g !== "")
                           .map(Number)
                         : [];
 
@@ -535,7 +536,7 @@ export function JournalView({
                     }
 
                     const absences = studentLastValues.filter(
-                      (g) => g === "Н",
+                      (g) => g === ABSENT,
                     ).length;
 
                     return (
@@ -551,7 +552,7 @@ export function JournalView({
                           <span className="hidden sm:inline">{student.name}</span>
                         </td>
                         {lessons.map((l) => (
-                          <td key={l.id} className={cn(tdBase, "align-middle", l.type === "ОКР" && "bg-amber-50/60 dark:bg-amber-950/20")}>
+                          <td key={l.id} className={cn(tdBase, "align-middle", l.type === "assessment" && "bg-amber-50/60 dark:bg-amber-950/20")}>
                             <GradeCell
                               lessonId={l.id}
                               studentId={student.id}
@@ -610,7 +611,7 @@ export function JournalView({
                       Ср. за урок
                     </td>
                     {lessonStats.map((stat, i) => (
-                      <td key={lessons[i].id} className={cn("border-t-2 border-b border-r px-2 py-1 text-center", lessons[i].type === "ОКР" && "bg-amber-50 dark:bg-amber-950/30")}>
+                      <td key={lessons[i].id} className={cn("border-t-2 border-b border-r px-2 py-1 text-center", lessons[i].type === "assessment" && "bg-amber-50 dark:bg-amber-950/30")}>
                         {stat.avg !== null ? (
                           <span className={cn("text-xs font-semibold tabular-nums", avgColor(stat.avg))}>
                             {stat.avg.toFixed(1)}
@@ -637,7 +638,7 @@ export function JournalView({
                       Н за урок
                     </td>
                     {lessonStats.map((stat, i) => (
-                      <td key={lessons[i].id} className={cn("border-b border-r px-2 py-1 text-center", lessons[i].type === "ОКР" && "bg-amber-50 dark:bg-amber-950/30")}>
+                      <td key={lessons[i].id} className={cn("border-b border-r px-2 py-1 text-center", lessons[i].type === "assessment" && "bg-amber-50 dark:bg-amber-950/30")}>
                         {stat.absCount > 0 ? (
                           <span className="text-xs font-semibold tabular-nums text-orange-600 dark:text-orange-400">
                             {stat.absCount}
@@ -664,7 +665,7 @@ export function JournalView({
                       Примечание
                     </td>
                     {lessons.map((l) => (
-                      <td key={l.id} className={cn("border-b border-r px-2 py-1 text-center", l.type === "ОКР" && "bg-amber-50 dark:bg-amber-950/30")}>
+                      <td key={l.id} className={cn("border-b border-r px-2 py-1 text-center", l.type === "assessment" && "bg-amber-50 dark:bg-amber-950/30")}>
                         <LessonTopicCell
                           lessonId={l.id}
                           topic={l.topic}
@@ -681,8 +682,8 @@ export function JournalView({
                       Тип урока
                     </td>
                     {lessons.map((l) => (
-                      <td key={l.id} className={cn("border-b border-r px-2 py-1 text-center", l.type === "ОКР" && "bg-amber-50 dark:bg-amber-950/30")}>
-                        <span className={cn("text-[10px] font-medium", l.type === "ОКР" ? "text-amber-700 dark:text-amber-400 font-bold" : "text-muted-foreground")}>
+                      <td key={l.id} className={cn("border-b border-r px-2 py-1 text-center", l.type === "assessment" && "bg-amber-50 dark:bg-amber-950/30")}>
+                        <span className={cn("text-[10px] font-medium", l.type === "assessment" ? "text-amber-700 dark:text-amber-400 font-bold" : "text-muted-foreground")}>
                           {lessonTypeAbbr(l.type)}
                         </span>
                       </td>
@@ -749,7 +750,7 @@ export function JournalView({
                             }
                             readonly={readonly || !isCurrentSemester}
                             isAbsent={
-                              lastVal(l.id + ":" + student.id) === "Н"
+                              lastVal(l.id + ":" + student.id) === ABSENT
                             }
                           />
                         </td>

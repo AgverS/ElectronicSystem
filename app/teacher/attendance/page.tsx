@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { ABSENT } from "@/lib/grades";
 import { requireRole } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { Role } from "@/lib/prisma-client";
@@ -134,7 +135,7 @@ export default async function AttendancePage({ searchParams }: PageProps) {
         where: {
           lessonId: { in: lessons.map((l) => l.id) },
           studentId: { in: students.map((s) => s.id) },
-          value: "Н",
+          value: ABSENT,
         },
         select: { studentId: true, lessonId: true },
       })

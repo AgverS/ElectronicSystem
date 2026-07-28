@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition, useState } from "react";
+import { ABSENT } from "@/lib/grades";
 import {
   Popover,
   PopoverContent,
@@ -61,11 +62,11 @@ interface GradeCellProps {
 }
 
 function isRedGrade(value: string, lessonType: string) {
-  const isN = value === "Н";
+  const isN = value === ABSENT;
   const numVal = parseInt(value);
   return (
-    (lessonType === "практика" && isN) ||
-    ((lessonType === "лабораторная" || lessonType === "ОКР") &&
+    (lessonType === "practical" && isN) ||
+    ((lessonType === "lab" || lessonType === "assessment") &&
       (isN || (!isNaN(numVal) && numVal < 3)))
   );
 }
@@ -86,7 +87,7 @@ export function GradeCell({
   assignmentId,
   grades: initialGrades,
   readonly,
-  lessonType = "лекция",
+  lessonType = "lecture",
 }: GradeCellProps) {
   const [grades, setGrades] = useState<GradeEntry[]>(
     [...initialGrades].sort((a, b) => a.retakeNumber - b.retakeNumber),
@@ -147,9 +148,9 @@ export function GradeCell({
       "8": "8",
       "9": "9",
       "0": "10",
-      н: "Н",
-      h: "Н",
-      n: "Н",
+      "н": ABSENT,
+      "h": ABSENT,
+      "n": ABSENT,
     };
     const target = keyMap[e.key.toLowerCase()];
     if (target) {
@@ -234,11 +235,11 @@ export function GradeCell({
 
         <div className="flex gap-1">
           <button
-            onClick={() => handleSelect("Н")}
+            onClick={() => handleSelect(ABSENT)}
             className={cn(
               "h-8 flex-1 rounded text-sm font-semibold transition-all hover:scale-105",
-              GRADE_BG["Н"],
-              activeValue === "Н" && "ring-2 ring-ring ring-offset-1",
+              GRADE_BG[ABSENT],
+              activeValue === ABSENT && "ring-2 ring-ring ring-offset-1",
             )}
           >
             Н

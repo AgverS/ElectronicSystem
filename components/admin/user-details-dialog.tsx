@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ABSENT } from "@/lib/grades";
 import { useQuery } from "@tanstack/react-query";
 import {
   Dialog,
@@ -44,11 +45,11 @@ const GRADE_COLORS: Record<string, string> = {
 const RED_STYLE = "bg-red-500 text-white dark:bg-red-600 dark:text-white ring-2 ring-red-300 dark:ring-red-900";
 
 function getGradeStyle(val: string, lessonType: string) {
-  const isN = val === "Н";
+  const isN = val === ABSENT;
   const numVal = parseInt(val);
   const isRed =
-    (lessonType === "практика" && isN) ||
-    ((lessonType === "лабораторная" || lessonType === "ОКР") && (isN || (!isNaN(numVal) && numVal < 3)));
+    (lessonType === "practical" && isN) ||
+    ((lessonType === "lab" || lessonType === "assessment") && (isN || (!isNaN(numVal) && numVal < 3)));
 
   return isRed ? RED_STYLE : (GRADE_COLORS[val] ?? "bg-muted");
 }

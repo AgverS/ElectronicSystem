@@ -1,15 +1,14 @@
-"use server";
-
-import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireRole } from "@/lib/session";
+import { ABSENT } from "@/lib/grades";
+import { translate } from "@/lib/i18n/provider";
+import { requireRole, getCurrentUser } from "@/lib/demo-actor";
 import { Role } from "@/lib/prisma-client";
 import { logAction } from "@/lib/audit";
 import { getCurrentSemesterId } from "@/lib/semester";
 
 async function checkAdmin() {
   const user = await requireRole(Role.ADMIN);
-  if (!user) throw new Error("Доступ запрещён");
+  if (!user) throw new Error(translate("errors.accessDenied"));
   return user;
 }
 
@@ -48,7 +47,7 @@ export async function createUser(data: {
 }) {
   const actor = await checkAdmin();
   if (!actor.isMaster && data.role === Role.ADMIN) {
-    throw new Error("Недостаточно прав для создания администраторов");
+    throw new Error(translate("errors.cannotCreateAdmin"));
   }
   const groupId = data.role === Role.STUDENT ? (data.groupId ?? null) : null;
   const specIds =
@@ -68,7 +67,7 @@ export async function createUser(data: {
   const existing = await prisma.user.findUnique({
     where: { username },
   });
-  if (existing) throw new Error("Пользователь с таким логином уже существует");
+  if (existing) throw new Error(translate("errors.usernameExists"));
 
   const user = await prisma.user.create({
     data: {
@@ -98,8 +97,6 @@ export async function createUser(data: {
       curatedGroupIds: curatedIds,
     },
   });
-  revalidatePath("/admin/users");
-  revalidatePath("/admin/groups");
 }
 
 export async function updateUser(
@@ -126,11 +123,11 @@ export async function updateUser(
     },
   });
   if (!actor.isMaster) {
-    if (id === actor.id) throw new Error("Нельзя изменить собственный аккаунт");
+    if (id === actor.id) throw new Error(translate("errors.cannotEditOwnAccount"));
     if (target?.role === Role.ADMIN || target?.isMaster)
-      throw new Error("Нет доступа к этому аккаунту");
+      throw new Error(translate("errors.noAccessToAccount"));
     if (data.role === Role.ADMIN)
-      throw new Error("Недостаточно прав для назначения роли администратора");
+      throw new Error(translate("errors.cannotAssignAdmin"));
   }
 
   const groupId = data.role === Role.STUDENT ? (data.groupId ?? null) : null;
@@ -152,7 +149,7 @@ export async function updateUser(
     where: { username },
   });
   if (existing && existing.id !== id) {
-    throw new Error("Пользователь с таким логином уже существует");
+    throw new Error(translate("errors.usernameExists"));
   }
 
   await prisma.user.update({
@@ -185,8 +182,6 @@ export async function updateUser(
       },
     },
   });
-  revalidatePath("/admin/users");
-  revalidatePath("/admin/groups");
 }
 
 export async function deleteUser(id: string) {
@@ -195,11 +190,11 @@ export async function deleteUser(id: string) {
     where: { id },
     select: { name: true, username: true, role: true, isMaster: true },
   });
-  if (user?.isMaster) throw new Error("Нельзя удалить системный аккаунт");
+  if (user?.isMaster) throw new Error(translate("errors.cannotDeleteSystemAccount"));
   if (!actor.isMaster) {
-    if (id === actor.id) throw new Error("Нельзя удалить собственный аккаунт");
+    if (id === actor.id) throw new Error(translate("errors.cannotDeleteOwnAccount"));
     if (user?.role === Role.ADMIN)
-      throw new Error("Нет доступа к этому аккаунту");
+      throw new Error(translate("errors.noAccessToAccount"));
   }
   await prisma.group.updateMany({
     where: { curatorId: id },
@@ -222,7 +217,6 @@ export async function deleteUser(id: string) {
     entityId: id,
     meta: { name: user?.name, username: user?.username, role: user?.role },
   });
-  revalidatePath("/admin/users");
 }
 
 export async function checkUsernameAvailability(username: string) {
@@ -241,10 +235,10 @@ export async function resetUserPassword(id: string) {
   });
 
   if (user?.isMaster)
-    throw new Error("Нельзя сбросить пароль системному аккаунту");
+    throw new Error(translate("errors.cannotResetSystemAccount"));
   if (!actor.isMaster) {
     if (user?.role === Role.ADMIN)
-      throw new Error("Нет доступа к этому аккаунту");
+      throw new Error(translate("errors.noAccessToAccount"));
   }
 
   await prisma.account.updateMany({
@@ -263,7 +257,6 @@ export async function resetUserPassword(id: string) {
     entityId: id,
     meta: { name: user?.name, username: user?.username },
   });
-  revalidatePath("/admin/users");
 }
 
 export async function createUsers(
@@ -278,7 +271,7 @@ export async function createUsers(
 ): Promise<{ results: Array<{ ok: boolean; error?: string }> }> {
   const actor = await checkAdmin();
   if (!actor.isMaster && users.some((u) => u.role === Role.ADMIN)) {
-    throw new Error("Недостаточно прав для создания администраторов");
+    throw new Error(translate("errors.cannotCreateAdmin"));
   }
 
   const results: Array<{ ok: boolean; error?: string }> = [];
@@ -290,7 +283,7 @@ export async function createUsers(
       const name = u.name.trim();
 
       if (batchUsernames.has(username)) {
-        results.push({ ok: false, error: "Дубликат в списке" });
+        results.push({ ok: false, error: translate("errors.duplicateInList") });
         continue;
       }
       batchUsernames.add(username);
@@ -303,7 +296,7 @@ export async function createUsers(
         select: { id: true },
       });
       if (existing) {
-        results.push({ ok: false, error: "Логин уже занят" });
+        results.push({ ok: false, error: translate("errors.usernameTaken") });
         continue;
       }
 
@@ -347,12 +340,10 @@ export async function createUsers(
       const isUnique = (err as { code?: string })?.code === "P2002";
       results.push({
         ok: false,
-        error: isUnique ? "Логин уже занят" : "Ошибка создания",
+        error: isUnique ? translate("errors.usernameTaken") : translate("errors.createFailed"),
       });
     }
   }
-  revalidatePath("/admin/users");
-  revalidatePath("/admin/groups");
   return { results };
 }
 
@@ -396,12 +387,11 @@ export async function createGroup(data: {
         specialtyId: data.specialtyId ?? null,
       },
     });
-    revalidatePath("/admin/groups");
     return { ok: true };
   } catch (err) {
     return {
       ok: false,
-      error: err instanceof Error ? err.message : "Не удалось создать группу",
+      error: err instanceof Error ? err.message : translate("errors.groupCreateFailed"),
     };
   }
 }
@@ -433,11 +423,10 @@ export async function createGroupsBulk(
       results.push({
         ok: false,
         name: g.name,
-        error: isUnique ? "Группа уже существует" : "Ошибка создания",
+        error: isUnique ? translate("errors.groupExists") : translate("errors.createFailed"),
       });
     }
   }
-  revalidatePath("/admin/groups");
   return { results };
 }
 
@@ -449,7 +438,7 @@ export async function updateGroup(
 
   const existing = await prisma.group.findUnique({ where: { name: data.name } });
   if (existing && existing.id !== id) {
-    throw new Error("Группа с таким названием уже существует");
+    throw new Error(translate("errors.groupNameTaken"));
   }
 
   const before = await prisma.group.findUnique({
@@ -478,7 +467,6 @@ export async function updateGroup(
       },
     },
   });
-  revalidatePath("/admin/groups");
 }
 
 export async function deleteGroup(id: string) {
@@ -500,14 +488,13 @@ export async function deleteGroup(id: string) {
     entityId: id,
     meta: { name: group?.name },
   });
-  revalidatePath("/admin/groups");
 }
 
 // Subjects
 function normalizeHours(hours: number | null | undefined): number | null {
   if (hours == null) return null;
   if (!Number.isInteger(hours) || hours < 0) {
-    throw new Error("Количество часов должно быть целым неотрицательным числом");
+    throw new Error(translate("errors.hoursInvalid"));
   }
   return hours === 0 ? null : hours;
 }
@@ -517,7 +504,7 @@ async function hoursSemesterStamp(hours: number | null): Promise<string | null> 
   if (hours == null) return null;
   const semesterId = await getCurrentSemesterId();
   if (!semesterId) {
-    throw new Error("Сначала создайте семестр в разделе «Семестры»");
+    throw new Error(translate("errors.createSemesterFirst"));
   }
   return semesterId;
 }
@@ -578,7 +565,6 @@ export async function createSubject(data: {
       },
     });
   }
-  revalidatePath("/admin/subjects");
 }
 
 export async function updateSubject(
@@ -594,7 +580,7 @@ export async function updateSubject(
 
   const existing = await prisma.subject.findUnique({ where: { name: data.name } });
   if (existing && existing.id !== id) {
-    throw new Error("Предмет с таким названием уже существует");
+    throw new Error(translate("errors.subjectNameTaken"));
   }
 
   const ids = [...new Set(data.specialtyIds ?? [])].filter(Boolean);
@@ -625,7 +611,6 @@ export async function updateSubject(
       specialtyIds: ids,
     },
   });
-  revalidatePath("/admin/subjects");
 }
 
 export async function deleteSubject(id: string) {
@@ -643,19 +628,18 @@ export async function deleteSubject(id: string) {
     entityId: id,
     meta: { name: subject?.name },
   });
-  revalidatePath("/admin/subjects");
 }
 
 // Specialties
 export async function createSpecialty(data: { name: string; letter: string; abbreviation?: string }) {
   const actor = await checkAdmin();
   if (!(await canManageSpecialties(actor)))
-    throw new Error("Недостаточно прав");
+    throw new Error(translate("errors.insufficientRights"));
   const name = data.name.trim();
-  if (!name) throw new Error("Введите название специальности");
+  if (!name) throw new Error(translate("errors.specialtyNameRequired"));
 
   const existing = await prisma.specialty.findUnique({ where: { name } });
-  if (existing) throw new Error("Специальность с таким названием уже существует");
+  if (existing) throw new Error(translate("errors.specialtyNameTaken"));
 
   const letter = data.letter.trim().toUpperCase().slice(0, 1);
   const abbreviation = data.abbreviation?.trim() || name.split(/\s+/).filter(w => w.length > 2).map(w => w[0]).join("").toUpperCase();
@@ -667,8 +651,6 @@ export async function createSpecialty(data: { name: string; letter: string; abbr
     entityId: specialty.id,
     meta: { name, letter, abbreviation },
   });
-  revalidatePath("/admin/specialties");
-  revalidatePath("/admin/subjects");
 }
 
 export async function updateSpecialty(
@@ -677,13 +659,13 @@ export async function updateSpecialty(
 ) {
   const actor = await checkAdmin();
   if (!(await canManageSpecialties(actor)))
-    throw new Error("Недостаточно прав");
+    throw new Error(translate("errors.insufficientRights"));
   const name = data.name.trim();
-  if (!name) throw new Error("Введите название специальности");
+  if (!name) throw new Error(translate("errors.specialtyNameRequired"));
 
   const existing = await prisma.specialty.findUnique({ where: { name } });
   if (existing && existing.id !== id) {
-    throw new Error("Специальность с таким названием уже существует");
+    throw new Error(translate("errors.specialtyNameTaken"));
   }
 
   const letter = data.letter.trim().toUpperCase().slice(0, 1);
@@ -700,14 +682,12 @@ export async function updateSpecialty(
     entityId: id,
     meta: { before, after: { name, letter, abbreviation } },
   });
-  revalidatePath("/admin/specialties");
-  revalidatePath("/admin/subjects");
 }
 
 export async function deleteSpecialty(id: string) {
   const actor = await checkAdmin();
   if (!(await canManageSpecialties(actor)))
-    throw new Error("Недостаточно прав");
+    throw new Error(translate("errors.insufficientRights"));
   const specialty = await prisma.specialty.findUnique({
     where: { id },
     select: { name: true },
@@ -721,8 +701,6 @@ export async function deleteSpecialty(id: string) {
     entityId: id,
     meta: { name: specialty?.name },
   });
-  revalidatePath("/admin/specialties");
-  revalidatePath("/admin/subjects");
 }
 
 // Semesters
@@ -794,7 +772,6 @@ export async function createSemester(data: {
       isCurrent: !!data.isCurrent,
     },
   });
-  revalidatePath("/admin/semesters");
 }
 
 export async function updateSemester(
@@ -857,7 +834,6 @@ export async function updateSemester(
       },
     },
   });
-  revalidatePath("/admin/semesters");
 }
 
 export async function deleteSemester(id: string) {
@@ -880,7 +856,6 @@ export async function deleteSemester(id: string) {
       year: semester?.year,
     },
   });
-  revalidatePath("/admin/semesters");
 }
 
 // Assignments
@@ -893,7 +868,7 @@ export async function createAssignment(data: {
   const groupIds = [...new Set(data.groupIds)].filter(Boolean);
   const teacherIds = [...new Set(data.teacherIds)].filter(Boolean);
   if (teacherIds.length === 0 || !data.subjectId || groupIds.length === 0) {
-    throw new Error("Выберите хотя бы одного преподавателя, предмет и хотя бы одну группу");
+    throw new Error(translate("errors.pickTeacherSubjectGroup"));
   }
 
   let created = 0;
@@ -946,8 +921,6 @@ export async function createAssignment(data: {
       updated,
     },
   });
-
-  revalidatePath("/admin/assignments");
   return { created, updated };
 }
 
@@ -973,7 +946,6 @@ export async function deleteAssignment(id: string) {
       subject: assignment?.subject?.name,
     },
   });
-  revalidatePath("/admin/assignments");
 }
 
 export async function updateAssignment(data: {
@@ -986,7 +958,7 @@ export async function updateAssignment(data: {
   const teacherIds = [...new Set(data.teacherIds)].filter(Boolean);
   const groupIds = [...new Set(data.groupIds)].filter(Boolean);
   if (teacherIds.length === 0 || !data.subjectId || groupIds.length === 0) {
-    throw new Error("Выберите хотя бы одного преподавателя и хотя бы одну группу");
+    throw new Error(translate("errors.pickTeacherAndGroup"));
   }
 
   // Текущие назначения этой строки (преподаватели + предмет)
@@ -1044,8 +1016,6 @@ export async function updateAssignment(data: {
       removed: removed.length,
     },
   });
-
-  revalidatePath("/admin/assignments");
   return { created, updated, removed: removed.length };
 }
 
@@ -1077,8 +1047,6 @@ export async function deleteAssignments(ids: string[]) {
       groups: items.map((i) => i.group.name).join(", "),
     },
   });
-
-  revalidatePath("/admin/assignments");
 }
 
 // Bell times (расписание звонков)
@@ -1161,9 +1129,6 @@ export async function saveBellTimes(
     entity: "bell_time",
     meta: { count: data.length },
   });
-  revalidatePath("/admin/bells");
-  revalidatePath("/schedule");
-  revalidatePath("/student/schedule");
 }
 
 function validateOverride(data: {
@@ -1175,11 +1140,11 @@ function validateOverride(data: {
   const startDate = data.startDate.trim();
   const endDate = data.endDate.trim();
   if (!DATE_RE.test(startDate) || !DATE_RE.test(endDate))
-    throw new Error("Укажите даты периода");
+    throw new Error(translate("errors.periodDatesRequired"));
   if (startDate > endDate)
-    throw new Error("Дата начала позже даты окончания");
+    throw new Error(translate("errors.startAfterEnd"));
   const slots = cleanSlots(data.slots);
-  if (slots.length === 0) throw new Error("Добавьте хотя бы одну пару");
+  if (slots.length === 0) throw new Error(translate("errors.addAtLeastOneSlot"));
   return { name: data.name?.trim() || null, startDate, endDate, slots };
 }
 
@@ -1206,9 +1171,6 @@ export async function createBellOverride(data: {
     entityId: created.id,
     meta: { name: v.name, startDate: v.startDate, endDate: v.endDate },
   });
-  revalidatePath("/admin/bells");
-  revalidatePath("/schedule");
-  revalidatePath("/student/schedule");
 }
 
 export async function updateBellOverride(
@@ -1241,9 +1203,6 @@ export async function updateBellOverride(
     entityId: id,
     meta: { name: v.name, startDate: v.startDate, endDate: v.endDate },
   });
-  revalidatePath("/admin/bells");
-  revalidatePath("/schedule");
-  revalidatePath("/student/schedule");
 }
 
 export async function deleteBellOverride(id: string) {
@@ -1255,9 +1214,6 @@ export async function deleteBellOverride(id: string) {
     entity: "bell_override",
     entityId: id,
   });
-  revalidatePath("/admin/bells");
-  revalidatePath("/schedule");
-  revalidatePath("/student/schedule");
 }
 
 export async function getUserDetailsForAdmin(userId: string) {
@@ -1273,7 +1229,7 @@ export async function getUserDetailsForAdmin(userId: string) {
     },
   });
 
-  if (!user) throw new Error("Пользователь не найден");
+  if (!user) throw new Error(translate("errors.userNotFound"));
 
   // If it's a student, get their academic info (grades by semester)
   let academic: {
@@ -1329,7 +1285,7 @@ export async function getUserDetailsForAdmin(userId: string) {
             })
             .filter(Boolean);
 
-          const numeric = grades.filter((g: any) => g.value !== "Н").map((g: any) => Number(g.value));
+          const numeric = grades.filter((g: any) => g.value !== ABSENT).map((g: any) => Number(g.value));
           const avg = numeric.length
             ? (numeric.reduce((sum, val) => sum + val, 0) / numeric.length).toFixed(1)
             : null;

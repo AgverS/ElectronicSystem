@@ -1,21 +1,19 @@
-"use server";
-
-import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireRole } from "@/lib/session";
+import { translate } from "@/lib/i18n/provider";
+import { requireRole, getCurrentUser } from "@/lib/demo-actor";
 import { Role, RecordKind } from "@/lib/prisma-client";
 import { logAction } from "@/lib/audit";
 import { saveUpload, deleteUpload, ALLOWED_MIME, MAX_FILE_SIZE } from "@/lib/uploads";
 
 async function checkAdmin() {
   const user = await requireRole(Role.ADMIN);
-  if (!user) throw new Error("Доступ запрещён");
+  if (!user) throw new Error(translate("errors.accessDenied"));
   return user;
 }
 
 function parseKind(value: FormDataEntryValue | null): RecordKind {
   if (value === RecordKind.REWARD || value === RecordKind.PENALTY) return value;
-  throw new Error("Неверный тип записи");
+  throw new Error(translate("errors.invalidRecordKind"));
 }
 
 function collectFiles(formData: FormData): File[] {
@@ -43,8 +41,6 @@ async function persistFiles(recordId: string, files: File[]) {
 }
 
 function revalidate() {
-  revalidatePath("/admin/records");
-  revalidatePath("/student/records");
 }
 
 export async function createStudentRecord(formData: FormData) {
@@ -56,17 +52,17 @@ export async function createStudentRecord(formData: FormData) {
   const dateStr = String(formData.get("date") ?? "");
   const reason = String(formData.get("reason") ?? "").trim();
 
-  if (!studentId) throw new Error("Не выбран учащийся");
-  if (!number) throw new Error("Укажите номер приказа");
-  if (!dateStr) throw new Error("Укажите дату приказа");
-  if (!reason) throw new Error("Укажите основание");
+  if (!studentId) throw new Error(translate("errors.noStudentSelected"));
+  if (!number) throw new Error(translate("errors.orderNumberRequired"));
+  if (!dateStr) throw new Error(translate("errors.orderDateRequired"));
+  if (!reason) throw new Error(translate("errors.reasonRequired"));
 
   const student = await prisma.user.findUnique({
     where: { id: studentId },
     select: { role: true },
   });
   if (!student || student.role !== Role.STUDENT) {
-    throw new Error("Записи можно выписывать только учащимся");
+    throw new Error(translate("errors.recordsStudentsOnly"));
   }
 
   // Validate everything before writing anything.
@@ -96,16 +92,16 @@ export async function updateStudentRecord(formData: FormData) {
   const dateStr = String(formData.get("date") ?? "");
   const reason = String(formData.get("reason") ?? "").trim();
 
-  if (!id) throw new Error("Не указана запись");
-  if (!number) throw new Error("Укажите номер приказа");
-  if (!dateStr) throw new Error("Укажите дату приказа");
-  if (!reason) throw new Error("Укажите основание");
+  if (!id) throw new Error(translate("errors.noRecordSpecified"));
+  if (!number) throw new Error(translate("errors.orderNumberRequired"));
+  if (!dateStr) throw new Error(translate("errors.orderDateRequired"));
+  if (!reason) throw new Error(translate("errors.reasonRequired"));
 
   const existing = await prisma.studentRecord.findUnique({
     where: { id },
     select: { id: true, studentId: true },
   });
-  if (!existing) throw new Error("Запись не найдена");
+  if (!existing) throw new Error(translate("errors.recordNotFound"));
 
   const files = collectFiles(formData);
 
@@ -156,9 +152,9 @@ export async function writeOffStudentRecord(id: string) {
     where: { id },
     select: { id: true, kind: true, number: true, studentId: true, writtenOffAt: true },
   });
-  if (!record) throw new Error("Запись не найдена");
+  if (!record) throw new Error(translate("errors.recordNotFound"));
   if (record.kind !== RecordKind.PENALTY) {
-    throw new Error("Списывать можно только взыскания");
+    throw new Error(translate("errors.onlyPenaltiesWrittenOff"));
   }
   if (record.writtenOffAt) return; // уже списано
 
@@ -184,7 +180,7 @@ export async function cancelStudentRecordWriteOff(id: string) {
     where: { id },
     select: { id: true, number: true, studentId: true },
   });
-  if (!record) throw new Error("Запись не найдена");
+  if (!record) throw new Error(translate("errors.recordNotFound"));
 
   await prisma.studentRecord.update({
     where: { id },
@@ -211,7 +207,7 @@ export interface ImportRow {
 
 export async function importStudentRecords(rows: ImportRow[]) {
   const actor = await checkAdmin();
-  if (!rows.length) throw new Error("Нет строк для импорта");
+  if (!rows.length) throw new Error(translate("errors.nothingToImport"));
 
   const created: string[] = [];
 

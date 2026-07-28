@@ -1,15 +1,14 @@
-"use server";
-
-import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireRole } from "@/lib/session";
+import { ABSENT } from "@/lib/grades";
+import { translate } from "@/lib/i18n/provider";
+import { requireRole, getCurrentUser } from "@/lib/demo-actor";
 import { Role } from "@/lib/prisma-client";
 import { logAction } from "@/lib/audit";
 import { getCurrentSemesterId } from "@/lib/semester";
 
 async function checkTeacher() {
   const user = await requireRole(Role.TEACHER, Role.ADMIN);
-  if (!user) throw new Error("Доступ запрещён");
+  if (!user) throw new Error(translate("errors.accessDenied"));
   return user;
 }
 
@@ -21,7 +20,7 @@ async function checkCurrentSemester(lessonId: string) {
   });
   if (!lesson || lesson.semesterId !== currentId) {
     throw new Error(
-      "Редактирование уроков в закончившихся семестрах запрещено",
+      translate("errors.pastSemesterReadOnly"),
     );
   }
 }
@@ -39,23 +38,23 @@ export async function addLesson(data: {
 
   const currentSemesterId = await getCurrentSemesterId();
   if (!currentSemesterId)
-    throw new Error("Сначала создайте семестр в разделе «Семестры»");
+    throw new Error(translate("errors.createSemesterFirst"));
 
   const semester = await prisma.semester.findUnique({
     where: { id: currentSemesterId },
   });
-  if (!semester) throw new Error("Семестр не найден");
+  if (!semester) throw new Error(translate("errors.semesterNotFound"));
 
   const lessonDate = new Date(data.date);
   if (lessonDate < semester.startDate || lessonDate > semester.endDate) {
-    throw new Error("Дата урока должна быть в пределах текущего семестра");
+    throw new Error(translate("errors.lessonDateOutsideSemester"));
   }
 
   if (teacher.role === Role.TEACHER) {
     const assignment = await prisma.assignment.findFirst({
       where: { id: data.assignmentId, teachers: { some: { id: teacher.id } } },
     });
-    if (!assignment) throw new Error("Назначение не найдено");
+    if (!assignment) throw new Error(translate("errors.assignmentNotFound"));
   }
 
   // Можно создать сразу несколько уроков (колонок) на одну дату.
@@ -87,7 +86,6 @@ export async function addLesson(data: {
       semesterId: currentSemesterId,
     },
   });
-  revalidatePath(`/teacher/journal/${data.assignmentId}`);
 }
 
 export async function deleteLesson(lessonId: string, assignmentId: string) {
@@ -101,7 +99,6 @@ export async function deleteLesson(lessonId: string, assignmentId: string) {
     entityId: lessonId,
     meta: { assignmentId },
   });
-  revalidatePath(`/teacher/journal/${assignmentId}`);
 }
 
 // Hours live on the subject. A teacher may change them for a subject they
@@ -116,16 +113,16 @@ export async function setSubjectHours(data: {
     where: { id: data.assignmentId },
     select: { subjectId: true, teachers: { select: { id: true } } },
   });
-  if (!assignment) throw new Error("Назначение не найдено");
+  if (!assignment) throw new Error(translate("errors.assignmentNotFound"));
   if (teacher.role === Role.TEACHER && !assignment.teachers.some((t) => t.id === teacher.id)) {
-    throw new Error("Доступ запрещён");
+    throw new Error(translate("errors.accessDenied"));
   }
 
   let hours = data.hours;
   if (hours != null) {
     if (!Number.isInteger(hours) || hours < 0) {
       throw new Error(
-        "Количество часов должно быть целым неотрицательным числом",
+        translate("errors.hoursInvalid"),
       );
     }
     if (hours === 0) hours = null;
@@ -134,7 +131,7 @@ export async function setSubjectHours(data: {
   // Hours apply only to the current semester; stamp it so they reset next one.
   const semesterId = hours == null ? null : await getCurrentSemesterId();
   if (hours != null && !semesterId) {
-    throw new Error("Сначала создайте семестр в разделе «Семестры»");
+    throw new Error(translate("errors.createSemesterFirst"));
   }
 
   await prisma.subject.update({
@@ -148,9 +145,6 @@ export async function setSubjectHours(data: {
     entityId: assignment.subjectId,
     meta: { hours, semesterId, assignmentId: data.assignmentId },
   });
-  revalidatePath(`/teacher/journal/${data.assignmentId}`);
-  revalidatePath(`/admin/journals/${data.assignmentId}`);
-  revalidatePath("/admin/subjects");
 }
 
 // План «всего лабораторных работ» по группе+предмету. Правит владелец-препод/админ.
@@ -164,15 +158,15 @@ export async function setLabsTotal(data: {
     where: { id: data.assignmentId },
     select: { teachers: { select: { id: true } } },
   });
-  if (!assignment) throw new Error("Назначение не найдено");
+  if (!assignment) throw new Error(translate("errors.assignmentNotFound"));
   if (teacher.role === Role.TEACHER && !assignment.teachers.some((t) => t.id === teacher.id)) {
-    throw new Error("Доступ запрещён");
+    throw new Error(translate("errors.accessDenied"));
   }
 
   let total = data.total;
   if (total != null) {
     if (!Number.isInteger(total) || total < 0) {
-      throw new Error("Количество лаб должно быть целым неотрицательным числом");
+      throw new Error(translate("errors.labsTotalInvalid"));
     }
     if (total === 0) total = null;
   }
@@ -188,8 +182,6 @@ export async function setLabsTotal(data: {
     entityId: data.assignmentId,
     meta: { total },
   });
-  revalidatePath(`/teacher/journal/${data.assignmentId}`);
-  revalidatePath(`/admin/journals/${data.assignmentId}`);
 }
 
 // Срок сдачи лабы. deadline = YYYY-MM-DD (продлить) или null (сброс к +14 дней).
@@ -205,18 +197,18 @@ export async function setLabDeadline(data: {
     where: { id: data.lessonId },
     include: { assignment: { select: { teachers: { select: { id: true } } } } },
   });
-  if (!lesson) throw new Error("Урок не найден");
+  if (!lesson) throw new Error(translate("errors.lessonNotFound"));
   if (
     user.role === Role.TEACHER &&
     !lesson.assignment.teachers.some((t) => t.id === user.id)
   ) {
-    throw new Error("Доступ запрещён");
+    throw new Error(translate("errors.accessDenied"));
   }
 
   let deadline: Date | null = null;
   if (data.deadline) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(data.deadline)) {
-      throw new Error("Неверная дата");
+      throw new Error(translate("errors.invalidDate"));
     }
     deadline = new Date(data.deadline + "T00:00:00.000Z");
   }
@@ -232,8 +224,6 @@ export async function setLabDeadline(data: {
     entityId: data.lessonId,
     meta: { deadline: data.deadline, assignmentId: data.assignmentId },
   });
-  revalidatePath(`/teacher/journal/${data.assignmentId}`);
-  revalidatePath(`/admin/journals/${data.assignmentId}`);
 }
 
 export async function saveGrade(data: {
@@ -305,7 +295,6 @@ export async function saveGrade(data: {
       },
     });
   }
-  revalidatePath(`/teacher/journal/${data.assignmentId}`);
 }
 
 export async function addRetake(data: {
@@ -321,9 +310,9 @@ export async function addRetake(data: {
     orderBy: { retakeNumber: "desc" },
     take: 1,
   });
-  if (existing.length === 0) throw new Error("Нет исходной оценки для пересдачи");
+  if (existing.length === 0) throw new Error(translate("errors.noGradeToRetake"));
   const maxRetake = existing[0].retakeNumber;
-  if (maxRetake >= 3) throw new Error("Достигнут максимум пересдач (3)");
+  if (maxRetake >= 3) throw new Error(translate("errors.maxRetakes"));
 
   const newRetakeNumber = maxRetake + 1;
   await prisma.grade.create({
@@ -345,8 +334,6 @@ export async function addRetake(data: {
       assignmentId: data.assignmentId,
     },
   });
-  revalidatePath(`/teacher/journal/${data.assignmentId}`);
-  revalidatePath(`/admin/journals/${data.assignmentId}`);
   return newRetakeNumber;
 }
 
@@ -379,8 +366,8 @@ export async function saveLateness(data: {
     // Если опоздание <= 23 и стояло Н, то убираем Н
     let value = existing?.value || "";
     if (data.lateness > 23) {
-      value = "Н";
-    } else if (value === "Н") {
+      value = ABSENT;
+    } else if (value === ABSENT) {
       value = "";
     }
 
@@ -407,7 +394,6 @@ export async function saveLateness(data: {
       lateness: data.lateness,
     },
   });
-  revalidatePath(`/teacher/journal/${data.assignmentId}`);
 }
 
 // Куратор отмечает все пропуски учащегося за день уважительными (или снимает
@@ -430,16 +416,16 @@ export async function setAbsenceExcused(data: {
     !user.isMaster &&
     group.curatorId !== user.id
   ) {
-    throw new Error("Отмечать пропуски может только куратор группы");
+    throw new Error(translate("errors.onlyCuratorMarksAbsence"));
   }
 
   const student = await prisma.user.findFirst({
     where: { id: data.studentId, groupId: data.groupId, role: Role.STUDENT },
     select: { id: true },
   });
-  if (!student) throw new Error("Учащийся не найден в группе");
+  if (!student) throw new Error(translate("errors.studentNotInGroup"));
 
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(data.date)) throw new Error("Неверная дата");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(data.date)) throw new Error(translate("errors.invalidDate"));
   const date = new Date(data.date + "T00:00:00.000Z");
 
   if (data.excused) {
@@ -465,7 +451,6 @@ export async function setAbsenceExcused(data: {
       groupId: data.groupId,
     },
   });
-  revalidatePath("/teacher/attendance");
 }
 
 export async function updateLessonTopic(lessonId: string, topic: string) {
@@ -475,9 +460,9 @@ export async function updateLessonTopic(lessonId: string, topic: string) {
     where: { id: lessonId },
     include: { assignment: { include: { teachers: { select: { id: true } } } } },
   });
-  if (!lesson) throw new Error("Урок не найден");
+  if (!lesson) throw new Error(translate("errors.lessonNotFound"));
   if (user.role === Role.TEACHER && !lesson.assignment.teachers.some((t) => t.id === user.id)) {
-    throw new Error("Доступ запрещён");
+    throw new Error(translate("errors.accessDenied"));
   }
   await prisma.lesson.update({
     where: { id: lessonId },
@@ -490,7 +475,6 @@ export async function updateLessonTopic(lessonId: string, topic: string) {
     entityId: lessonId,
     meta: { before: lesson.topic, after: topic.trim() || null },
   });
-  revalidatePath(`/teacher/journal/${lesson.assignmentId}`);
 }
 
 export async function addStudentToGroup(data: {
@@ -502,7 +486,7 @@ export async function addStudentToGroup(data: {
     const assignment = await prisma.assignment.findFirst({
       where: { teachers: { some: { id: teacher.id } }, groupId: data.groupId },
     });
-    if (!assignment) throw new Error("Нет доступа к этой группе");
+    if (!assignment) throw new Error(translate("errors.noAccessToGroup"));
   }
   const student = await prisma.user.findUnique({
     where: { id: data.studentId },
