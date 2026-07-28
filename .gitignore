@@ -27,3 +27,6 @@ pnpm-debug.log*
 *.tsbuildinfo
 
 /lib/generated/prisma
+
+# static export
+/out/
