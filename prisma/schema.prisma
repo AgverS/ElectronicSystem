@@ -1,0 +1,472 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/prisma-client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+}
+
+enum RecordKind {
+  REWARD
+  PENALTY
+}
+
+model User {
+  id        String   @id
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  name          String
+  email         String?
+  emailVerified Boolean @map("email_verified")
+  image         String?
+  username      String? @unique
+  role          Role    @default(STUDENT)
+  isMaster      Boolean @default(false) @map("is_master")
+  groupId       String? @map("group_id")
+  calendarToken String? @unique @map("calendar_token")
+  reportBlocked Boolean @default(false) @map("report_blocked")
+
+  sessions  Session[]
+  accounts  Account[]
+  auditLogs AuditLog[]
+
+  group           Group?                 @relation("StudentGroup", fields: [groupId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  assignments      Assignment[]           @relation("TeacherAssignments")
+  curatedGroups    Group[]                @relation("GroupCurator")
+  grades           Grade[]
+  scheduleEntries  ScheduleEntry[]        @relation("ScheduleTeacher")
+  substitutions    ScheduleSubstitution[] @relation("SubstitutionTeacher")
+  records          StudentRecord[]        @relation("StudentRecords")
+  issuedRecords    StudentRecord[]        @relation("IssuedRecords")
+  specialties      Specialty[]            @relation("UserSpecialties")
+  subjects         Subject[]             @relation("TeacherSubjects")
+  excusedAbsences  ExcusedAbsence[]
+  extraLessons     ExtraLesson[]          @relation("TeacherExtraLessons")
+  extraLessonRsvps ExtraLessonRsvp[]      @relation("StudentRsvps")
+
+  @@index([role])
+  @@index([groupId])
+  @@index([isMaster])
+  @@map("users")
+}
+
+model Session {
+  id        String   @id
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  expiresAt DateTime @map("expires_at")
+  token     String   @unique
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model Account {
+  id        String   @id
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  accountId  String @map("account_id")
+  providerId String @map("provider_id")
+
+  accessToken           String?   @map("access_token")
+  refreshToken          String?   @map("refresh_token")
+  idToken               String?   @map("id_token")
+  accessTokenExpiresAt  DateTime? @map("access_token_expires_at")
+  refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at")
+  scope                 String?
+  password              String?
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Verification {
+  id        String   @id
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  identifier String
+  value      String
+  expiresAt  DateTime @map("expires_at")
+
+  @@map("verifications")
+}
+
+model Group {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  year      Int      @default(1)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  curatorId   String? @map("curator_id")
+  specialtyId String? @map("specialty_id")
+
+  curator   User?      @relation("GroupCurator", fields: [curatorId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  specialty Specialty? @relation(fields: [specialtyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  students        User[]                 @relation("StudentGroup")
+  assignments     Assignment[]
+  scheduleEntries ScheduleEntry[]
+  substitutions   ScheduleSubstitution[]
+  extraLessons    ExtraLesson[]
+
+  @@index([curatorId])
+  @@index([specialtyId])
+  @@map("groups")
+}
+
+model Subject {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  isPractical Boolean  @default(false) @map("is_practical")
+  hours       Int?
+  // Semester the hours were set for. Hours count only for this semester; in any
+  // other (current) semester they read as unset ("reset"), until set again.
+  hoursSemesterId String?  @map("hours_semester_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  assignments     Assignment[]
+  scheduleEntries ScheduleEntry[]
+  substitutions   ScheduleSubstitution[]
+  specialties     Specialty[]            @relation("SubjectSpecialties")
+  teachers        User[]                 @relation("TeacherSubjects")
+
+  @@map("subjects")
+}
+
+model Specialty {
+  id           String   @id @default(cuid())
+  name         String   @unique
+  abbreviation String   @default("")
+  letter       String   @default("")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  subjects Subject[] @relation("SubjectSpecialties")
+  groups   Group[]
+  users    User[]    @relation("UserSpecialties")
+
+  @@map("specialties")
+}
+
+model Semester {
+  id        String   @id @default(cuid())
+  name      String
+  number    Int
+  year      String
+  startDate DateTime @map("start_date") @db.Date
+  endDate   DateTime @map("end_date") @db.Date
+  isCurrent Boolean  @default(false) @map("is_current")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  lessons Lesson[]
+
+  @@unique([number, year])
+  @@index([isCurrent])
+  @@map("semesters")
+}
+
+model Assignment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created_at")
+
+  groupId   String @map("group_id")
+  subjectId String @map("subject_id")
+
+  // План «всего лабораторных работ» по этой группе+предмету. Задаёт преподаватель.
+  labsTotal Int? @map("labs_total")
+
+  teachers User[]  @relation("TeacherAssignments")
+  group   Group   @relation(fields: [groupId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  lessons Lesson[]
+
+  @@unique([groupId, subjectId])
+  @@index([groupId])
+  @@index([subjectId])
+  @@map("assignments")
+}
+
+model Lesson {
+  id    String   @id @default(cuid())
+  date  DateTime @db.Date
+  topic String?
+  type  String   @default("??????")
+
+  // Срок сдачи лабы. null = по умолчанию (дата урока + 14 дней). После срока
+  // незачтённая лаба становится «платной»; преподаватель может его продлить.
+  deadline DateTime? @db.Date
+
+  assignmentId String   @map("assignment_id")
+  semesterId   String   @map("semester_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  semester   Semester   @relation(fields: [semesterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  grades     Grade[]
+
+  @@index([assignmentId, date])
+  @@index([semesterId])
+  @@map("lessons")
+}
+
+model Grade {
+  id           String   @id @default(cuid())
+  value        String
+  lateness     Int?
+  retakeNumber Int      @default(0) @map("retake_number")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  lessonId  String @map("lesson_id")
+  studentId String @map("student_id")
+
+  lesson  Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  student User   @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([lessonId, studentId, retakeNumber])
+  @@index([studentId])
+  @@map("grades")
+}
+
+// Куратор отмечает, что все пропуски учащегося за конкретный день уважительные.
+// Наличие строки = день уважительный; отсутствие = неуважительный (по умолчанию).
+model ExcusedAbsence {
+  id        String   @id @default(cuid())
+  studentId String   @map("student_id")
+  date      DateTime @db.Date
+  createdAt DateTime @default(now()) @map("created_at")
+
+  student User @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([studentId, date])
+  @@map("excused_absences")
+}
+
+model ScheduleEntry {
+  id           String @id @default(cuid())
+  groupId      String @map("group_id")
+  dayOfWeek    Int    @map("day_of_week")
+  lessonNumber Int    @map("lesson_number")
+  subgroup     String @default("") @map("subgroup")
+  subjectId    String @map("subject_id")
+  teacherId    String @map("teacher_id")
+  room         String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  group   Group   @relation(fields: [groupId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  teacher User    @relation("ScheduleTeacher", fields: [teacherId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([groupId, dayOfWeek, lessonNumber, subgroup])
+  @@index([teacherId])
+  @@map("schedule_entries")
+}
+
+model ScheduleSubstitution {
+  id           String   @id @default(cuid())
+  groupId      String   @map("group_id")
+  date         DateTime @db.Date
+  lessonNumber Int      @map("lesson_number")
+  subgroup     String   @default("") @map("subgroup")
+  cancelled    Boolean  @default(false)
+  subjectId    String?  @map("subject_id")
+  teacherId    String?  @map("teacher_id")
+  room         String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  group   Group    @relation(fields: [groupId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  subject Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  teacher User?    @relation("SubstitutionTeacher", fields: [teacherId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@unique([groupId, date, lessonNumber, subgroup])
+  @@index([teacherId])
+  @@index([date])
+  @@map("schedule_substitutions")
+}
+
+model PushSubscription {
+  id        String @id @default(cuid())
+  endpoint  String
+  p256dh    String
+  auth      String
+  filterKey String @map("filter_key") // "group:id" | "teacher:id" | "room:name"
+
+  lastNotifiedAt DateTime? @map("last_notified_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  @@unique([endpoint, filterKey])
+  @@index([filterKey])
+  @@map("push_subscriptions")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created_at")
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  action    String
+  entity    String
+  entityId  String? @map("entity_id")
+  meta      Json?
+  ipAddress String? @map("ip_address")
+  userAgent String? @map("user_agent")
+
+  @@index([userId])
+  @@index([action])
+  @@index([entity])
+  @@index([createdAt(sort: Desc)])
+  @@map("audit_logs")
+}
+
+model StudentRecord {
+  id     String     @id @default(cuid())
+  kind   RecordKind
+  number String
+  date   DateTime   @db.Date
+  reason String
+
+  // Досрочное списание взыскания: запись не удаляется, а помечается списанной —
+  // остаётся видна администратору, но перестаёт считаться действующей.
+  writtenOffAt   DateTime? @map("written_off_at") @db.Date
+  writtenOffById String?   @map("written_off_by_id")
+
+  studentId  String @map("student_id")
+  issuedById String @map("issued_by_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  student  User @relation("StudentRecords", fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  issuedBy User @relation("IssuedRecords", fields: [issuedById], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  attachments RecordAttachment[]
+
+  @@index([studentId])
+  @@index([kind])
+  @@map("student_records")
+}
+
+model RecordAttachment {
+  id         String   @id @default(cuid())
+  recordId   String   @map("record_id")
+  fileName   String   @map("file_name")
+  mimeType   String   @map("mime_type")
+  size       Int
+  storageKey String   @map("storage_key")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  record StudentRecord @relation(fields: [recordId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([recordId])
+  @@map("record_attachments")
+}
+
+model BackupSetting {
+  id            String    @id @default("singleton")
+  enabled       Boolean   @default(false)
+  intervalHours Int       @default(24) @map("interval_hours")
+  keepCount     Int       @default(10) @map("keep_count")
+  lastBackupAt  DateTime? @map("last_backup_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@map("backup_settings")
+}
+
+// Постоянное расписание звонков. Время пары (HH:MM) для группы дней:
+// "main" = Пн/Вт/Ср/Пт, "thu" = Чт, "sat" = Сб.
+model BellTime {
+  id        String   @id @default(cuid())
+  dayGroup  String   @map("day_group")
+  number    Int
+  startTime String   @map("start_time")
+  endTime   String   @map("end_time")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([dayGroup, number])
+  @@map("bell_times")
+}
+
+// Временное расписание звонков на период (например, предпраздничное).
+// На даты в [startDate; endDate] звонки берутся отсюда вместо постоянного.
+model BellOverride {
+  id        String   @id @default(cuid())
+  name      String?
+  startDate DateTime @map("start_date") @db.Date
+  endDate   DateTime @map("end_date") @db.Date
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  slots BellOverrideSlot[]
+
+  @@map("bell_overrides")
+}
+
+model BellOverrideSlot {
+  id         String @id @default(cuid())
+  overrideId String @map("override_id")
+  number     Int
+  startTime  String @map("start_time")
+  endTime    String @map("end_time")
+
+  override BellOverride @relation(fields: [overrideId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([overrideId, number])
+  @@map("bell_override_slots")
+}
+
+model ExtraLesson {
+  id           String   @id @default(cuid())
+  teacherId    String   @map("teacher_id")
+  date         DateTime @db.Date
+  lessonNumber Int      @map("lesson_number")
+  room         String
+  comment      String?
+  groupId      String?  @map("group_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  teacher User         @relation("TeacherExtraLessons", fields: [teacherId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  group   Group?       @relation(fields: [groupId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  rsvps   ExtraLessonRsvp[]
+
+  @@unique([teacherId, date, lessonNumber])
+  @@map("extra_lessons")
+}
+
+model ExtraLessonRsvp {
+  id            String   @id @default(cuid())
+  extraLessonId String   @map("extra_lesson_id")
+  studentId     String   @map("student_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  extraLesson ExtraLesson @relation(fields: [extraLessonId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  student     User        @relation("StudentRsvps", fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([extraLessonId, studentId])
+  @@map("extra_lesson_rsvps")
+}

@@ -1,0 +1,29 @@
+# deps
+node_modules/
+
+# next.js
+.next/
+out/
+
+# env
+.env
+.env.*
+!.env.example
+
+# uploads (local dev storage for record attachments)
+/uploads/
+
+# misc
+.DS_Store
+*.pem
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# vercel
+.vercel
+
+# typescript build info
+*.tsbuildinfo
+
+/lib/generated/prisma
