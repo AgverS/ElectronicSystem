@@ -1,18 +1,6 @@
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "./prisma-client";
-import "dotenv/config";
-
-const globalForPrisma = globalThis as unknown as {
-  prisma?: PrismaClient;
-};
-
-function createPrismaClient() {
-  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
-  return new PrismaClient({ adapter });
-}
-
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
-
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
-}
+/**
+ * In the demo build `prisma` is the in-browser demo database. Data-access code
+ * written against Prisma keeps working; each visitor gets their own private
+ * copy of the dataset.
+ */
+export { db as prisma, resetDemoData, onDemoDataChange } from "./demo-db/client";
