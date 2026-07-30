@@ -26,7 +26,7 @@ import { cn } from "@/lib/utils";
 import { formatCourse } from "@/lib/group-course";
 
 
-// Radix Select запрещает пустое значение у SelectItem — используем sentinel.
+// Radix Select forbids an empty SelectItem value, so a sentinel stands in for it.
 const NONE = "__none__";
 
 interface Props {
@@ -56,7 +56,7 @@ export function CreateGroupDialog({ teachers, specialties }: Props) {
   const [singleDigits, setSingleDigits] = useState("");
   const [curatorId, setCuratorId] = useState("");
   const [singleSpecialtyId, setSingleSpecialtyId] = useState("");
-  // Пока специальность не выбрана вручную — подставляем по букве названия.
+  // Until the specialty is chosen by hand, infer it from the name's letter.
   const [singleSpecialtyTouched, setSingleSpecialtyTouched] = useState(false);
   const [singleError, setSingleError] = useState("");
 

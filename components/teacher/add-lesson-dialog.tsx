@@ -48,8 +48,8 @@ export function AddLessonDialog({
   });
   const [topic, setTopic] = useState("");
   const [type, setType] = useState(isPractical ? "practical" : "lecture");
-  // Строка, а не число: иначе на каждое нажатие поле «зажимается» в диапазон и
-  // не даёт стереть значение, чтобы ввести другое.
+  // Held as a string, not a number: clamping on every keystroke would stop the
+  // field being cleared to type a different value.
   const [count, setCount] = useState("1");
   const [error, setError] = useState("");
   const [pending, startTransition] = useTransition();
@@ -133,7 +133,7 @@ export function AddLessonDialog({
                 value={count}
                 onChange={(e) => {
                   const v = e.target.value;
-                  // Пускаем пустое поле и любые цифры — правим диапазон при blur.
+                  // Accept an empty field and any digits; clamp the range on blur.
                   if (v === "" || /^\d{1,2}$/.test(v)) setCount(v);
                 }}
                 onBlur={() => setCount(String(countNum))}

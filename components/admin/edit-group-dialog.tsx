@@ -25,10 +25,10 @@ import { updateGroup } from "@/lib/actions/admin";
 import { useRefresh } from "@/lib/use-refresh";
 import { formatCourse } from "@/lib/group-course";
 
-// Radix Select запрещает пустое значение у SelectItem — используем sentinel.
+// Radix Select forbids an empty SelectItem value, so a sentinel stands in for it.
 const NONE = "__none__";
 
-// Подбирает специальность по первой букве названия группы (Specialty.letter).
+// Picks the specialty from the first letter of the group's name (Specialty.letter).
 function specialtyIdByLetter(
   name: string,
   specialties: { id: string; letter: string }[],
@@ -51,11 +51,11 @@ export function EditGroupDialog({ group, teachers, specialties }: EditGroupDialo
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(group.name);
   const [curatorId, setCuratorId] = useState(group.curatorId ?? "");
-  // Если специальность не задана — подставляем по букве названия (можно изменить).
+  // With no specialty set, infer one from the name's letter; it stays editable.
   const [specialtyId, setSpecialtyId] = useState(
     group.specialtyId || specialtyIdByLetter(group.name, specialties),
   );
-  // Пока пользователь не выбрал специальность вручную — подставляем по букве.
+  // Until the specialty is chosen by hand, keep inferring it from the letter.
   const [specialtyTouched, setSpecialtyTouched] = useState(false);
   const [error, setError] = useState("");
   const [pending, startTransition] = useTransition();

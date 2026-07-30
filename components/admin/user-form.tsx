@@ -55,7 +55,7 @@ const ROLE_LABELS: Record<Role, string> = {
   STUDENT: translate("landing.role.student.title"),
 };
 
-// Radix Select запрещает пустое значение у SelectItem — используем sentinel.
+// Radix Select forbids an empty SelectItem value, so a sentinel stands in for it.
 const NONE = "__none__";
 
 

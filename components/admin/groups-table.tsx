@@ -34,7 +34,7 @@ import { deleteGroup } from "@/lib/actions/admin";
 import { formatCourse } from "@/lib/group-course";
 import { shortName } from "@/lib/utils";
 
-// Подбирает специальность по первой букве названия группы (Specialty.letter).
+// Picks the specialty from the first letter of the group's name (Specialty.letter).
 function specialtyByLetter<T extends { letter: string }>(
   name: string,
   specialties: T[],

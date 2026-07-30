@@ -47,7 +47,7 @@ export function EditSubjectDialog({ subject, specialties }: EditSubjectDialogPro
 
   function handleOpenChange(v: boolean) {
     if (v) {
-      // Сбрасываем к актуальным значениям при открытии.
+      // Reset to the current values whenever the dialog opens.
       setName(subject.name);
       setIsPractical(subject.isPractical);
       setHours(subject.hours != null ? String(subject.hours) : "");

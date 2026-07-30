@@ -1,4 +1,4 @@
-// Общие помощники для генерации ICS-фидов расписания (персональный и публичный).
+// Shared helpers for building the timetable's ICS feeds, personal and public.
 
 import { prisma } from "@/lib/prisma";
 import { toISODate } from "@/lib/week";
@@ -11,7 +11,7 @@ export const baseInclude = {
   group: { select: { name: true } },
 };
 
-// Диапазон дат: текущий семестр, иначе скользящее окно ±.
+// Date range: the current semester, or else a rolling window around today.
 export async function resolveRange(): Promise<{ start: Date; end: Date }> {
   const semester = await prisma.semester.findFirst({
     where: { isCurrent: true },

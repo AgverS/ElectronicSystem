@@ -1,25 +1,25 @@
 import { translate } from "@/lib/i18n/translate";
 /**
- * Курс группы вычисляется автоматически из её названия.
+ * A group's year is worked out from its name.
  *
- * Формат названия: <буква специальности>-<цифры>, где первая цифра числовой
- * части — это последняя цифра года поступления (напр. «Т-395» → поступление в
- * год, оканчивающийся на 3). Курс = текущий учебный год − год поступления + 1.
- * Учебный год переключается 1 сентября.
+ * Names read <specialty letter>-<digits>, where the first digit of the number
+ * is the last digit of the year of entry (so "S-395" means a year of entry
+ * ending in 3). The year of study is the current academic year minus the year
+ * of entry, plus one. The academic year rolls over on 1 September.
  *
- * Пример: на 2025/26 учебный год «Т-395» (поступление 2023) → 3 курс.
+ * Example: in 2025/26, "S-395" (entry 2023) is in year 3.
  */
 
 const MAX_COURSE = 4;
 
-/** Год начала текущего учебного года (учебный год стартует в сентябре). */
+/** The year the current academic year began — it starts in September. */
 function academicStartYear(now: Date): number {
-  // Месяцы 0-based: сентябрь = 8.
+  // Months are zero-based, so September is 8.
   return now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1;
 }
 
 /**
- * Возвращает курс группы (1..4) или null, если название без цифр.
+ * The group's year (1..4), or null when the name has no digits.
  */
 export function courseFromGroupName(name: string, now: Date = new Date()): number | null {
   const match = name.match(/\d+/);
@@ -28,7 +28,7 @@ export function courseFromGroupName(name: string, now: Date = new Date()): numbe
   const digits = match[0];
   const admissionDigit = Number(digits[0]);
   const startYear = academicStartYear(now);
-  // Самый поздний год <= startYear, оканчивающийся на admissionDigit.
+  // The latest year at or before startYear ending in admissionDigit.
   const admissionYear =
     startYear - (((startYear % 10) - admissionDigit + 10) % 10);
 
@@ -43,7 +43,7 @@ export function courseFromGroupName(name: string, now: Date = new Date()): numbe
   return course;
 }
 
-/** Отображение курса: «3 курс» или «—». */
+/** The year as a label, e.g. "Year 3", or an em dash. */
 export function formatCourse(name: string, now: Date = new Date()): string {
   const course = courseFromGroupName(name, now);
   return course === null ? "—" : translate("ui.courseValue", { course });

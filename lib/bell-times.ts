@@ -1,9 +1,9 @@
 import { translate } from "@/lib/i18n/translate";
-// Расписание звонков.
+// Bell times.
 //
-// Постоянное расписание задаётся для трёх групп дней:
-//   "main" — Пн, Вт, Ср, Пт; "thu" — Чт; "sat" — Сб.
-// Временные изменения (overrides) на период дат перекрывают постоянное.
+// The standard timetable is defined for three groups of days:
+//   "main" — Mon, Tue, Wed, Fri; "thu" — Thursday; "sat" — Saturday.
+// Temporary overrides covering a date range take precedence over the standard.
 
 export type DayGroup = "main" | "thu" | "sat";
 
@@ -39,7 +39,7 @@ export interface BellOverrideData {
 // number -> { startTime, endTime }
 export type BellTimesMap = Record<number, { startTime: string; endTime: string }>;
 
-// День недели даты (1 = Пн … 6 = Сб, 0 = Вс). Расписание в UTC.
+// Day of the week (1 = Mon … 6 = Sat, 0 = Sun). Dates are pinned to UTC.
 export function weekdayOf(date: Date): number {
   return date.getUTCDay();
 }
@@ -51,9 +51,9 @@ export function dayGroupForWeekday(weekday: number): DayGroup | null {
   return null; // Sunday
 }
 
-// Стандартное расписание звонков (по умолчанию, если в БД ещё ничего нет).
+// Fallback bell times, used when nothing has been configured yet.
 export const DEFAULT_BELL_TIMES: BellTimeRow[] = [
-  // main — Пн, Вт, Ср, Пт
+  // main — Mon, Tue, Wed, Fri
   { dayGroup: "main", number: 1, startTime: "08:00", endTime: "08:45" },
   { dayGroup: "main", number: 2, startTime: "08:55", endTime: "09:40" },
   { dayGroup: "main", number: 3, startTime: "09:50", endTime: "10:35" },
@@ -67,7 +67,7 @@ export const DEFAULT_BELL_TIMES: BellTimeRow[] = [
   { dayGroup: "main", number: 11, startTime: "17:50", endTime: "18:35" },
   { dayGroup: "main", number: 12, startTime: "18:45", endTime: "19:30" },
   { dayGroup: "main", number: 13, startTime: "19:40", endTime: "20:25" },
-  // thu — Четверг
+  // thu — Thursday
   { dayGroup: "thu", number: 1, startTime: "08:00", endTime: "08:45" },
   { dayGroup: "thu", number: 2, startTime: "08:55", endTime: "09:40" },
   { dayGroup: "thu", number: 3, startTime: "09:50", endTime: "10:35" },
@@ -81,7 +81,7 @@ export const DEFAULT_BELL_TIMES: BellTimeRow[] = [
   { dayGroup: "thu", number: 11, startTime: "18:20", endTime: "19:05" },
   { dayGroup: "thu", number: 12, startTime: "19:15", endTime: "20:00" },
   { dayGroup: "thu", number: 13, startTime: "20:10", endTime: "20:55" },
-  // sat — Суббота
+  // sat — Saturday
   { dayGroup: "sat", number: 1, startTime: "08:00", endTime: "08:45" },
   { dayGroup: "sat", number: 2, startTime: "08:55", endTime: "09:40" },
   { dayGroup: "sat", number: 3, startTime: "09:50", endTime: "10:35" },
@@ -103,7 +103,7 @@ function mapForGroup(rows: BellTimeRow[], group: DayGroup): BellTimesMap {
     if (r.dayGroup === group)
       map[r.number] = { startTime: r.startTime, endTime: r.endTime };
   }
-  // Фолбэк на стандартное расписание, если для группы ничего не задано.
+  // Fall back to the standard times when this day group has none of its own.
   if (Object.keys(map).length === 0) {
     for (const r of DEFAULT_BELL_TIMES) {
       if (r.dayGroup === group)
@@ -125,7 +125,8 @@ export interface BellContext {
   overrides: BellOverrideData[];
 }
 
-// Звонки на конкретную дату: сначала временные изменения, затем постоянное по дню недели.
+// Bell times for a given date: a temporary override first, then the standard
+// times for that day of the week.
 export function resolveBellTimes(date: Date, ctx: BellContext): BellTimesMap {
   const iso = date.toISOString().slice(0, 10);
   const ov = ctx.overrides.find((o) => o.startDate <= iso && iso <= o.endDate);
@@ -136,7 +137,7 @@ export function resolveBellTimes(date: Date, ctx: BellContext): BellTimesMap {
   return mapForGroup(ctx.permanent, group);
 }
 
-// Карты звонков по каждому дню недели (для столбцов сетки расписания).
+// Bell times for each day of the week, for the timetable grid's columns.
 export function buildBellTimesByDay(
   weekDates: Date[],
   ctx: BellContext,

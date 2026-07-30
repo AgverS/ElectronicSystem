@@ -1,5 +1,5 @@
-// Разворачивает недельное расписание + замены в конкретные занятия по датам,
-// подставляя время из расписания звонков. Используется для генерации .ics.
+// Expands the weekly timetable and its cover lessons into dated events, taking
+// the times from the bell schedule. Used to build the .ics feeds.
 
 import { resolveBellTimes, type BellContext } from "@/lib/bell-times";
 import { translate } from "@/lib/i18n/translate";
@@ -52,7 +52,7 @@ function subgroupSuffix(sg: string) {
   return sg ? translate("ui.subgroupParen", { subgroup: sg }) : "";
 }
 
-// Расписание группы (для ученика).
+// A group's timetable, as a student sees it.
 export function computeGroupEvents(opts: {
   base: BaseEntryInput[];
   subs: SubInput[];
@@ -72,7 +72,7 @@ export function computeGroupEvents(opts: {
     if (weekday === 0) continue;
     const bellMap = resolveBellTimes(day, bell);
 
-    // Все слоты этого дня: из базы (по дню недели) и из замен (по дате).
+    // Every slot for the day: from the standard timetable and from cover lessons.
     const slots = new Set<string>();
     const baseToday = base.filter((b) => b.dayOfWeek === weekday);
     for (const b of baseToday) slots.add(`${b.lessonNumber}|${b.subgroup}`);
@@ -127,7 +127,7 @@ export function computeGroupEvents(opts: {
   return events;
 }
 
-// Расписание преподавателя (его пары, с учётом замен и отмен).
+// A teacher's timetable, allowing for cover lessons and cancellations.
 export function computeTeacherEvents(opts: {
   teacherId: string;
   base: BaseEntryInput[]; // lessons this teacher gives
@@ -149,12 +149,12 @@ export function computeTeacherEvents(opts: {
     if (weekday === 0) continue;
     const bellMap = resolveBellTimes(day, bell);
 
-    // 1. Базовые пары преподавателя в этот день недели.
+    // 1. The teacher's scheduled lessons on this day of the week.
     for (const b of base) {
       if (b.dayOfWeek !== weekday) continue;
       const key = subKey(b.groupId, iso, b.lessonNumber, b.subgroup);
       const sub = subMap.get(key);
-      // Эффективный преподаватель на эту дату.
+      // Who actually teaches it on this date.
       const effectiveTeacher = sub
         ? sub.cancelled
           ? null
@@ -177,7 +177,7 @@ export function computeTeacherEvents(opts: {
       });
     }
 
-    // 2. Замены, где преподаватель назначен на чужую/новую пару.
+    // 2. Cover lessons where this teacher stands in for someone else.
     for (const s of subs) {
       if (s.date !== iso || s.cancelled) continue;
       if (s.teacher?.id !== teacherId) continue;
@@ -200,7 +200,7 @@ export function computeTeacherEvents(opts: {
   return events;
 }
 
-// Расписание кабинета (все пары, проходящие в этом кабинете, с учётом замен).
+// A room's timetable: everything held there, allowing for cover lessons.
 export function computeRoomEvents(opts: {
   room: string;
   base: BaseEntryInput[]; // scheduled lessons in this room
@@ -222,12 +222,12 @@ export function computeRoomEvents(opts: {
     if (weekday === 0) continue;
     const bellMap = resolveBellTimes(day, bell);
 
-    // 1. Базовые пары в этом кабинете в этот день недели.
+    // 1. Lessons scheduled in this room on this day of the week.
     for (const b of base) {
       if (b.dayOfWeek !== weekday) continue;
       const key = subKey(b.groupId, iso, b.lessonNumber, b.subgroup);
       const sub = subMap.get(key);
-      // Эффективный кабинет на эту дату (замена могла перенести/отменить пару).
+      // Which room it actually uses on this date — cover may have moved it.
       const effectiveRoom = sub ? (sub.cancelled ? null : sub.room) : b.room;
       if (effectiveRoom !== room) continue;
       const time = bellMap[b.lessonNumber];
@@ -245,7 +245,7 @@ export function computeRoomEvents(opts: {
       });
     }
 
-    // 2. Замены, перенесённые в этот кабинет (база была в другом кабинете).
+    // 2. Cover lessons moved into this room from somewhere else.
     for (const s of subs) {
       if (s.date !== iso || s.cancelled) continue;
       if (s.room !== room) continue;

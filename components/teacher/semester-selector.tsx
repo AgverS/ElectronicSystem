@@ -15,7 +15,7 @@ import { formatSemesterName } from "@/lib/utils";
 interface SemesterSelectorProps {
   semesters: { id: string; name: string; year: string }[];
   currentId: string;
-  /** Семестр, который сейчас идёт по календарю — помечается «(текущий)». */
+  /** The semester the calendar is currently in — marked "(current)". */
   markCurrentId?: string;
   groupName?: string;
 }

@@ -1,9 +1,9 @@
-// Единый расчёт срока и статуса лабораторной работы — используется и в журнале
-// преподавателя/админа, и в кабинете студента, чтобы статусы считались одинаково.
+// One place to work out a laboratory work's deadline and status, shared by the
+// teacher's journal and the student's own pages, so both agree.
 
 const TWO_WEEKS_MS = 14 * 24 * 60 * 60 * 1000;
 
-// Эффективный срок сдачи: явно заданный дедлайн или дата урока + 14 дней.
+// The effective deadline: the one that was set, or the lesson date plus 14 days.
 export function labDeadline(date: Date, deadline: Date | null): Date {
   return deadline ?? new Date(new Date(date).getTime() + TWO_WEEKS_MS);
 }
@@ -26,7 +26,7 @@ export function labStatus(
   return now > labDeadline(date, deadline) ? "paid" : "pending";
 }
 
-// Сводка по списку лаб одного студента: сдано / не зачтено / выдано.
+// Summary for one student's laboratory work: passed / not passed / set.
 export function labStats(
   labs: { grade: string; date: Date; deadline: Date | null }[],
   now: Date = new Date(),

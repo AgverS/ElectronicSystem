@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { translate } from "@/lib/i18n/translate";
 
-/* Маленький спарклайн для KPI-плиток. Значения нормализуются в 0..1. */
+/* A small sparkline for the summary tiles. Values are normalised to 0..1. */
 export function Sparkline({
   points,
   tone = "muted",
@@ -52,7 +52,7 @@ export function Sparkline({
   );
 }
 
-/* График пропусков по неделям: площадь + линия. */
+/* Absences by week, drawn as an area with a line on top. */
 export function TrendChart({
   series,
   labels,
@@ -106,7 +106,7 @@ export function TrendChart({
   );
 }
 
-/* Тепловая карта пропусков: группы × дни. Интенсивность — красный по alpha. */
+/* Absence heat map, groups by days. Intensity is red varied by alpha. */
 export function AbsenceHeatmap({
   groups,
   days,

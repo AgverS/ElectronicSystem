@@ -40,7 +40,7 @@ export function EditAssignmentDialog({
   teachers,
   groups,
 }: EditAssignmentDialogProps) {
-  // Сохраняем последние данные, чтобы контент не пропадал во время анимации закрытия
+  // Keep the last data so the content does not vanish during the closing animation.
   const [retained, setRetained] = useState<EditAssignmentData | null>(data);
   const [teacherIds, setTeacherIds] = useState<Set<string>>(new Set());
   const [teacherSearch, setTeacherSearch] = useState("");
@@ -51,7 +51,7 @@ export function EditAssignmentDialog({
   const [pending, startTransition] = useTransition();
   const refresh = useRefresh();
 
-  // Синхронизация при открытии — на этапе рендера, без useEffect
+  // Synchronised on open during render, without an effect.
   if (open && data && !synced) {
     setSynced(true);
     setRetained(data);

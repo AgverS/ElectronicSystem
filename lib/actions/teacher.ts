@@ -57,7 +57,7 @@ export async function addLesson(data: {
     if (!assignment) throw new Error(translate("errors.assignmentNotFound"));
   }
 
-  // Можно создать сразу несколько уроков (колонок) на одну дату.
+  // Several lessons (columns) can be created for a single date at once.
   const createdIds: string[] = [];
   for (let i = 0; i < count; i++) {
     const lesson = await prisma.lesson.create({
@@ -147,7 +147,8 @@ export async function setSubjectHours(data: {
   });
 }
 
-// План «всего лабораторных работ» по группе+предмету. Правит владелец-препод/админ.
+// The planned total of laboratory works for a group and subject. Set by the
+// assigned teacher or an administrator.
 export async function setLabsTotal(data: {
   assignmentId: string;
   total: number | null;
@@ -184,7 +185,8 @@ export async function setLabsTotal(data: {
   });
 }
 
-// Срок сдачи лабы. deadline = YYYY-MM-DD (продлить) или null (сброс к +14 дней).
+// A laboratory work's deadline: YYYY-MM-DD to extend it, or null to reset it to
+// the lesson date plus 14 days.
 export async function setLabDeadline(data: {
   lessonId: string;
   deadline: string | null;
@@ -362,8 +364,8 @@ export async function saveLateness(data: {
       });
     }
   } else {
-    // Автоматически ставить Н, если опоздание более 23 минут
-    // Если опоздание <= 23 и стояло Н, то убираем Н
+    // More than 23 minutes late is recorded as an absence;
+    // 23 minutes or fewer clears an absence that was set for that reason.
     let value = existing?.value || "";
     if (data.lateness > 23) {
       value = ABSENT;
@@ -396,8 +398,8 @@ export async function saveLateness(data: {
   });
 }
 
-// Куратор отмечает все пропуски учащегося за день уважительными (или снимает
-// отметку). Право редактирования — только у куратора группы и админа/мастера.
+// The curator marks all of a student's absences for one day as excused, or
+// clears that mark. Only the group's curator and administrators may do this.
 export async function setAbsenceExcused(data: {
   studentId: string;
   date: string; // YYYY-MM-DD

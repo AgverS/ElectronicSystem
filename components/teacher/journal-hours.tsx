@@ -64,7 +64,7 @@ export function JournalHours({
     });
   }
 
-  // Без часов и без права правки — ничего не показываем
+  // Nothing to show when there are no hours and no right to set them.
   if (plannedHours == null && !canEdit) return null;
 
   return (

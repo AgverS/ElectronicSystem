@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 export type SlotCell = { startTime: string; endTime: string };
 
-// Длительность пары в минутах, либо null если время не задано полностью.
+// Length of the period in minutes, or null when the times are incomplete.
 export function slotDuration(start: string, end: string): number | null {
   if (!start || !end) return null;
   const [sh, sm] = start.split(":").map(Number);

@@ -296,7 +296,7 @@ export async function createUsers(
         continue;
       }
 
-      // Для преподавателя/админа выбранная группа — кураторская.
+      // For a teacher or administrator, the chosen group is one they curate.
       const curatedId = u.role !== Role.STUDENT ? (u.curatedGroupId ?? null) : null;
       const specIds =
         u.role === Role.STUDENT
@@ -351,8 +351,8 @@ export async function createGroup(data: {
 }): Promise<{ ok: boolean; error?: string }> {
   const actor = await checkAdmin();
 
-  // Ошибки возвращаем значением, а не throw: в проде Next.js скрывает текст
-  // исключений из server actions, и пользователь видит лишь общую заглушку.
+  // Errors come back as a value rather than a throw: in production Next.js hides
+  // exception messages, leaving the user with a generic placeholder.
   try {
     const existing = await prisma.group.findUnique({
       where: { name: data.name },
@@ -364,7 +364,7 @@ export async function createGroup(data: {
           translate("ui.aGroupWithThisNameAlreadyExistsPossibly"),
       };
 
-    // Курс вычисляется из названия группы (см. lib/group-course), не хранится.
+    // The year comes from the group's name (see lib/group-course); it is not stored.
     const group = await prisma.group.create({
       data: {
         name: data.name,
@@ -522,7 +522,7 @@ export async function createSubject(data: {
   });
 
   if (existing) {
-    // Если предмет уже есть, просто добавляем ему новые специальности (слияние).
+    // If the subject exists already, merge the new specialties into it.
     await prisma.subject.update({
       where: { id: existing.id },
       data: {
@@ -688,7 +688,7 @@ export async function deleteSpecialty(id: string) {
     where: { id },
     select: { name: true },
   });
-  // m2m связи с предметами и пользователями удалятся каскадом через join-таблицы.
+  // The many-to-many links to subjects and people cascade through the join tables.
   await prisma.specialty.delete({ where: { id } });
   await logAction({
     userId: actor.id,
@@ -961,7 +961,7 @@ export async function updateAssignment(data: {
     throw new Error(translate("errors.pickTeacherAndGroup"));
   }
 
-  // Текущие назначения этой строки (преподаватели + предмет)
+  // The assignments this row currently covers — teachers plus subject.
   const prev = await prisma.assignment.findMany({
     where: { id: { in: data.prevAssignmentIds } },
     select: { id: true, groupId: true },
@@ -970,7 +970,7 @@ export async function updateAssignment(data: {
   let created = 0;
   let updated = 0;
 
-  // Привести каждую выбранную группу к точному составу преподавателей
+  // Bring each selected group to exactly this set of teachers.
   for (const groupId of groupIds) {
     const existing = await prisma.assignment.findUnique({
       where: { groupId_subjectId: { groupId, subjectId: data.subjectId } },
@@ -994,7 +994,7 @@ export async function updateAssignment(data: {
     }
   }
 
-  // Удалить назначения этой строки для снятых групп
+  // Drop this row's assignments for the groups that were unselected.
   const removed = prev.filter((a) => !groupIds.includes(a.groupId));
   if (removed.length) {
     await prisma.assignment.deleteMany({
@@ -1049,7 +1049,7 @@ export async function deleteAssignments(ids: string[]) {
   });
 }
 
-// Bell times (расписание звонков)
+// Bell times
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const BELL_DAY_GROUPS = ["main", "thu", "sat"];
@@ -1059,7 +1059,7 @@ function timeToMinutes(t: string): number {
   return h * 60 + m;
 }
 
-// Валидирует и сортирует набор пар (номер, начало, конец).
+// Validates and sorts a set of periods (number, start, end).
 function cleanSlots(
   rows: { number: number; startTime: string; endTime: string }[],
 ): { number: number; startTime: string; endTime: string }[] {
@@ -1085,7 +1085,7 @@ function cleanSlots(
   return clean.sort((a, b) => a.number - b.number);
 }
 
-// Постоянное расписание: сохраняет все группы дней сразу.
+// The standard timetable: saves every day group at once.
 export async function saveBellTimes(
   rows: {
     dayGroup: string;

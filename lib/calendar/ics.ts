@@ -1,5 +1,5 @@
-// Генерация iCalendar (.ics) для подписки в Google Календарь / Apple / Outlook.
-// Время — в часовом поясе Europe/Minsk (UTC+3, без перехода на летнее время).
+// Builds an iCalendar (.ics) feed for Google Calendar, Apple Calendar or Outlook.
+// Times use the institution's timezone: a fixed UTC+3, with no daylight saving.
 
 export const CAL_TZID = "Europe/Minsk";
 
@@ -21,7 +21,7 @@ function escapeText(s: string): string {
     .replace(/\r?\n/g, "\\n");
 }
 
-// Складывание длинных строк по правилу RFC 5545 (≤75 октетов в строке).
+// Fold long lines per RFC 5545 — no more than 75 octets each.
 function foldLine(line: string): string {
   if (line.length <= 75) return line;
   const parts: string[] = [];
@@ -46,7 +46,7 @@ function utcStamp(now: Date): string {
   return now.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
 }
 
-// Статическое определение Europe/Minsk: фиксированный сдвиг +03:00.
+// A static timezone definition: a fixed +03:00 offset.
 const VTIMEZONE = [
   "BEGIN:VTIMEZONE",
   `TZID:${CAL_TZID}`,

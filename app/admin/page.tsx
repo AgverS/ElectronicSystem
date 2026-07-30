@@ -165,14 +165,14 @@ async function loadOverview(now: Date): Promise<OverviewData> {
       ? avgRows.reduce((s, g) => s + Number(g.value), 0) / avgRows.length
       : null;
 
-  // Пропуски по неделям (тренд + спарклайн)
+  // Absences by week — trend plus sparkline
   const absByWeek = new Array(WEEKS).fill(0);
   for (const r of absRows as AbsRow[]) {
     const idx = Math.floor((startOfUTCDay(r.lesson.date).getTime() - trendStart.getTime()) / (7 * DAY));
     if (idx >= 0 && idx < WEEKS) absByWeek[idx] += 1;
   }
 
-  // Тепловая карта группа × день (последние 10 учебных дней)
+  // Heat map of group by day, over the last ten teaching days
   const dayKeys = new Set<number>();
   const perGroupDay = new Map<string, Map<number, number>>();
   const groupTotals = new Map<string, number>();
@@ -418,7 +418,7 @@ function Kpi({
         </span>
       )}
       {spark && (
-        // Только на десктопе — на мобилке карточка узкая и лайн наезжает на бейдж.
+        // Desktop only: on a phone the card is narrow and the line would run into the badge.
         <div className="absolute bottom-4 right-4 hidden opacity-90 sm:block">
           <Sparkline points={spark.points} tone={spark.tone} />
         </div>

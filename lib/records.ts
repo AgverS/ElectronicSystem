@@ -21,16 +21,16 @@ export function formatRecordDate(d: Date | string): string {
   });
 }
 
-// Дисциплинарное взыскание действует ровно один год с даты выдачи. Дата, после
-// которой оно считается истёкшим.
+// A penalty stands for exactly one year from the date it was issued. This is
+// the date after which it counts as expired.
 export function penaltyExpiresAt(date: Date | string): Date {
   const expiry = new Date(date);
   expiry.setFullYear(expiry.getFullYear() + 1);
   return expiry;
 }
 
-// Истекло ли взыскание. Поощрения не истекают. Через год с даты выдачи взыскание
-// у учащегося пропадает, а администратору показывается как истёкшее.
+// Whether a penalty has expired. Rewards never do. A year after it was issued a
+// penalty disappears for the student and reads as expired for an administrator.
 export function isPenaltyExpired(
   record: { kind: RecordKind; date: Date | string },
   now: Date = new Date(),
@@ -39,8 +39,8 @@ export function isPenaltyExpired(
   return now >= penaltyExpiresAt(record.date);
 }
 
-// Списано ли взыскание досрочно администратором. Списанное взыскание остаётся
-// видно администратору, но больше не считается действующим.
+// Whether an administrator wrote the penalty off early. A written-off penalty
+// stays visible to administrators but no longer counts as active.
 export function isPenaltyWrittenOff(record: {
   kind: RecordKind;
   writtenOffAt?: Date | string | null;
