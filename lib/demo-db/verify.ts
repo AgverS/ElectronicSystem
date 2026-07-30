@@ -41,6 +41,41 @@ async function main() {
   check("has grades", grades > 1000, grades);
   check("schedule populated", entries > 100, entries);
 
+  section("seed plausibility");
+  // A demo opened months after it was built must still look alive.
+  const currentSemester = await db.semester.findFirst({ where: { isCurrent: true } });
+  const now = new Date();
+  const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  check("a current semester exists", !!currentSemester, currentSemester?.name);
+  check(
+    "the current semester contains today",
+    !!currentSemester && currentSemester.startDate <= today && currentSemester.endDate >= today,
+    { start: currentSemester?.startDate, today, end: currentSemester?.endDate },
+  );
+
+  const pastLessons = await db.lesson.count({
+    where: { semesterId: currentSemester!.id, date: { lte: today } },
+  });
+  check("the current semester has lessons already taught", pastLessons > 50, pastLessons);
+
+  // Nobody teaches two groups at once, and no room holds two lessons at once.
+  const allEntries = await db.scheduleEntry.findMany();
+  const teacherSlots = new Set<string>();
+  const roomSlots = new Set<string>();
+  let teacherClashes = 0;
+  let roomClashes = 0;
+  for (const entry of allEntries) {
+    const slot = `${entry.dayOfWeek}:${entry.lessonNumber}`;
+    const teacherKey = `${entry.teacherId}@${slot}`;
+    const roomKey = `${entry.room}@${slot}`;
+    if (teacherSlots.has(teacherKey)) teacherClashes += 1;
+    if (roomSlots.has(roomKey)) roomClashes += 1;
+    teacherSlots.add(teacherKey);
+    roomSlots.add(roomKey);
+  }
+  check("no teacher is timetabled twice in one period", teacherClashes === 0, teacherClashes);
+  check("no room is timetabled twice in one period", roomClashes === 0, roomClashes);
+
   section("where filters");
   const students = await db.user.findMany({ where: { role: "STUDENT" } });
   check("role equality", students.length > 80, students.length);

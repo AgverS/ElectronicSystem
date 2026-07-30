@@ -137,46 +137,40 @@ export function buildSeed(): Dataset {
     { id: "sub-graph", name: "Computer Graphics", isPractical: true, hours: 96, topics: "general", specs: ["spec-des"] },
   ];
 
-  /* -- semesters (current one always contains today) -- */
+  /* -- semesters -- */
+  // The current semester is anchored around today rather than to fixed calendar
+  // dates. A demo opened during the summer break would otherwise present a term
+  // that finished weeks ago: no lessons this week, an empty timetable, and
+  // nothing happening anywhere. Anchoring guarantees roughly eleven weeks of
+  // history behind today and nine weeks of scheduled work ahead of it, whenever
+  // someone happens to open the link.
   const year = TODAY.getUTCFullYear();
-  const month = TODAY.getUTCMonth() + 1;
-  const isAutumn = month >= 8;
-  const academicStart = isAutumn ? year : year - 1;
+  const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+  const currentStart = addDays(TODAY, -11 * 7);
+  const currentEnd = addDays(TODAY, 9 * 7);
 
-  const semesterSpecs = [
-    {
-      id: "sem-3",
-      number: 3,
-      year: `${academicStart - 1}-${academicStart}`,
-      start: utc(academicStart - 1, 9, 1),
-      end: utc(academicStart, 1, 20),
-    },
-    {
-      id: "sem-4",
-      number: 4,
-      year: `${academicStart - 1}-${academicStart}`,
-      start: utc(academicStart, 2, 8),
-      end: utc(academicStart, 6, 25),
-    },
-    {
-      id: "sem-5",
-      number: 5,
-      year: `${academicStart}-${academicStart + 1}`,
-      start: utc(academicStart, 9, 1),
-      end: utc(academicStart + 1, 1, 20),
-    },
-    {
-      id: "sem-6",
-      number: 6,
-      year: `${academicStart}-${academicStart + 1}`,
-      start: utc(academicStart + 1, 2, 8),
-      end: utc(academicStart + 1, 6, 25),
-    },
-  ];
+  /** Academic year label for a date, with the year rolling over in September. */
+  const academicYearOf = (date: Date) => {
+    const y = date.getUTCFullYear();
+    return date.getUTCMonth() + 1 >= 9 ? `${y}-${y + 1}` : `${y - 1}-${y}`;
+  };
 
-  const currentSemester =
-    semesterSpecs.find((s) => TODAY >= s.start && TODAY <= s.end) ??
-    (isAutumn ? semesterSpecs[2] : semesterSpecs[3]);
+  // Earlier semesters step back a term at a time, giving the results and
+  // history screens something real to show.
+  const SEMESTER_SPAN_WEEKS = 26;
+  const semesterSpecs = [3, 2, 1, 0].map((stepsBack, index) => {
+    const start = new Date(currentStart.getTime() - stepsBack * SEMESTER_SPAN_WEEKS * WEEK_MS);
+    const end = new Date(currentEnd.getTime() - stepsBack * SEMESTER_SPAN_WEEKS * WEEK_MS);
+    return {
+      id: `sem-${index + 3}`,
+      number: index + 3,
+      year: academicYearOf(start),
+      start,
+      end,
+    };
+  });
+
+  const currentSemester = semesterSpecs[semesterSpecs.length - 1];
 
   for (const s of semesterSpecs) {
     e.create("semester", {
@@ -426,14 +420,53 @@ export function buildSeed(): Dataset {
   }
 
   /* -- weekly schedule -- */
+  // Occupancy of teachers and rooms, keyed by "day:period".
+  const busyTeachers = new Set<string>();
+  const busyRooms = new Set<string>();
+  const slotKey = (day: number, period: number) => `${day}:${period}`;
+
+  const isTeacherBusy = (teacherId: string, day: number, period: number) =>
+    busyTeachers.has(`${teacherId}@${slotKey(day, period)}`);
+  const occupyTeacher = (teacherId: string, day: number, period: number) =>
+    busyTeachers.add(`${teacherId}@${slotKey(day, period)}`);
+  const occupyRoom = (room: string, day: number, period: number) =>
+    busyRooms.add(`${room}@${slotKey(day, period)}`);
+  const freeRoom = (day: number, period: number) => {
+    const offset = Math.floor(rand() * ROOMS.length);
+    for (let i = 0; i < ROOMS.length; i++) {
+      const room = ROOMS[(offset + i) % ROOMS.length];
+      if (!busyRooms.has(`${room}@${slotKey(day, period)}`)) return room;
+    }
+    return null;
+  };
+
   for (const g of groupSpecs) {
     const groupAssignments = assignments.filter((a) => a.groupId === g.id);
     let cursor = 0;
     for (let day = 1; day <= 6; day++) {
       const lessonsToday = day === 6 ? between(0, 2) : between(3, 5);
       for (let slot = 1; slot <= lessonsToday; slot++) {
-        const assignment = groupAssignments[cursor % groupAssignments.length];
-        cursor += 1;
+        // Nobody can teach two groups at once, and no room holds two lessons at
+        // once. Try each of the group's subjects until one whose teacher is free
+        // turns up; if they are all busy this period, the group simply has a
+        // free slot, exactly as a real timetable would.
+        let assignment: (typeof groupAssignments)[number] | null = null;
+        for (let attempt = 0; attempt < groupAssignments.length; attempt++) {
+          const candidate = groupAssignments[(cursor + attempt) % groupAssignments.length];
+          if (!isTeacherBusy(candidate.teacherId, day, slot)) {
+            assignment = candidate;
+            cursor += attempt + 1;
+            break;
+          }
+        }
+        if (!assignment) continue;
+
+        const room = freeRoom(day, slot);
+        if (!room) continue;
+
+        occupyTeacher(assignment.teacherId, day, slot);
+        occupyRoom(room, day, slot);
+
         e.create("scheduleEntry", {
           data: {
             groupId: g.id,
@@ -442,7 +475,7 @@ export function buildSeed(): Dataset {
             subgroup: "",
             subjectId: assignment.subjectId,
             teacherId: assignment.teacherId,
-            room: pick(ROOMS),
+            room,
           },
         });
       }
