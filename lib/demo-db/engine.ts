@@ -269,7 +269,7 @@ export class DemoEngine {
   private project(model: ModelName, row: Row, args: Row = {}): Row {
     const def = modelDef(model);
     const { select, include } = args;
-    let out: Row = {};
+    const out: Row = {};
 
     if (select) {
       for (const [key, spec] of Object.entries(select as Row)) {

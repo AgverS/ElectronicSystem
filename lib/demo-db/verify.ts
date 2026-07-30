@@ -137,7 +137,7 @@ async function main() {
     (groupWithEverything?.assignments?.[0]?.teachers?.length ?? 0) > 0,
     groupWithEverything?.assignments?.[0]?.teachers?.length,
   );
-  const sortedNames = groupWithEverything!.students.map((s: any) => s.name);
+  const sortedNames = groupWithEverything!.students.map((s) => s.name);
   check(
     "include orderBy",
     JSON.stringify(sortedNames) === JSON.stringify([...sortedNames].sort()),
@@ -153,16 +153,16 @@ async function main() {
   check("_count present", typeof specialties[0]._count.groups === "number", specialties[0]._count);
   check(
     "_count accurate",
-    specialties.reduce((n: number, s: any) => n + s._count.groups, 0) === 8,
-    specialties.map((s: any) => s._count.groups),
+    specialties.reduce((n: number, s) => n + s._count.groups, 0) === 8,
+    specialties.map((s) => s._count.groups),
   );
 
   section("ordering, paging, distinct");
   const byName = await db.group.findMany({ orderBy: { name: "asc" } });
   check(
     "orderBy asc",
-    JSON.stringify(byName.map((g: any) => g.name)) ===
-      JSON.stringify([...byName.map((g: any) => g.name)].sort()),
+    JSON.stringify(byName.map((g) => g.name)) ===
+      JSON.stringify([...byName.map((g) => g.name)].sort()),
   );
 
   const multiSort = await db.scheduleEntry.findMany({
@@ -176,7 +176,7 @@ async function main() {
     include: { subject: true },
     take: 5,
   });
-  const relNames = relationSort.map((a: any) => a.subject.name);
+  const relNames = relationSort.map((a) => a.subject.name);
   check(
     "relation orderBy",
     JSON.stringify(relNames) === JSON.stringify([...relNames].sort()),
@@ -187,7 +187,7 @@ async function main() {
   check("skip/take", page.length === 10, page.length);
 
   const distinctRooms = await db.scheduleEntry.findMany({ distinct: ["room"] });
-  const roomSet = new Set(distinctRooms.map((r: any) => r.room));
+  const roomSet = new Set(distinctRooms.map((r) => r.room));
   check("distinct", roomSet.size === distinctRooms.length, distinctRooms.length);
 
   section("groupBy");
@@ -196,10 +196,10 @@ async function main() {
     where: { isMaster: false },
     _count: true,
   });
-  check("groupBy buckets", byRole.length === 3, byRole.map((r: any) => r.role));
+  check("groupBy buckets", byRole.length === 3, byRole.map((r) => r.role));
   check(
     "groupBy counts sum",
-    byRole.reduce((n: number, r: any) => n + r._count, 0) === users,
+    byRole.reduce((n: number, r) => n + r._count, 0) === users,
     byRole,
   );
 
@@ -268,7 +268,7 @@ async function main() {
     where: { name: "BA-21" },
     include: { assignments: true, students: true },
   }))!;
-  const assignmentIds = victim.assignments.map((a: any) => a.id);
+  const assignmentIds = victim.assignments.map((a) => a.id);
   const lessonsBefore = await db.lesson.count({
     where: { assignmentId: { in: assignmentIds } },
   });

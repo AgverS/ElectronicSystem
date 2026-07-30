@@ -1,57 +1,48 @@
-import { requireRole } from "@/lib/session";
-import { prisma } from "@/lib/prisma";
-import { Role } from "@/lib/prisma-client";
-import { redirect } from "next/navigation";
+"use client";
+
 import { PersonalScheduleClient } from "@/components/schedule/personal-schedule-client";
-import { toISODate } from "@/lib/week";
+import { PageLoading } from "@/components/ui/page-state";
+import { prisma } from "@/lib/prisma";
+import { loadBellContext } from "@/lib/bells-data";
+import { useDemoUser } from "@/lib/demo-session";
+import { useDemoData } from "@/lib/use-demo-data";
+import { useT } from "@/lib/i18n/provider";
 
-export default async function StudentSchedulePage() {
-  const user = await requireRole(Role.STUDENT, Role.ADMIN);
-  if (!user) redirect("/login");
+export default function StudentSchedulePage() {
+  const user = useDemoUser();
+  const t = useT();
 
-  if (!user.groupId) {
+  const { data, loading } = useDemoData(
+    ["student-schedule", user?.id, user?.groupId],
+    async () => {
+      const [group, bellSchedule] = await Promise.all([
+        user?.groupId
+          ? prisma.group.findUnique({ where: { id: user.groupId }, select: { name: true } })
+          : Promise.resolve(null),
+        loadBellContext(),
+      ]);
+      return { group, bellSchedule };
+    },
+    { enabled: !!user },
+  );
+
+  if (loading || !data) return <PageLoading />;
+
+  if (!user?.groupId) {
     return (
       <div>
-        <h1 className="mb-2 text-2xl font-bold tracking-tight">Расписание</h1>
-        <p className="text-muted-foreground">
-          Вы не добавлены ни в одну группу.
-        </p>
+        <h1 className="mb-2 text-2xl font-bold tracking-tight">{t("nav.schedule")}</h1>
+        <p className="text-muted-foreground">{t("student.noGroup")}</p>
       </div>
     );
   }
 
-  const [group, permanentBells, overrides] = await Promise.all([
-    prisma.group.findUnique({
-      where: { id: user.groupId },
-      select: { name: true },
-    }),
-    prisma.bellTime.findMany(),
-    prisma.bellOverride.findMany({ include: { slots: true } }),
-  ]);
-
   return (
     <PersonalScheduleClient
-      own={{ kind: "group", id: user.groupId, label: group?.name ?? "" }}
+      own={{ kind: "group", id: user.groupId, label: data.group?.name ?? "" }}
       userId={user.id}
       userRole="STUDENT"
-      vapidPublicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ""}
-      bellSchedule={{
-        permanent: permanentBells.map((b) => ({
-          dayGroup: b.dayGroup,
-          number: b.number,
-          startTime: b.startTime,
-          endTime: b.endTime,
-        })),
-        overrides: overrides.map((o) => ({
-          startDate: toISODate(o.startDate),
-          endDate: toISODate(o.endDate),
-          slots: o.slots.map((s) => ({
-            number: s.number,
-            startTime: s.startTime,
-            endTime: s.endTime,
-          })),
-        })),
-      }}
+      bellSchedule={data.bellSchedule}
     />
   );
 }

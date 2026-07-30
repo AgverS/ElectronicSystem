@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { translate } from "@/lib/i18n/provider";
-import { requireRole, getCurrentUser } from "@/lib/demo-actor";
+import { requireRole } from "@/lib/demo-actor";
 import { Role, RecordKind } from "@/lib/prisma-client";
 import { logAction } from "@/lib/audit";
 import { saveUpload, deleteUpload, ALLOWED_MIME, MAX_FILE_SIZE } from "@/lib/uploads";

@@ -1,6 +1,8 @@
-import { prisma } from "@/lib/prisma";
+"use client";
+
 import { Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -12,242 +14,36 @@ import {
 } from "@/components/ui/table";
 import { LogsFilters } from "@/components/admin/logs-filters";
 import { MetaButton } from "@/components/admin/meta-button";
+import { PageLoading } from "@/components/ui/page-state";
+import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/lib/prisma-client";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
+import { useDemoData } from "@/lib/use-demo-data";
+import { useI18n, useT } from "@/lib/i18n/provider";
+import { cn } from "@/lib/utils";
 
-const ACTION_CONFIG: Record<string, { label: string; className: string }> = {
-  LOGIN: {
-    label: "Вход",
-    className: "bg-green-500/10 text-green-600 border-green-500/20",
-  },
-  LOGOUT: {
-    label: "Выход",
-    className: "bg-slate-500/10 text-slate-500 border-slate-500/20",
-  },
-  CREATE_USER: {
-    label: "Создание польз.",
-    className: "bg-blue-500/10 text-blue-600 border-blue-500/20",
-  },
-  UPDATE_USER: {
-    label: "Изм. польз.",
-    className: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-  },
-  DELETE_USER: {
-    label: "Удал. польз.",
-    className: "bg-red-500/10 text-red-600 border-red-500/20",
-  },
-  CREATE_GROUP: {
-    label: "Создание группы",
-    className: "bg-blue-500/10 text-blue-600 border-blue-500/20",
-  },
-  UPDATE_GROUP: {
-    label: "Изм. группы",
-    className: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-  },
-  DELETE_GROUP: {
-    label: "Удал. группы",
-    className: "bg-red-500/10 text-red-600 border-red-500/20",
-  },
-  CREATE_SUBJECT: {
-    label: "Создание предм.",
-    className: "bg-blue-500/10 text-blue-600 border-blue-500/20",
-  },
-  UPDATE_SUBJECT: {
-    label: "Изм. предм.",
-    className: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-  },
-  DELETE_SUBJECT: {
-    label: "Удал. предм.",
-    className: "bg-red-500/10 text-red-600 border-red-500/20",
-  },
-  CREATE_SPECIALTY: {
-    label: "Создание спец.",
-    className: "bg-blue-500/10 text-blue-600 border-blue-500/20",
-  },
-  UPDATE_SPECIALTY: {
-    label: "Изм. спец.",
-    className: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-  },
-  DELETE_SPECIALTY: {
-    label: "Удал. спец.",
-    className: "bg-red-500/10 text-red-600 border-red-500/20",
-  },
-  CREATE_SEMESTER: {
-    label: "Создание семестра",
-    className: "bg-blue-500/10 text-blue-600 border-blue-500/20",
-  },
-  UPDATE_SEMESTER: {
-    label: "Изм. семестра",
-    className: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-  },
-  DELETE_SEMESTER: {
-    label: "Удал. семестра",
-    className: "bg-red-500/10 text-red-600 border-red-500/20",
-  },
-  CREATE_ASSIGNMENT: {
-    label: "Создание назнач.",
-    className: "bg-blue-500/10 text-blue-600 border-blue-500/20",
-  },
-  DELETE_ASSIGNMENT: {
-    label: "Удал. назнач.",
-    className: "bg-red-500/10 text-red-600 border-red-500/20",
-  },
-  CREATE_LESSON: {
-    label: "Создание урока",
-    className: "bg-blue-500/10 text-blue-600 border-blue-500/20",
-  },
-  DELETE_LESSON: {
-    label: "Удал. урока",
-    className: "bg-red-500/10 text-red-600 border-red-500/20",
-  },
-  UPDATE_LESSON_TOPIC: {
-    label: "Изм. темы урока",
-    className: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-  },
-  UPSERT_GRADE: {
-    label: "Отметка",
-    className: "bg-purple-500/10 text-purple-600 border-purple-500/20",
-  },
-  DELETE_GRADE: {
-    label: "Удал. отметки",
-    className: "bg-red-500/10 text-red-600 border-red-500/20",
-  },
-  ADD_STUDENT_TO_GROUP: {
-    label: "Студент в группу",
-    className: "bg-teal-500/10 text-teal-600 border-teal-500/20",
-  },
-  UPSERT_SCHEDULE_ENTRY: {
-    label: "Изм. расписания",
-    className: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-  },
-  DELETE_SCHEDULE_ENTRY: {
-    label: "Удал. расписания",
-    className: "bg-red-500/10 text-red-600 border-red-500/20",
-  },
-  UPSERT_SUBSTITUTION: {
-    label: "Замена",
-    className: "bg-yellow-500/10 text-yellow-600 border-yellow-500/20",
-  },
-  DELETE_SUBSTITUTION: {
-    label: "Удал. замены",
-    className: "bg-red-500/10 text-red-600 border-red-500/20",
-  },
-  SET_ABSENCE_EXCUSED: {
-    label: "Уваж. причина",
-    className: "bg-teal-500/10 text-teal-600 border-teal-500/20",
-  },
-  SAVE_LATENESS: {
-    label: "Опоздание",
-    className: "bg-orange-500/10 text-orange-600 border-orange-500/20",
-  },
-  SET_SUBJECT_HOURS: {
-    label: "Часы предм.",
-    className: "bg-indigo-500/10 text-indigo-600 border-indigo-500/20",
-  },
-  SET_LABS_TOTAL: {
-    label: "Кол-во лаб.",
-    className: "bg-indigo-500/10 text-indigo-600 border-indigo-500/20",
-  },
-  SET_LAB_DEADLINE: {
-    label: "Дедлайн лаб.",
-    className: "bg-indigo-500/10 text-indigo-600 border-indigo-500/20",
-  },
-  ADD_RETAKE: {
-    label: "Пересдача",
-    className: "bg-purple-500/10 text-purple-600 border-purple-500/20",
-  },
-  RESET_PASSWORD: {
-    label: "Сброс пароля",
-    className: "bg-rose-500/10 text-rose-600 border-rose-500/20",
-  },
-  SAVE_BELL_TIMES: {
-    label: "Звонки (пост.)",
-    className: "bg-cyan-500/10 text-cyan-600 border-cyan-500/20",
-  },
-  CREATE_BELL_OVERRIDE: {
-    label: "Создание звонков",
-    className: "bg-blue-500/10 text-blue-600 border-blue-500/20",
-  },
-  UPDATE_BELL_OVERRIDE: {
-    label: "Изм. звонков",
-    className: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-  },
-  DELETE_BELL_OVERRIDE: {
-    label: "Удал. звонков",
-    className: "bg-red-500/10 text-red-600 border-red-500/20",
-  },
-  CREATE_BACKUP: {
-    label: "Создание бэкапа",
-    className: "bg-green-500/10 text-green-600 border-green-500/20",
-  },
-  DELETE_BACKUP: {
-    label: "Удаление бэкапа",
-    className: "bg-red-500/10 text-red-600 border-red-500/20",
-  },
-  RESTORE_BACKUP: {
-    label: "Восст. бэкапа",
-    className: "bg-purple-500/10 text-purple-600 border-purple-500/20",
-  },
-  UPDATE_BACKUP_SETTINGS: {
-    label: "Настр. бэкапа",
-    className: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-  },
-  CREATE_STUDENT_RECORD: {
-    label: "Создание приказа",
-    className: "bg-blue-500/10 text-blue-600 border-blue-500/20",
-  },
-  UPDATE_STUDENT_RECORD: {
-    label: "Изм. приказа",
-    className: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-  },
-  DELETE_STUDENT_RECORD: {
-    label: "Удал. приказа",
-    className: "bg-red-500/10 text-red-600 border-red-500/20",
-  },
-  WRITE_OFF_STUDENT_RECORD: {
-    label: "Списание взыскания",
-    className: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-  },
-  CANCEL_RECORD_WRITE_OFF: {
-    label: "Отмена списания",
-    className: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-  },
-  DELETE_RECORD_ATTACHMENT: {
-    label: "Удал. вложения",
-    className: "bg-red-500/10 text-red-600 border-red-500/20",
-  },
-};
-
-const ENTITY_LABELS: Record<string, string> = {
-  session: "Сессия",
-  user: "Пользователь",
-  group: "Группа",
-  subject: "Предмет",
-  semester: "Семестр",
-  assignment: "Назначение",
-  lesson: "Урок",
-  grade: "Отметка",
-  schedule_entry: "Расписание",
-  schedule_substitution: "Замена",
-  excused_absence: "Уваж. причина",
-  specialty: "Специальность",
-  bell_time: "Звонки",
-  bell_override: "Звонки (искл.)",
-  backup: "Бэкап",
-  backup_setting: "Настр. бэкапа",
-  student_record: "Приказ",
-  record_attachment: "Вложение",
-};
-
-function formatDate(d: Date) {
-  return new Intl.DateTimeFormat("ru-RU", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  }).format(d);
+/**
+ * Badge colour follows the verb the action starts with, rather than a per-action
+ * table: creations read blue, changes amber, removals red. One rule covers every
+ * action, including any added later.
+ */
+function actionClasses(action: string): string {
+  if (action.startsWith("CREATE_") || action.startsWith("ADD_"))
+    return "bg-blue-500/10 text-blue-600 border-blue-500/20";
+  if (action.startsWith("DELETE_") || action.startsWith("RESET_"))
+    return "bg-red-500/10 text-red-600 border-red-500/20";
+  if (
+    action.startsWith("UPDATE_") ||
+    action.startsWith("UPSERT_") ||
+    action.startsWith("SET_") ||
+    action.startsWith("SAVE_") ||
+    action.startsWith("WRITE_OFF_") ||
+    action.startsWith("CANCEL_")
+  )
+    return "bg-amber-500/10 text-amber-600 border-amber-500/20";
+  if (action === "LOGIN") return "bg-green-500/10 text-green-600 border-green-500/20";
+  if (action === "LOGOUT") return "bg-slate-500/10 text-slate-500 border-slate-500/20";
+  return "border-border text-foreground";
 }
 
 function buildWhere(
@@ -257,9 +53,7 @@ function buildWhere(
   dateFrom: string,
   dateTo: string,
 ): Prisma.AuditLogWhereInput {
-  const where: Prisma.AuditLogWhereInput = {
-    user: { isMaster: false },
-  };
+  const where: Prisma.AuditLogWhereInput = { user: { isMaster: false } };
 
   if (action) where.action = action;
   if (entity) where.entity = entity;
@@ -267,7 +61,7 @@ function buildWhere(
   if (dateFrom || dateTo) {
     where.createdAt = {
       ...(dateFrom ? { gte: new Date(dateFrom) } : {}),
-      ...(dateTo ? { lte: new Date(dateTo + "T23:59:59.999Z") } : {}),
+      ...(dateTo ? { lte: new Date(`${dateTo}T23:59:59.999Z`) } : {}),
     };
   }
 
@@ -283,56 +77,73 @@ function buildWhere(
   return where;
 }
 
-function buildPageUrl(current: URLSearchParams, page: number) {
-  const p = new URLSearchParams(current.toString());
-  p.set("page", String(page));
-  return `/admin/logs?${p.toString()}`;
+export default function LogsPage() {
+  return (
+    <Suspense fallback={<PageLoading />}>
+      <LogsPageContent />
+    </Suspense>
+  );
 }
 
-export default async function LogsPage({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[]>>;
-}) {
-  const params = await searchParams;
+function LogsPageContent() {
+  const searchParams = useSearchParams();
+  const t = useT();
+  const { intlLocale } = useI18n();
 
-  const action = String(params.action ?? "");
-  const entity = String(params.entity ?? "");
-  const search = String(params.search ?? "");
-  const dateFrom = String(params.dateFrom ?? "");
-  const dateTo = String(params.dateTo ?? "");
-  const page = Math.max(1, parseInt(String(params.page ?? "1"), 10) || 1);
-  const limit = Math.min(
-    100,
-    Math.max(10, parseInt(String(params.limit ?? "50"), 10) || 50),
-  );
-
+  const action = searchParams.get("action") ?? "";
+  const entity = searchParams.get("entity") ?? "";
+  const search = searchParams.get("search") ?? "";
+  const dateFrom = searchParams.get("dateFrom") ?? "";
+  const dateTo = searchParams.get("dateTo") ?? "";
+  const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10) || 1);
+  const limit = Math.min(100, Math.max(10, parseInt(searchParams.get("limit") ?? "50", 10) || 50));
   const skip = (page - 1) * limit;
-  const where = buildWhere(action, entity, search, dateFrom, dateTo);
 
-  const [logs, total] = await Promise.all([
-    prisma.auditLog.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      skip,
-      take: limit,
-      include: { user: { select: { name: true, username: true, role: true } } },
-    }),
-    prisma.auditLog.count({ where }),
-  ]);
-
-  const totalPages = Math.max(1, Math.ceil(total / limit));
-  const currentParams = new URLSearchParams(
-    Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)])),
+  const { data, loading } = useDemoData(
+    ["admin-logs", action, entity, search, dateFrom, dateTo, page, limit],
+    async () => {
+      const where = buildWhere(action, entity, search, dateFrom, dateTo);
+      const [logs, total] = await Promise.all([
+        prisma.auditLog.findMany({
+          where,
+          orderBy: { createdAt: "desc" },
+          skip,
+          take: limit,
+          include: { user: { select: { name: true, username: true, role: true } } },
+        }),
+        prisma.auditLog.count({ where }),
+      ]);
+      return { logs, total };
+    },
   );
+
+  const formatDate = (d: Date) =>
+    new Intl.DateTimeFormat(intlLocale, {
+      day: "2-digit",
+      month: "2-digit",
+      year: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(d);
+
+  const total = data?.total ?? 0;
+  const logs = data?.logs ?? [];
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+
+  const pageUrl = (target: number) => {
+    const next = new URLSearchParams(searchParams.toString());
+    next.set("page", String(target));
+    return `/admin/logs/?${next.toString()}`;
+  };
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Журнал действий</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{t("nav.logs")}</h1>
           <p className="text-sm text-muted-foreground">
-            {total.toLocaleString("ru-RU")} записей
+            {t("audit.entryCount", { count: total.toLocaleString(intlLocale) })}
           </p>
         </div>
       </div>
@@ -345,31 +156,31 @@ export default async function LogsPage({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-36">Время</TableHead>
-              <TableHead className="w-44">Пользователь</TableHead>
-              <TableHead className="w-44">Действие</TableHead>
-              <TableHead className="w-32">Сущность</TableHead>
-              <TableHead className="w-28">IP адрес</TableHead>
-              <TableHead>User-Agent</TableHead>
+              <TableHead className="w-36">{t("common.time")}</TableHead>
+              <TableHead className="w-44">{t("audit.user")}</TableHead>
+              <TableHead className="w-44">{t("audit.action")}</TableHead>
+              <TableHead className="w-32">{t("audit.entity")}</TableHead>
+              <TableHead className="w-28">{t("audit.ip")}</TableHead>
+              <TableHead>{t("audit.userAgent")}</TableHead>
               <TableHead className="w-20" />
             </TableRow>
           </TableHeader>
           <TableBody>
-            {logs.length === 0 ? (
+            {loading ? (
               <TableRow>
-                <TableCell
-                  colSpan={7}
-                  className="py-12 text-center text-muted-foreground"
-                >
-                  Записей не найдено
+                <TableCell colSpan={7}>
+                  <PageLoading />
+                </TableCell>
+              </TableRow>
+            ) : logs.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="py-12 text-center text-muted-foreground">
+                  {t("audit.empty")}
                 </TableCell>
               </TableRow>
             ) : (
               logs.map((log) => {
-                const cfg = ACTION_CONFIG[log.action];
-                const entityLabel = ENTITY_LABELS[log.entity] ?? log.entity;
                 const meta = log.meta as Record<string, unknown> | null;
-
                 return (
                   <TableRow key={log.id}>
                     <TableCell className="font-mono text-xs text-muted-foreground">
@@ -377,27 +188,20 @@ export default async function LogsPage({
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-sm font-medium leading-none">
-                          {log.user.name}
-                        </span>
+                        <span className="text-sm font-medium leading-none">{log.user.name}</span>
                         <span className="font-mono text-xs text-muted-foreground">
                           {log.user.username}
                         </span>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        variant="outline"
-                        className={
-                          cfg?.className ?? "border-border text-foreground"
-                        }
-                      >
-                        {cfg?.label ?? log.action}
+                      <Badge variant="outline" className={actionClasses(log.action)}>
+                        {t(`audit.action.${log.action}`)}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-sm">{entityLabel}</span>
+                        <span className="text-sm">{t(`audit.entity.${log.entity}`)}</span>
                         {log.entityId && (
                           <span className="font-mono text-xs text-muted-foreground">
                             {log.entityId.slice(0, 8)}…
@@ -405,21 +209,15 @@ export default async function LogsPage({
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="font-mono text-xs">
-                      {log.ipAddress ?? "-"}
-                    </TableCell>
+                    <TableCell className="font-mono text-xs">{log.ipAddress ?? "—"}</TableCell>
                     <TableCell
                       className="max-w-48 truncate text-xs text-muted-foreground"
                       title={log.userAgent ?? ""}
                     >
-                      {log.userAgent
-                        ? log.userAgent.replace(/Mozilla\/[\d.]+\s*/, "")
-                        : "-"}
+                      {log.userAgent ? log.userAgent.replace(/Mozilla\/[\d.]+\s*/, "") : "—"}
                     </TableCell>
                     <TableCell>
-                      {meta && Object.keys(meta).length > 0 ? (
-                        <MetaButton meta={meta} />
-                      ) : null}
+                      {meta && Object.keys(meta).length > 0 ? <MetaButton meta={meta} /> : null}
                     </TableCell>
                   </TableRow>
                 );
@@ -429,74 +227,46 @@ export default async function LogsPage({
         </Table>
       </div>
 
-      {/* Pagination */}
       <div className="flex items-center justify-between text-sm">
         <p className="text-muted-foreground">
-          Страница {page} из {totalPages} · записи {skip + 1}–
-          {Math.min(skip + limit, total)} из {total.toLocaleString("ru-RU")}
+          {t("common.page", { page, total: totalPages })}
+          {total > 0 && ` · ${skip + 1}–${Math.min(skip + limit, total)} / ${total}`}
         </p>
         <div className="flex items-center gap-1">
           {page > 1 && (
             <Link
-              href={buildPageUrl(currentParams, 1)}
+              href={pageUrl(page - 1)}
               className="flex h-8 items-center gap-1 rounded-md px-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               <IconChevronLeft size={14} />
-              <IconChevronLeft size={14} className="-ml-2.5" />
-            </Link>
-          )}
-          {page > 1 && (
-            <Link
-              href={buildPageUrl(currentParams, page - 1)}
-              className="flex h-8 items-center gap-1 rounded-md px-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            >
-              <IconChevronLeft size={14} />
-              Назад
+              {t("common.previous")}
             </Link>
           )}
 
-          {/* Page numbers */}
           {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
-            let p: number;
-            if (totalPages <= 7) {
-              p = i + 1;
-            } else if (page <= 4) {
-              p = i + 1;
-            } else if (page >= totalPages - 3) {
-              p = totalPages - 6 + i;
-            } else {
-              p = page - 3 + i;
-            }
-            return (
-              <Link
-                key={p}
-                href={buildPageUrl(currentParams, p)}
-                className={`flex h-8 min-w-8 items-center justify-center rounded-md px-2 text-sm transition-colors hover:bg-muted ${p === page
-                  ? "bg-muted font-medium text-foreground"
-                  : "text-muted-foreground"
-                  }`}
-              >
-                {p}
-              </Link>
-            );
-          })}
+            const first =
+              totalPages <= 7 ? 1 : page <= 4 ? 1 : page >= totalPages - 3 ? totalPages - 6 : page - 3;
+            return first + i;
+          }).map((p) => (
+            <Link
+              key={p}
+              href={pageUrl(p)}
+              className={cn(
+                "flex h-8 min-w-8 items-center justify-center rounded-md px-2 text-sm transition-colors hover:bg-muted",
+                p === page ? "bg-muted font-medium text-foreground" : "text-muted-foreground",
+              )}
+            >
+              {p}
+            </Link>
+          ))}
 
           {page < totalPages && (
             <Link
-              href={buildPageUrl(currentParams, page + 1)}
+              href={pageUrl(page + 1)}
               className="flex h-8 items-center gap-1 rounded-md px-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
-              Вперёд
+              {t("common.next")}
               <IconChevronRight size={14} />
-            </Link>
-          )}
-          {page < totalPages && (
-            <Link
-              href={buildPageUrl(currentParams, totalPages)}
-              className="flex h-8 items-center gap-1 rounded-md px-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            >
-              <IconChevronRight size={14} />
-              <IconChevronRight size={14} className="-ml-2.5" />
             </Link>
           )}
         </div>

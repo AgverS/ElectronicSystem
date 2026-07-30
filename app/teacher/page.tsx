@@ -1,11 +1,11 @@
-import { requireRole } from "@/lib/session";
-import { Role } from "@/lib/prisma-client";
-import { redirect } from "next/navigation";
+"use client";
+
 import { TeacherJournalsView } from "@/components/teacher/teacher-journals-view";
+import { PageLoading } from "@/components/ui/page-state";
+import { useDemoUser } from "@/lib/demo-session";
 
-export default async function TeacherPage() {
-  const user = await requireRole(Role.TEACHER, Role.ADMIN);
-  if (!user) redirect("/login");
-
+export default function TeacherPage() {
+  const user = useDemoUser();
+  if (!user) return <PageLoading />;
   return <TeacherJournalsView userRole={user.role} />;
 }

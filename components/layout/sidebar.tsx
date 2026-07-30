@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
   IconLayoutDashboard,
@@ -270,7 +270,7 @@ function NavActionButton({
 }: {
   item: NavActionItem;
   onClick: () => void;
-  variants?: any;
+  variants?: Variants;
 }) {
   const t = useT();
   return (
@@ -300,7 +300,7 @@ function NavItemLink({
   item: NavItem;
   pathname: string;
   onNavigate?: () => void;
-  variants?: any;
+  variants?: Variants;
   isChild?: boolean;
   tabbable?: boolean;
 }) {
@@ -352,7 +352,7 @@ function NavGroupComponent({
   group: NavGroup;
   pathname: string;
   onNavigate?: () => void;
-  itemVariants: any;
+  itemVariants: Variants;
 }) {
   const t = useT();
   const isAnyChildActive = group.items.some((item) =>
@@ -361,11 +361,20 @@ function NavGroupComponent({
       : pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href)),
   );
 
-  const [isOpen, setIsOpen] = React.useState(isAnyChildActive);
+  // A group follows whether one of its pages is open, until the visitor
+  // expands or collapses it themselves; navigating into the group hands
+  // control back. Adjusted during render rather than in an effect, so
+  // navigation does not cost an extra render pass.
+  const [manuallyToggled, setManuallyToggled] = React.useState<boolean | null>(null);
+  const [wasChildActive, setWasChildActive] = React.useState(isAnyChildActive);
 
-  React.useEffect(() => {
-    if (isAnyChildActive) setIsOpen(true);
-  }, [isAnyChildActive]);
+  if (wasChildActive !== isAnyChildActive) {
+    setWasChildActive(isAnyChildActive);
+    if (isAnyChildActive) setManuallyToggled(null);
+  }
+
+  const isOpen = manuallyToggled ?? isAnyChildActive;
+  const setIsOpen = setManuallyToggled;
 
   return (
     <div className="flex flex-col">

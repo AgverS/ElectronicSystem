@@ -1,10 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { translate } from "@/lib/i18n/provider";
-import { requireRole, getCurrentUser } from "@/lib/demo-actor";
+import { requireRole } from "@/lib/demo-actor";
 import { Role } from "@/lib/prisma-client";
 import { logAction } from "@/lib/audit";
 import { fromISODate } from "@/lib/week";
-import { sendPushNotifications } from "@/lib/push";
 
 async function checkAdmin() {
   const user = await requireRole(Role.ADMIN);
@@ -156,63 +155,9 @@ export async function upsertSubstitution(data: {
     meta: { groupId: data.groupId, date: data.date, lessonNumber: data.lessonNumber, subgroup, cancelled: data.cancelled },
   });
 
-  const subgroupSuffix = subgroup ? `, подгр. ${subgroup}` : "";
-  const notifBody = data.cancelled
-    ? `Урок ${data.lessonNumber} (${data.date}${subgroupSuffix}) отменён`
-    : `Замена на уроке ${data.lessonNumber} (${data.date}${subgroupSuffix})`;
-
-  // Awaited so the work finishes before the action returns (fire-and-forget
-  // promises can be dropped once the response is sent) and so failures surface
-  // in server logs instead of vanishing.
-  const notifications: Promise<unknown>[] = [
-    sendPushNotifications(
-      { groupId: data.groupId },
-      {
-        title: "Изменения в расписании",
-        body: notifBody,
-        url: `/schedule?group=${data.groupId}`,
-        tag: `schedule-${data.groupId}`,
-      },
-      { delayMs: 60_000 },
-    ),
-  ];
-
-  if (sub.teacherId) {
-    notifications.push(
-      sendPushNotifications(
-        { teacherId: sub.teacherId },
-        {
-          title: "Изменения в расписании",
-          body: notifBody,
-          url: `/schedule?teacher=${sub.teacherId}`,
-          tag: `schedule-teacher-${sub.teacherId}`,
-        },
-        { delayMs: 60_000 },
-      ),
-    );
-  }
-
-  if (sub.room) {
-    notifications.push(
-      sendPushNotifications(
-        { room: sub.room },
-        {
-          title: "Изменения в расписании",
-          body: notifBody,
-          url: `/schedule?room=${encodeURIComponent(sub.room)}`,
-          tag: `schedule-room-${sub.room}`,
-        },
-        { delayMs: 60_000 },
-      ),
-    );
-  }
-
-  const results = await Promise.allSettled(notifications);
-  for (const r of results) {
-    if (r.status === "rejected") {
-      console.error("[push] notification batch failed:", r.reason);
-    }
-  }
+  // The full system notifies the group and the teachers involved here. The demo
+  // has no server to send push notifications from, so the change simply shows
+  // up in the timetable.
 }
 
 export async function deleteSubstitution(id: string) {

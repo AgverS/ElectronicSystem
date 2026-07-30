@@ -254,7 +254,7 @@ function AdminJournalsViewInner({
 function JournalCard({ a }: { a: Assignment }) {
   return (
     <Link
-      href={`/admin/journals/${a.id}`}
+      href={`/admin/journal/?id=${a.id}`}
       className="group flex flex-col gap-1 rounded-lg border bg-card p-4 transition-colors hover:bg-muted"
     >
       <div className="flex items-start gap-2">

@@ -70,7 +70,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     const initial = isLocale(saved) ? saved : detectLocale(navigator.languages ?? []);
     if (initial !== DEFAULT_LOCALE) void applyLocale(initial);
     else document.documentElement.lang = DEFAULT_LOCALE;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   async function applyLocale(next: Locale) {
@@ -93,7 +93,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   const setLocale = React.useCallback((next: Locale) => {
     window.localStorage.setItem(STORAGE_KEY, next);
     void applyLocale(next);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   const t = React.useCallback(

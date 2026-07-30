@@ -17,7 +17,6 @@ import {
   fmtShort,
 } from "@/lib/week";
 import { IconChevronLeft, IconChevronRight, IconArrowLeft } from "@tabler/icons-react";
-import { PushSubscribeButton } from "@/components/schedule/push-subscribe-button";
 import { CalendarSubscribe } from "@/components/schedule/calendar-subscribe";
 import { buildBellTimesByDay, type BellContext } from "@/lib/bell-times";
 import { ExtraLessonCreateDialog } from "@/components/schedule/extra-lesson-create-dialog";
@@ -34,7 +33,6 @@ type OwnFilter =
 
 interface Props {
   own: OwnFilter;
-  vapidPublicKey: string;
   bellSchedule: BellContext;
   userId?: string; // current user's own id (for RSVP context)
   userRole?: "TEACHER" | "STUDENT";
@@ -42,7 +40,6 @@ interface Props {
 
 export function PersonalScheduleClient({
   own,
-  vapidPublicKey,
   bellSchedule,
   userId,
   userRole,
@@ -210,9 +207,6 @@ export function PersonalScheduleClient({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {isOwnView && <CalendarSubscribe />}
-          {active.kind === "group" && <PushSubscribeButton filter={{ groupId: active.id }} vapidPublicKey={vapidPublicKey} />}
-          {active.kind === "teacher" && <PushSubscribeButton filter={{ teacherId: active.id }} vapidPublicKey={vapidPublicKey} />}
-          {active.kind === "room" && <PushSubscribeButton filter={{ room: active.id }} vapidPublicKey={vapidPublicKey} />}
         </div>
       </div>
 

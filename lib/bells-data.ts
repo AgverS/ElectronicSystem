@@ -13,16 +13,16 @@ export async function loadBellContext(): Promise<BellContext> {
   ]);
 
   return {
-    permanent: permanent.map((row: any) => ({
+    permanent: permanent.map((row) => ({
       dayGroup: row.dayGroup,
       number: row.number,
       startTime: row.startTime,
       endTime: row.endTime,
     })),
-    overrides: overrides.map((row: any) => ({
+    overrides: overrides.map((row) => ({
       startDate: toISODate(row.startDate),
       endDate: toISODate(row.endDate),
-      slots: row.slots.map((s: any) => ({
+      slots: row.slots.map((s) => ({
         number: s.number,
         startTime: s.startTime,
         endTime: s.endTime,

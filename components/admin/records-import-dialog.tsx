@@ -38,11 +38,13 @@ import { cn } from "@/lib/utils";
 import { RecordKind } from "@/lib/prisma-client";
 import { RECORD_KIND_LABELS, RECORD_KIND_COLORS } from "@/lib/records";
 import { importStudentRecords, type ImportRow } from "@/lib/actions/records";
-import type {
-  DetectResult,
-  ImportPreviewRow,
-  ColumnMapping,
-} from "@/app/api/admin/records/import/route";
+import {
+  detectSpreadsheet,
+  buildImportPreview,
+  type DetectResult,
+  type ImportPreviewRow,
+  type ColumnMapping,
+} from "@/lib/records-import";
 
 interface Props {
   onImported: () => void;
@@ -103,13 +105,7 @@ export function RecordsImportDialog({ onImported }: Props) {
     setLoading(true);
     setError(null);
     try {
-      const fd = new FormData();
-      fd.append("step", "detect");
-      fd.append("file", file);
-      const res = await fetch("/api/admin/records/import", { method: "POST", body: fd });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Ошибка чтения файла");
-      const result = json as DetectResult;
+      const result = await detectSpreadsheet(file);
       setDetect(result);
       setMapping(result.mapping as MappingState);
       setHasHeader(result.hasHeader);
@@ -127,14 +123,8 @@ export function RecordsImportDialog({ onImported }: Props) {
   }
 
   async function runParse(f: File, map: MappingState, header: boolean) {
-    const fd = new FormData();
-    fd.append("step", "parse");
-    fd.append("file", f);
-    fd.append("mapping", JSON.stringify({ ...map, hasHeader: header } satisfies ColumnMapping));
-    const res = await fetch("/api/admin/records/import", { method: "POST", body: fd });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error ?? "Ошибка парсинга");
-    setPreview(json.rows);
+    const rows = await buildImportPreview(f, { ...map, hasHeader: header } satisfies ColumnMapping);
+    setPreview(rows);
     setStep("preview");
   }
 

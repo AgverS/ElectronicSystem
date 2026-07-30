@@ -1,10 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { translate } from "@/lib/i18n/provider";
-import { requireRole, getCurrentUser } from "@/lib/demo-actor";
+import { requireRole } from "@/lib/demo-actor";
 import { Role } from "@/lib/prisma-client";
 import { logAction } from "@/lib/audit";
 import { fromISODate } from "@/lib/week";
-import { sendPushNotifications } from "@/lib/push";
 
 async function checkTeacher() {
   const user = await requireRole(Role.TEACHER, Role.ADMIN);
@@ -41,29 +40,9 @@ export async function createExtraLesson(data: {
     meta: { date: data.date, lessonNumber: data.lessonNumber, room: data.room, groupId: data.groupId },
   });
 
-  const notifTitle = "Дополнительное занятие";
-  const notifBody = `${actor.name} — урок ${data.lessonNumber} (${data.date}), каб. ${data.room}`;
-
-  if (data.groupId) {
-    await sendPushNotifications(
-      { groupId: data.groupId },
-      { title: notifTitle, body: notifBody, url: "/student/schedule", tag: `extra-lesson-${lesson.id}` },
-    );
-  } else {
-    const assignments = await prisma.assignment.findMany({
-      where: { teachers: { some: { id: actor.id } } },
-      select: { groupId: true },
-      distinct: ["groupId"],
-    });
-    await Promise.allSettled(
-      assignments.map((a) =>
-        sendPushNotifications(
-          { groupId: a.groupId },
-          { title: notifTitle, body: notifBody, url: "/student/schedule", tag: `extra-lesson-${lesson.id}` },
-        ),
-      ),
-    );
-  }
+  // The full system sends a push notification to the affected students here.
+  // The demo has no server to send from, so the extra lesson simply appears in
+  // their timetable.
 }
 
 export async function deleteExtraLesson(id: string) {

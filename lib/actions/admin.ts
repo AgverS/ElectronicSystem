@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { ABSENT } from "@/lib/grades";
 import { translate } from "@/lib/i18n/provider";
-import { requireRole, getCurrentUser } from "@/lib/demo-actor";
+import { requireRole } from "@/lib/demo-actor";
 import { Role } from "@/lib/prisma-client";
 import { logAction } from "@/lib/audit";
 import { getCurrentSemesterId } from "@/lib/semester";
@@ -241,14 +241,10 @@ export async function resetUserPassword(id: string) {
       throw new Error(translate("errors.noAccessToAccount"));
   }
 
-  await prisma.account.updateMany({
-    where: { userId: id, providerId: "credential" },
-    data: { password: null },
-  });
-
-  await prisma.session.deleteMany({
-    where: { userId: id },
-  });
+  // In the full system this clears the stored credential and ends the user's
+  // sessions, so they set a new password on next sign-in. The demo has no
+  // accounts to clear — the action is kept so the flow is still demonstrable,
+  // and it records the same audit entry.
 
   await logAction({
     userId: actor.id,
@@ -1232,17 +1228,16 @@ export async function getUserDetailsForAdmin(userId: string) {
   if (!user) throw new Error(translate("errors.userNotFound"));
 
   // If it's a student, get their academic info (grades by semester)
+  type SemesterRow = {
+    subjectId: string;
+    subject: string;
+    grades: { id: string; value: string; date: Date; topic: string | null; type: string }[];
+    avg: string | null;
+  };
+
   let academic: {
     semesters: { id: string; name: string; year: string }[];
-    semesterData: Record<
-      string,
-      {
-        subjectId: string;
-        subject: string;
-        grades: { id: string; value: string; date: Date; topic: string | null; type: string }[];
-        avg: string | null;
-      }[]
-    >;
+    semesterData: Record<string, SemesterRow[]>;
   } | null = null;
 
   if (user.role === Role.STUDENT && user.groupId) {
@@ -1265,7 +1260,7 @@ export async function getUserDetailsForAdmin(userId: string) {
       orderBy: { subject: { name: "asc" } },
     });
 
-    const semesterData: Record<string, any> = {};
+    const semesterData: Record<string, SemesterRow[]> = {};
 
     for (const semester of semesters) {
       const rows = assignments
@@ -1283,9 +1278,11 @@ export async function getUserDetailsForAdmin(userId: string) {
                 type: l.type,
               };
             })
-            .filter(Boolean);
+            // A type predicate, so the nulls are gone from the type as well
+            // as the array and the grades below need no casting.
+            .filter((g): g is NonNullable<typeof g> => g !== null);
 
-          const numeric = grades.filter((g: any) => g.value !== ABSENT).map((g: any) => Number(g.value));
+          const numeric = grades.filter((g) => g.value !== ABSENT).map((g) => Number(g.value));
           const avg = numeric.length
             ? (numeric.reduce((sum, val) => sum + val, 0) / numeric.length).toFixed(1)
             : null;

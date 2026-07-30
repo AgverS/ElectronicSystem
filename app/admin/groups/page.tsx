@@ -1,47 +1,64 @@
+"use client";
+
 import { prisma } from "@/lib/prisma";
 import { Role } from "@/lib/prisma-client";
-import { getCurrentUser } from "@/lib/session";
 import { getAdminScope } from "@/lib/actions/admin";
 import { CreateGroupDialog } from "@/components/admin/create-group-dialog";
 import { GroupsTable } from "@/components/admin/groups-table";
+import { PageLoading } from "@/components/ui/page-state";
+import { useDemoUser } from "@/lib/demo-session";
+import { useDemoData } from "@/lib/use-demo-data";
+import { useT } from "@/lib/i18n/provider";
 
-export default async function GroupsPage() {
-  const currentUser = await getCurrentUser();
-  const scope = currentUser ? await getAdminScope(currentUser.id) : null;
+export default function GroupsPage() {
+  const currentUser = useDemoUser();
+  const t = useT();
 
-  // Админу, закреплённому за одной специальностью, колонка специальности не нужна.
-  const hideSpecialty =
-    !!scope && !scope.isMaster && scope.specialtyIds.length === 1;
+  const { data, loading } = useDemoData(
+    ["admin-groups-page", currentUser?.id],
+    async () => {
+      const scope = currentUser ? await getAdminScope(currentUser.id) : null;
+      const staffRoles: Role[] = [Role.TEACHER, Role.ADMIN];
 
-  const specialties = await prisma.specialty.findMany({
-    orderBy: { name: "asc" },
-    select: { id: true, name: true, abbreviation: true, letter: true },
-  });
+      const [specialties, teachers] = await Promise.all([
+        prisma.specialty.findMany({
+          orderBy: { name: "asc" },
+          select: { id: true, name: true, abbreviation: true, letter: true },
+        }),
+        prisma.user.findMany({
+          where: {
+            role: { in: staffRoles },
+            isMaster: false,
+            ...(scope && !scope.isMaster && scope.specialtyIds.length > 0
+              ? { specialties: { some: { id: { in: scope.specialtyIds } } } }
+              : {}),
+          },
+          orderBy: { name: "asc" },
+          select: { id: true, name: true },
+        }),
+      ]);
 
-  const staffRoles: Role[] = [Role.TEACHER, Role.ADMIN];
-
-  const teachers = await prisma.user.findMany({
-    where: {
-      role: { in: staffRoles },
-      isMaster: false,
-      ...(scope && !scope.isMaster && scope.specialtyIds.length > 0
-        ? { specialties: { some: { id: { in: scope.specialtyIds } } } }
-        : {}),
+      return {
+        specialties,
+        teachers,
+        hideSpecialty: !!scope && !scope.isMaster && scope.specialtyIds.length === 1,
+      };
     },
-    orderBy: { name: "asc" },
-    select: { id: true, name: true },
-  });
+    { enabled: !!currentUser },
+  );
+
+  if (loading || !data) return <PageLoading />;
 
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">Группы</h1>
-        <CreateGroupDialog teachers={teachers} specialties={specialties} />
+        <h1 className="text-2xl font-bold tracking-tight">{t("nav.groups")}</h1>
+        <CreateGroupDialog teachers={data.teachers} specialties={data.specialties} />
       </div>
       <GroupsTable
-        teachers={teachers}
-        specialties={specialties}
-        hideSpecialty={hideSpecialty}
+        teachers={data.teachers}
+        specialties={data.specialties}
+        hideSpecialty={data.hideSpecialty}
       />
     </div>
   );

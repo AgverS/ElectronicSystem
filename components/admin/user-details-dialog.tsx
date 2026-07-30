@@ -135,7 +135,7 @@ export function UserDetailsDialog({ userId, userName, trigger }: UserDetailsDial
                   <div>
                     <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Специальности</h3>
                     <div className="flex flex-wrap gap-1.5">
-                      {user.specialties.map((s: any) => (
+                      {user.specialties.map((s) => (
                         <span key={s.id} className="rounded bg-muted px-2 py-0.5 text-xs" title={s.name}>
                           {s.abbreviation || s.name}
                         </span>
@@ -147,7 +147,7 @@ export function UserDetailsDialog({ userId, userName, trigger }: UserDetailsDial
                   <div>
                     <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Кураторские группы</h3>
                     <div className="flex flex-wrap gap-1.5">
-                      {user.curatedGroups.map((g: any) => (
+                      {user.curatedGroups.map((g) => (
                         <span key={g.id} className="rounded bg-muted px-2 py-0.5 text-xs font-semibold">
                           {g.name}
                         </span>
@@ -159,7 +159,7 @@ export function UserDetailsDialog({ userId, userName, trigger }: UserDetailsDial
                   <div>
                     <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Преподаваемые предметы</h3>
                     <div className="flex flex-wrap gap-1.5">
-                      {user.subjects.map((s: any) => (
+                      {user.subjects.map((s) => (
                         <span key={s.id} className="rounded bg-muted px-2 py-0.5 text-xs">
                           {s.name}
                         </span>
@@ -182,7 +182,7 @@ export function UserDetailsDialog({ userId, userName, trigger }: UserDetailsDial
                   <Tabs defaultValue={academic.semesters[0].id} className="w-full">
                     <div className="overflow-x-auto pb-1">
                       <TabsList className="flex w-max gap-1">
-                        {academic.semesters.map((sem: any) => (
+                        {academic.semesters.map((sem) => (
                           <TabsTrigger key={sem.id} value={sem.id} className="text-xs whitespace-nowrap">
                             {formatSemesterName(sem, user.group?.name)}
                           </TabsTrigger>
@@ -190,7 +190,7 @@ export function UserDetailsDialog({ userId, userName, trigger }: UserDetailsDial
                       </TabsList>
                     </div>
 
-                    {academic.semesters.map((sem: any) => {
+                    {academic.semesters.map((sem) => {
                       const rows = academic.semesterData[sem.id] || [];
                       return (
                         <TabsContent key={sem.id} value={sem.id} className="mt-2">
@@ -204,14 +204,14 @@ export function UserDetailsDialog({ userId, userName, trigger }: UserDetailsDial
                                 </tr>
                               </thead>
                               <tbody>
-                                {rows.map((row: any) => (
+                                {rows.map((row) => (
                                   <tr key={row.subjectId} className="border-b last:border-0 hover:bg-muted/20">
                                     <td className="px-3 py-2 font-medium whitespace-nowrap max-w-[180px] truncate" title={row.subject}>
                                       {row.subject}
                                     </td>
                                     <td className="px-3 py-2">
                                       <div className="flex flex-wrap gap-1">
-                                        {row.grades.map((g: any) => (
+                                        {row.grades.map((g) => (
                                           <span
                                             key={g.id}
                                             title={fmtDate(g.date) + (g.topic ? " · " + g.topic : "")}

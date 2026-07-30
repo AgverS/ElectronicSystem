@@ -1,15 +1,14 @@
-import { redirect } from "next/navigation";
-import { requireRole } from "@/lib/session";
-import { Role } from "@/lib/prisma-client";
-import { RecordsView } from "@/components/admin/records-view";
+"use client";
 
-export default async function AdminRecordsPage() {
-  const user = await requireRole(Role.ADMIN);
-  if (!user) redirect("/login");
+import { RecordsView } from "@/components/admin/records-view";
+import { useT } from "@/lib/i18n/provider";
+
+export default function AdminRecordsPage() {
+  const t = useT();
 
   return (
     <div>
-      <h1 className="mb-4 text-2xl font-bold tracking-tight">Поощрения и взыскания</h1>
+      <h1 className="mb-4 text-2xl font-bold tracking-tight">{t("nav.records")}</h1>
       <RecordsView />
     </div>
   );

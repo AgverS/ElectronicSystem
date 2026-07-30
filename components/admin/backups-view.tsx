@@ -41,7 +41,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "../ui/switch";
+import { useT } from "@/lib/i18n/provider";
 import {
+  downloadBackup,
   createBackupAction,
   deleteBackupAction,
   restoreBackupAction,
@@ -70,6 +72,7 @@ export function BackupsView({
   initialBackups,
   initialSettings,
 }: BackupsViewProps) {
+  const t = useT();
   const [backups, setBackups] = useState<Backup[]>(initialBackups);
   const [settings, setSettings] = useState<BackupSettings>(initialSettings);
   const [isCreating, setIsCreating] = useState(false);
@@ -188,15 +191,10 @@ export function BackupsView({
                         <Button
                           variant="ghost"
                           size="icon"
-                          asChild
-                          title="Скачать"
+                          title={t("common.download")}
+                          onClick={() => downloadBackup(backup.filename)}
                         >
-                          <a
-                            href={`/api/admin/backups/${backup.filename}`}
-                            download
-                          >
-                            <IconDownload size={16} />
-                          </a>
+                          <IconDownload size={16} />
                         </Button>
 
                         <AlertDialog>

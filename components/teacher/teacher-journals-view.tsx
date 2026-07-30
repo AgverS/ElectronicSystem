@@ -194,7 +194,7 @@ function JournalCard({ a, userRole }: { a: Assignment; userRole: Role }) {
       whileHover={{ y: -2 }}
     >
       <Link
-        href={`/teacher/journal/${a.id}`}
+        href={`/teacher/journal/?id=${a.id}`}
         className="group/card flex flex-col gap-1 rounded-xl border bg-card p-4 shadow-xs transition-[border-color,box-shadow] hover:border-primary/30 hover:shadow-md"
       >
         <div className="flex items-start gap-2">

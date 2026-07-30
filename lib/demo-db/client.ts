@@ -107,6 +107,21 @@ export function onDemoDataChange(listener: () => void): () => void {
   return () => listeners.delete(listener);
 }
 
+/** Serialise the whole dataset — used by the backup feature. */
+export function exportDemoData(): string {
+  return serialise(engine.getDataset());
+}
+
+/** Replace the dataset from a previously exported snapshot. */
+export function importDemoData(payload: string): boolean {
+  const parsed = deserialise(payload);
+  if (!parsed) return false;
+  engine.replaceDataset(parsed);
+  schedulePersist();
+  notifyChange();
+  return true;
+}
+
 /** Restore the pristine seeded dataset. */
 export function resetDemoData() {
   engine.replaceDataset(buildSeed());

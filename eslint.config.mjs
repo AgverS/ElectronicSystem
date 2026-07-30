@@ -16,6 +16,17 @@ const eslintConfig = defineConfig([
     "lib/prisma-client/**",
   ]),
   {
+    // The demo database is a query engine over untyped rows: a row is
+    // `Record<string, any>` by construction, and the delegates cast once at the
+    // boundary where results become typed model rows. Everything the rest of
+    // the app touches is fully typed (see lib/demo-db/types.ts), so the rule
+    // stays on everywhere else.
+    files: ["lib/demo-db/**/*.ts"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
+  {
     rules: {
       // Allow intentionally-unused vars/args prefixed with "_"
       // (e.g. discarding a field via a rest pattern).

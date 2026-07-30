@@ -1,7 +1,14 @@
-import { headers } from "next/headers";
 import { prisma } from "./prisma";
 import { Prisma } from "@/lib/prisma-client";
 
+/**
+ * Records an entry in the audit trail.
+ *
+ * The full system also captures the caller's IP address from the request
+ * headers. There is no request here — everything happens in the browser — so
+ * the entry records the browser instead, and the audit screen still shows a
+ * real history of what the visitor has changed.
+ */
 export async function logAction(params: {
   userId: string;
   action: string;
@@ -10,13 +17,6 @@ export async function logAction(params: {
   meta?: Prisma.InputJsonValue | null;
 }) {
   try {
-    const h = await headers();
-    const forwarded = h.get("x-forwarded-for");
-    const ip = forwarded
-      ? forwarded.split(",")[0].trim()
-      : (h.get("x-real-ip") ?? null);
-    const ua = h.get("user-agent") ?? null;
-
     await prisma.auditLog.create({
       data: {
         userId: params.userId,
@@ -24,11 +24,11 @@ export async function logAction(params: {
         entity: params.entity,
         entityId: params.entityId ?? null,
         meta: params.meta ?? Prisma.JsonNull,
-        ipAddress: ip,
-        userAgent: ua,
+        ipAddress: null,
+        userAgent: typeof navigator === "undefined" ? null : navigator.userAgent,
       },
     });
   } catch {
-    // audit logging must never fail the main operation
+    // Audit logging must never fail the operation it is recording.
   }
 }

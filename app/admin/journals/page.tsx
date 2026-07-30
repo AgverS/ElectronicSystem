@@ -1,28 +1,39 @@
+"use client";
+
 import { prisma } from "@/lib/prisma";
-import { requireRole } from "@/lib/session";
 import { Role } from "@/lib/prisma-client";
-import { redirect } from "next/navigation";
 import { AdminJournalsView } from "@/components/admin/admin-journals-view";
+import { PageLoading } from "@/components/ui/page-state";
+import { useDemoUser } from "@/lib/demo-session";
+import { useDemoData } from "@/lib/use-demo-data";
 
-export default async function AdminJournalsPage() {
-  const user = await requireRole(Role.ADMIN);
-  if (!user) redirect("/login");
+export default function AdminJournalsPage() {
+  const user = useDemoUser();
 
-  const [curatedGroupsCount, teachers] = await Promise.all([
-    prisma.group.count({ where: { curatorId: user.id } }),
-    user.isMaster
-      ? prisma.user.findMany({
-          where: { role: { in: [Role.TEACHER, Role.ADMIN] }, isMaster: false },
-          orderBy: { name: "asc" },
-          select: { id: true, name: true },
-        })
-      : Promise.resolve([]),
-  ]);
+  const { data, loading } = useDemoData(
+    ["admin-journals-page", user?.id],
+    async () => {
+      const [curatedGroupsCount, teachers] = await Promise.all([
+        prisma.group.count({ where: { curatorId: user?.id } }),
+        user?.isMaster
+          ? prisma.user.findMany({
+              where: { role: { in: [Role.TEACHER, Role.ADMIN] }, isMaster: false },
+              orderBy: { name: "asc" },
+              select: { id: true, name: true },
+            })
+          : Promise.resolve([]),
+      ]);
+      return { curatedGroupsCount, teachers };
+    },
+    { enabled: !!user },
+  );
+
+  if (loading || !data) return <PageLoading />;
 
   return (
     <AdminJournalsView
-      curatedGroupsCount={curatedGroupsCount}
-      teachers={teachers}
+      curatedGroupsCount={data.curatedGroupsCount}
+      teachers={data.teachers}
     />
   );
 }

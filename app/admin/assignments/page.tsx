@@ -1,57 +1,64 @@
+"use client";
+
 import { prisma } from "@/lib/prisma";
 import { Role } from "@/lib/prisma-client";
-import { getCurrentUser } from "@/lib/session";
 import { getAdminScope } from "@/lib/actions/admin";
 import { CreateAssignmentDialog } from "@/components/admin/create-assignment-dialog";
 import { AssignmentsTable } from "@/components/admin/assignments-table";
+import { PageLoading } from "@/components/ui/page-state";
+import { useDemoUser } from "@/lib/demo-session";
+import { useDemoData } from "@/lib/use-demo-data";
+import { useT } from "@/lib/i18n/provider";
 
-export default async function AssignmentsPage() {
-  const currentUser = await getCurrentUser();
-  const scope = currentUser ? await getAdminScope(currentUser.id) : null;
-  const isMaster = scope?.isMaster ?? currentUser?.isMaster ?? false;
+export default function AssignmentsPage() {
+  const currentUser = useDemoUser();
+  const t = useT();
 
-  const staffRoles: Role[] = [Role.TEACHER, Role.ADMIN];
+  const { data, loading } = useDemoData(
+    ["admin-assignments-page", currentUser?.id],
+    async () => {
+      const scope = currentUser ? await getAdminScope(currentUser.id) : null;
+      const isMaster = scope?.isMaster ?? currentUser?.isMaster ?? false;
+      const scoped = scope && !isMaster && scope.specialtyIds.length > 0;
+      const staffRoles: Role[] = [Role.TEACHER, Role.ADMIN];
 
-  const [teachers, groups, subjects] = await Promise.all([
-    isMaster
-      ? prisma.user.findMany({
-          where: { role: { in: staffRoles }, isMaster: false },
+      const [teachers, groups, subjects] = await Promise.all([
+        prisma.user.findMany({
+          where: {
+            role: { in: staffRoles },
+            isMaster: false,
+            ...(scoped ? { specialties: { some: { id: { in: scope!.specialtyIds } } } } : {}),
+          },
           orderBy: { name: "asc" },
-        })
-      : scope && scope.specialtyIds.length > 0
-        ? prisma.user.findMany({
-            where: {
-              role: { in: staffRoles },
-              isMaster: false,
-              specialties: { some: { id: { in: scope.specialtyIds } } },
-            },
-            orderBy: { name: "asc" },
-          })
-        : prisma.user.findMany({
-            where: { role: { in: staffRoles }, isMaster: false },
-            orderBy: { name: "asc" },
-          }),
-    scope && !isMaster && scope.specialtyIds.length > 0
-      ? prisma.group.findMany({
-          where: { specialtyId: { in: scope.specialtyIds } },
+        }),
+        prisma.group.findMany({
+          where: scoped ? { specialtyId: { in: scope!.specialtyIds } } : undefined,
           orderBy: { name: "asc" },
-        })
-      : prisma.group.findMany({ orderBy: { name: "asc" } }),
-    prisma.subject.findMany({ orderBy: { name: "asc" } }),
-  ]);
+        }),
+        prisma.subject.findMany({ orderBy: { name: "asc" } }),
+      ]);
+
+      return { teachers, groups, subjects };
+    },
+    { enabled: !!currentUser },
+  );
+
+  if (loading || !data) return <PageLoading />;
 
   return (
     <div>
       <div className="mb-4 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Назначения</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Кто ведёт какой предмет у какой группы.
-          </p>
+          <h1 className="text-2xl font-bold tracking-tight">{t("nav.assignments")}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t("admin.assignments.subtitle")}</p>
         </div>
-        <CreateAssignmentDialog teachers={teachers} groups={groups} subjects={subjects} />
+        <CreateAssignmentDialog
+          teachers={data.teachers}
+          groups={data.groups}
+          subjects={data.subjects}
+        />
       </div>
-      <AssignmentsTable teachers={teachers} groups={groups} subjects={subjects} />
+      <AssignmentsTable teachers={data.teachers} groups={data.groups} subjects={data.subjects} />
     </div>
   );
 }

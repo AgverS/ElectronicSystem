@@ -1,41 +1,46 @@
-import { randomBytes } from "crypto";
-import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { translate } from "@/lib/i18n/provider";
 import { getCurrentUser } from "@/lib/demo-actor";
 
-async function baseUrl(): Promise<string> {
-  const h = await headers();
-  const host = h.get("host") ?? "";
-  const proto = h.get("x-forwarded-proto") ?? "https";
-  return `${proto}://${host}`;
+/**
+ * Personal calendar subscription links.
+ *
+ * The full system serves an .ics feed from `/api/calendar/<token>.ics`, which a
+ * calendar application polls. A static demo has no such endpoint, so the token
+ * is still issued and shown — the flow is demonstrable — and the timetable can
+ * be downloaded as a one-off .ics file instead (see lib/calendar/ics.ts).
+ */
+
+function randomToken(): string {
+  const bytes = new Uint8Array(24);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-// Возвращает персональную ссылку на ICS-подписку, создавая токен при необходимости.
+function feedUrl(token: string): string {
+  const origin = typeof window === "undefined" ? "" : window.location.origin;
+  return `${origin}/api/calendar/${token}.ics`;
+}
+
 export async function getCalendarFeedUrl(): Promise<string> {
   const user = await getCurrentUser();
-  if (!user) throw new Error("Не авторизовано");
+  if (!user) throw new Error(translate("errors.accessDenied"));
 
   let token = user.calendarToken;
   if (!token) {
-    token = randomBytes(24).toString("hex");
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { calendarToken: token },
-    });
+    token = randomToken();
+    await prisma.user.update({ where: { id: user.id }, data: { calendarToken: token } });
   }
 
-  return `${await baseUrl()}/api/calendar/${token}.ics`;
+  return feedUrl(token);
 }
 
-// Сбрасывает токен (старая ссылка перестаёт работать) и возвращает новую.
+/** Issues a new token, so any previously shared link stops working. */
 export async function resetCalendarToken(): Promise<string> {
   const user = await getCurrentUser();
-  if (!user) throw new Error("Не авторизовано");
+  if (!user) throw new Error(translate("errors.accessDenied"));
 
-  const token = randomBytes(24).toString("hex");
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { calendarToken: token },
-  });
-  return `${await baseUrl()}/api/calendar/${token}.ics`;
+  const token = randomToken();
+  await prisma.user.update({ where: { id: user.id }, data: { calendarToken: token } });
+  return feedUrl(token);
 }

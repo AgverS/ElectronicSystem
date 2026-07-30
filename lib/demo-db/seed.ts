@@ -338,7 +338,6 @@ export function buildSeed(): Dataset {
     semesterSpecs[semesterSpecs.findIndex((s) => s.id === currentSemester.id) - 1] ??
     semesterSpecs[0];
 
-  const LESSON_TYPES = ["lecture", "practical", "lab", "assessment"] as const;
   const GRADE_POOL = ["4", "5", "5", "6", "6", "7", "7", "7", "8", "8", "9", "9", "10", "3", "AB"];
 
   const studentsByGroup = new Map<string, string[]>();

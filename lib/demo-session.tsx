@@ -78,9 +78,9 @@ async function loadPersonas(): Promise<Persona[]> {
 
   // Prefer teachers who curate a group — their screens have the most to show.
   const rankedTeachers = [...teachers].sort(
-    (a: any, b: any) => b.curatedGroups.length - a.curatedGroups.length,
+    (a, b) => b.curatedGroups.length - a.curatedGroups.length,
   );
-  for (const teacher of rankedTeachers.slice(0, 3) as any[]) {
+  for (const teacher of rankedTeachers.slice(0, 3)) {
     const curated = teacher.curatedGroups[0]?.name;
     personas.push({
       id: teacher.id,
@@ -96,7 +96,7 @@ async function loadPersonas(): Promise<Persona[]> {
 
   // One student per group, so the switcher covers several specialties.
   const seenGroups = new Set<string>();
-  for (const student of students as any[]) {
+  for (const student of students) {
     if (!student.group || seenGroups.has(student.group.id)) continue;
     seenGroups.add(student.group.id);
     personas.push({
@@ -123,7 +123,7 @@ export function DemoSessionProvider({ children }: { children: React.ReactNode })
       setUser(null);
       return;
     }
-    const record: any = await prisma.user.findUnique({
+    const record = await prisma.user.findUnique({
       where: { id },
       include: { group: true },
     });
