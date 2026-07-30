@@ -163,9 +163,7 @@ function AdminJournalsViewInner({
                   >
                     {groups.map((g) => (
                       <div key={g.id}>
-                        <p className="mb-3 text-sm font-medium text-muted-foreground">
-                          Группа {g.name}
-                        </p>
+                        <p className="mb-3 text-sm font-medium text-muted-foreground">{translate("ui.groupNamed", { name: g.name })}</p>
                         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                           {g.assignments.map((a) => (
                             <JournalCard key={a.id} a={a} />
@@ -223,7 +221,7 @@ function AdminJournalsViewInner({
                         <IconChevronLeft size={16} />
                         {translate("common.back")}
                       </Button>
-                      <h2 className="font-medium">Группа {currentGroup?.name}</h2>
+                      <h2 className="font-medium">{translate("ui.groupNamed", { name: currentGroup?.name ?? "" })}</h2>
                     </div>
                     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                       {currentGroup?.assignments.map((a) => (

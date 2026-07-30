@@ -136,7 +136,7 @@ export function BellOverridesManager({ overrides }: { overrides: Override[] }) {
                   <IconPencil size={15} />
                 </IconBtn>
                 <DeleteDialog
-                  label={`Удалить «${o.name || translate("ui.untitled")}»`}
+                  label={translate("ui.deleteNamed", { name: o.name || translate("ui.untitled") })}
                   action={async () => {
                     await deleteBellOverride(o.id);
                     refresh();

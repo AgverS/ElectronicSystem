@@ -162,7 +162,7 @@ function TeacherJournalsViewInner({ userRole }: TeacherJournalsViewProps) {
                         <IconChevronLeft size={16} />
                         {translate("common.back")}
                       </Button>
-                      <h2 className="font-medium">Группа {currentGroup?.name}</h2>
+                      <h2 className="font-medium">{translate("ui.groupNamed", { name: currentGroup?.name ?? "" })}</h2>
                     </div>
                     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                       {currentGroup?.items.map((a) => (
@@ -204,9 +204,7 @@ function JournalCard({ a, userRole }: { a: Assignment; userRole: Role }) {
             {a.subject.name}
           </p>
         </div>
-        <p className="max-w-full truncate text-sm text-muted-foreground" title={a.group.name}>
-          Группа {a.group.name}
-        </p>
+        <p className="max-w-full truncate text-sm text-muted-foreground" title={a.group.name}>{translate("ui.groupNamed", { name: a.group.name })}</p>
         <p className="max-w-full truncate text-xs text-muted-foreground" title={a.teachers.map((t) => t.name).join(", ")}>
           {a.teachers.map((t) => shortName(t.name)).join(", ")}
         </p>

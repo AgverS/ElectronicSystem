@@ -158,7 +158,7 @@ function SubjectsTableInner({ specialties }: SubjectsTableProps) {
                     <Checkbox
                       checked={selected.has(s.id)}
                       onCheckedChange={() => toggle(s.id)}
-                      aria-label={`Выбрать ${s.name}`}
+                      aria-label={translate("ui.selectNamed", { name: s.name })}
                     />
                   </TableCell>
                   <TableCell className="font-medium">
@@ -214,7 +214,7 @@ function SubjectsTableInner({ specialties }: SubjectsTableProps) {
                     <div className="flex items-center gap-1">
                       <EditSubjectDialog subject={s} specialties={specialties} />
                       <DeleteDialog
-                        label={`Удалить «${s.name}»`}
+                        label={translate("ui.deleteNamed", { name: s.name })}
                         action={() => deleteSubject(s.id)}
                       />
                     </div>

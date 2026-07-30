@@ -391,7 +391,7 @@ export function RecordsImportDialog({ onImported }: Props) {
               {error && <ErrorBanner message={error} />}
               <div className="flex gap-2">
                 <Button onClick={handleImport} disabled={loading || matched === 0} size="sm">
-                  {loading ? translate("ui.importing") : `Импортировать ${matched} записей`}
+                  {loading ? translate("ui.importing") : translate("ui.importCount", { count: matched })}
                 </Button>
                 <Button variant="ghost" size="sm" onClick={reset}>{translate("common.cancel")}</Button>
               </div>

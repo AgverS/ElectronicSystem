@@ -27,7 +27,7 @@ export function GroupExportButtons({ groupName, curatorName, students }: GroupEx
     const medium = { style: "medium" as const, color: { argb: "FF9CA3AF" } };
 
     // Title
-    ws.addRow([`Список группы ${groupName}`]);
+    ws.addRow([translate("ui.groupListTitle", { name: groupName })]);
     ws.mergeCells(1, 1, 1, COL_COUNT);
     const t = ws.getRow(1).getCell(1);
     t.font = { bold: true, size: 14 };
@@ -35,7 +35,7 @@ export function GroupExportButtons({ groupName, curatorName, students }: GroupEx
     ws.getRow(1).height = 30;
 
     // Curator
-    ws.addRow([`Куратор: ${curatorName || translate("ui.notAssigned")}`]);
+    ws.addRow([translate("ui.curatorNamed", { name: curatorName || translate("ui.notAssigned") })]);
     ws.mergeCells(2, 1, 2, COL_COUNT);
     const s = ws.getRow(2).getCell(1);
     s.font = { size: 11, italic: true };

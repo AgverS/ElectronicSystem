@@ -167,7 +167,7 @@ function AssignmentsTableInner({ teachers, groups, subjects }: AssignmentsTableP
                           {g.groupName}
                           <button
                             type="button"
-                            aria-label={`Удалить ${g.groupName}`}
+                            aria-label={translate("ui.deleteNamed", { name: g.groupName })}
                             onClick={() =>
                               setToDelete({
                                 id: g.assignmentId,

@@ -270,7 +270,7 @@ export function GradeCell({
                 {grades.map((g, i) => (
                   <div key={g.retakeNumber} className="flex items-center gap-2">
                     <span className="text-[10px] text-muted-foreground w-20 shrink-0">
-                      {i === 0 ? translate("ui.original") : `Пересдача ${i}`}
+                      {i === 0 ? translate("ui.original") : translate("ui.retakeN", { n: i })}
                     </span>
                     <span
                       className={cn(

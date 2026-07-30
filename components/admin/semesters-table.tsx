@@ -144,7 +144,7 @@ function SemestersTableInner() {
                     <Checkbox
                       checked={selected.has(s.id)}
                       onCheckedChange={() => toggle(s.id)}
-                      aria-label={`Выбрать ${s.name}`}
+                      aria-label={translate("ui.selectNamed", { name: s.name })}
                     />
                   </TableCell>
                   <TableCell className="font-medium">
@@ -174,7 +174,7 @@ function SemestersTableInner() {
                         }}
                       />
                       <DeleteDialog
-                        label={`Удалить «${s.name}»`}
+                        label={translate("ui.deleteNamed", { name: s.name })}
                         action={() => deleteSemester(s.id)}
                       />
                     </div>

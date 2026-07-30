@@ -160,7 +160,7 @@ export function WeekScheduleTable({
         {mode !== "teacher" && (
           <span className="block text-xs font-medium text-foreground">{el.teacher.name}</span>
         )}
-        <span className="block text-xs text-muted-foreground">Каб. {el.room}</span>
+        <span className="block text-xs text-muted-foreground">{translate("ui.roomShort", { room: el.room })}</span>
         {el.comment && (
           <span className="block text-xs text-muted-foreground truncate">{el.comment}</span>
         )}
@@ -211,9 +211,7 @@ export function WeekScheduleTable({
 
   function subgroupTag(sg: string) {
     return sg ? (
-      <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-        Подгр. {sg}
-      </span>
+      <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{translate("ui.subgroupShort", { subgroup: sg })}</span>
     ) : null;
   }
 
@@ -235,9 +233,7 @@ export function WeekScheduleTable({
               kind="room"
               value={base.room}
               href={`${baseUrl}?room=${encodeURIComponent(base.room)}`}
-            >
-              Каб. {base.room}
-            </NavLink>
+            >{translate("ui.roomShort", { room: base.room })}</NavLink>
           </>
         ) : mode === "room" ? (
           <>
@@ -271,9 +267,7 @@ export function WeekScheduleTable({
               kind="room"
               value={base.room}
               href={`${baseUrl}?room=${encodeURIComponent(base.room)}`}
-            >
-              Каб. {base.room}
-            </NavLink>
+            >{translate("ui.roomShort", { room: base.room })}</NavLink>
           </>
         )}
       </div>
@@ -325,9 +319,7 @@ export function WeekScheduleTable({
                   kind="room"
                   value={sub.room}
                   href={`${baseUrl}?room=${encodeURIComponent(sub.room)}`}
-                >
-                  Каб. {sub.room}
-                </NavLink>
+                >{translate("ui.roomShort", { room: sub.room })}</NavLink>
               )}
             </>
           ) : mode === "room" ? (
@@ -367,9 +359,7 @@ export function WeekScheduleTable({
                   kind="room"
                   value={sub.room}
                   href={`${baseUrl}?room=${encodeURIComponent(sub.room)}`}
-                >
-                  Каб. {sub.room}
-                </NavLink>
+                >{translate("ui.roomShort", { room: sub.room })}</NavLink>
               )}
             </>
           )}

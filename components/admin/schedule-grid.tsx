@@ -308,9 +308,7 @@ export function AdminScheduleGrid() {
                               >
                                 <div className="flex-1 min-w-0">
                                   {entry.subgroup && (
-                                    <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                                      Подгр. {entry.subgroup}
-                                    </div>
+                                    <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{translate("ui.subgroupShort", { subgroup: entry.subgroup })}</div>
                                   )}
                                   <div className="font-medium text-foreground truncate">
                                     {entry.subject.name}
@@ -318,9 +316,7 @@ export function AdminScheduleGrid() {
                                   <div className="text-muted-foreground truncate">
                                     {entry.teacher.name}
                                   </div>
-                                  <div className="text-muted-foreground">
-                                    Каб. {entry.room}
-                                  </div>
+                                  <div className="text-muted-foreground">{translate("ui.roomShort", { room: entry.room })}</div>
                                 </div>
                                 <IconPencil
                                   size={12}

@@ -162,7 +162,7 @@ function GroupsTableInner({ teachers, specialties, hideSpecialty }: GroupsTableP
                     <Checkbox
                       checked={selected.has(g.id)}
                       onCheckedChange={() => toggle(g.id)}
-                      aria-label={`Выбрать ${g.name}`}
+                      aria-label={translate("ui.selectNamed", { name: g.name })}
                     />
                   </TableCell>
                   <TableCell className="font-medium">{g.name}</TableCell>
@@ -208,7 +208,7 @@ function GroupsTableInner({ teachers, specialties, hideSpecialty }: GroupsTableP
                         specialties={specialties}
                       />
                       <DeleteDialog
-                        label={`Удалить группу ${g.name}`}
+                        label={translate("ui.deleteNamed", { name: g.name })}
                         action={async () => {
                           await deleteGroup(g.id);
                           await queryClient.invalidateQueries({

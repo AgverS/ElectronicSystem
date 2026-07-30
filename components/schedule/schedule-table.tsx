@@ -98,10 +98,8 @@ export function ScheduleTable({
                             <Link
                               href={`${baseUrl}?room=${encodeURIComponent(entry.room)}`}
                               className="text-xs text-muted-foreground hover:text-primary hover:underline truncate"
-                              title={`Каб. ${entry.room}`}
-                            >
-                              Каб. {entry.room}
-                            </Link>
+                              title={translate("ui.roomShort", { room: entry.room })}
+                            >{translate("ui.roomShort", { room: entry.room })}</Link>
                           </>
                         ) : mode === "room" ? (
                           <>
@@ -132,10 +130,8 @@ export function ScheduleTable({
                             <Link
                               href={`${baseUrl}?room=${encodeURIComponent(entry.room)}`}
                               className="text-xs text-muted-foreground hover:text-primary hover:underline truncate"
-                              title={`Каб. ${entry.room}`}
-                            >
-                              Каб. {entry.room}
-                            </Link>
+                              title={translate("ui.roomShort", { room: entry.room })}
+                            >{translate("ui.roomShort", { room: entry.room })}</Link>
                           </>
                         )}
                       </div>

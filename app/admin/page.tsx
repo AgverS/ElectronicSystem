@@ -71,11 +71,11 @@ function startOfUTCDay(d: Date) {
 function formatRelative(d: Date, now: Date): string {
   const minutes = Math.floor((now.getTime() - d.getTime()) / 60_000);
   if (minutes < 1) return translate("ui.justNow");
-  if (minutes < 60) return `${minutes} мин. назад`;
+  if (minutes < 60) return translate("ui.minutesAgo", { minutes });
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} ч. назад`;
+  if (hours < 24) return translate("ui.hoursAgo", { hours });
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days} дн. назад`;
+  if (days < 7) return translate("ui.daysAgo", { days });
   return new Intl.DateTimeFormat("ru-RU", { day: "2-digit", month: "2-digit", year: "2-digit" }).format(d);
 }
 
@@ -239,7 +239,7 @@ export default async function AdminDashboard() {
   const d = await loadOverview(now).catch(() => EMPTY);
 
   const weekLabels = Array.from({ length: WEEKS }, (_, i) =>
-    i === WEEKS - 1 ? translate("ui.now") : `${WEEKS - 1 - i}н`,
+    i === WEEKS - 1 ? translate("ui.now") : translate("ui.weeksShort", { n: WEEKS - 1 - i }),
   );
   const dateLabel = new Intl.DateTimeFormat("ru-RU", {
     weekday: "long", day: "numeric", month: "long",

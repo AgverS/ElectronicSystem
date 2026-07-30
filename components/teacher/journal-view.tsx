@@ -330,7 +330,7 @@ export function JournalView({
           <IconChevronLeft size={16} />
           {translate("common.back")}
         </Button>
-        <h2 className="font-medium text-muted-foreground">Группа {assignment.group.name}</h2>
+        <h2 className="font-medium text-muted-foreground">{translate("ui.groupNamed", { name: assignment.group.name })}</h2>
       </div>
 
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -449,8 +449,8 @@ export function JournalView({
                         {remainingHours == null
                           ? translate("ui.remaining")
                           : remainingHours < 0
-                            ? `перерасход ${-remainingHours}`
-                            : `осталось ${remainingHours}`}
+                            ? translate("ui.hoursOver", { hours: -remainingHours })
+                            : translate("ui.hoursRemaining", { hours: remainingHours })}
                       </span>
                     </th>
                   </tr>

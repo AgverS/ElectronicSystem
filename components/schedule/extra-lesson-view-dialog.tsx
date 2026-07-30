@@ -125,7 +125,7 @@ export function ExtraLessonViewDialog(props: Props) {
                 className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 <IconUsers size={14} />
-                {showRsvps ? `Участники (${rsvps?.length ?? lesson.rsvpCount})` : `Показать участников (${lesson.rsvpCount})`}
+                {showRsvps ? translate("ui.attendeesTitle", { count: rsvps?.length ?? lesson.rsvpCount }) : translate("ui.showAttendees", { count: lesson.rsvpCount })}
               </button>
               {showRsvps && rsvps && (
                 <div className="mt-2 flex flex-col gap-1">
@@ -149,7 +149,7 @@ export function ExtraLessonViewDialog(props: Props) {
           {props.role === "student" && (
             <div className="flex items-center justify-between rounded-md border px-3 py-2">
               <span className="text-sm">
-                {lesson.rsvpCount > 0 ? `${lesson.rsvpCount} чел. придут` : translate("ui.nobodyHasSignedUpYet")}
+                {lesson.rsvpCount > 0 ? translate("ui.attendeesCount", { count: lesson.rsvpCount }) : translate("ui.nobodyHasSignedUpYet")}
               </span>
               <Button
                 size="sm"

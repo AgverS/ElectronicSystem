@@ -226,7 +226,7 @@ function UsersTableInner({
                       <Checkbox
                         checked={selected.has(u.id)}
                         onCheckedChange={() => toggle(u.id)}
-                        aria-label={`Выбрать ${u.name}`}
+                        aria-label={translate("ui.selectNamed", { name: u.name })}
                       />
                     )}
                   </TableCell>
@@ -297,7 +297,7 @@ function UsersTableInner({
                       )}
                       {canModify(u) && (
                         <DeleteDialog
-                          label={`Удалить ${u.name}`}
+                          label={translate("ui.deleteNamed", { name: u.name })}
                           action={async () => {
                             await deleteUser(u.id);
                             await queryClient.invalidateQueries({

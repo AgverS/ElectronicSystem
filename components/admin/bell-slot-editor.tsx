@@ -62,7 +62,7 @@ export function BellSlotEditor({
             </span>
             <Input
               type="time"
-              aria-label={`Начало пары ${n}`}
+              aria-label={translate("ui.periodStart", { n: n })}
               aria-invalid={invalid}
               value={c.startTime}
               onChange={(e) => onChange(n, "startTime", e.target.value)}
@@ -73,7 +73,7 @@ export function BellSlotEditor({
             </span>
             <Input
               type="time"
-              aria-label={`Конец пары ${n}`}
+              aria-label={translate("ui.periodEnd", { n: n })}
               aria-invalid={invalid}
               value={c.endTime}
               onChange={(e) => onChange(n, "endTime", e.target.value)}

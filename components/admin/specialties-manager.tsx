@@ -271,7 +271,7 @@ function SpecialtyRow({
               <IconPencil size={15} />
             </IconBtn>
             <DeleteDialog
-              label={`Удалить «${specialty.name}»`}
+              label={translate("ui.deleteNamed", { name: specialty.name })}
               action={() => deleteSpecialty(specialty.id)}
             />
           </div>

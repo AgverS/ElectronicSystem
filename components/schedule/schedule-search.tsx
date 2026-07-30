@@ -79,7 +79,7 @@ export function ScheduleSearch({ onSelect }: ScheduleSearchProps = {}) {
           })),
           ...data.rooms.map((room: string) => ({
             kind: "room" as const,
-            label: `Кабинет ${room}`,
+            label: translate("ui.roomNamed", { room: room }),
             href: `/schedule?room=${encodeURIComponent(room)}`,
             value: room,
           })),

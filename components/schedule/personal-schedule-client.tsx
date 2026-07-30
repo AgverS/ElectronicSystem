@@ -136,7 +136,7 @@ export function PersonalScheduleClient({
         value;
       setFilter({ kind: "teacher", id: value, label });
     } else {
-      setFilter({ kind: "room", id: value, label: `Кабинет ${value}` });
+      setFilter({ kind: "room", id: value, label: translate("ui.roomNamed", { room: value }) });
     }
   }
 
@@ -152,13 +152,13 @@ export function PersonalScheduleClient({
 
   const title = isOwnView
     ? own.kind === "group"
-      ? `Группа ${own.label}`
+      ? translate("ui.groupNamed", { name: own.label })
       : own.label
     : active.kind === "teacher"
       ? active.label
       : active.kind === "room"
         ? active.label
-        : `Группа ${active.label}`;
+        : translate("ui.groupNamed", { name: active.label });
 
   const subtitle = isOwnView
     ? translate("ui.myTimetable")

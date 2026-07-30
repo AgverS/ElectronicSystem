@@ -118,7 +118,7 @@ export function computeGroupEvents(opts: {
         startTime: time.startTime,
         endTime: time.endTime,
         summary: `${lessonNumber}. ${summary}${subgroupSuffix(subgroup)}`,
-        location: room ? `Каб. ${room}` : undefined,
+        location: room ? translate("ui.roomShort", { room: room }) : undefined,
         description: teacherName ? `Преподаватель: ${teacherName}` : undefined,
       });
     }
@@ -173,7 +173,7 @@ export function computeTeacherEvents(opts: {
         startTime: time.startTime,
         endTime: time.endTime,
         summary: `${b.lessonNumber}. ${subject} — ${b.group.name}${subgroupSuffix(b.subgroup)}`,
-        location: room ? `Каб. ${room}` : undefined,
+        location: room ? translate("ui.roomShort", { room: room }) : undefined,
       });
     }
 
@@ -192,7 +192,7 @@ export function computeTeacherEvents(opts: {
         startTime: time.startTime,
         endTime: time.endTime,
         summary: `${s.lessonNumber}. ${s.subject?.name ?? translate("audit.entity.schedule_substitution")} — ${s.group.name}${subgroupSuffix(s.subgroup)}`,
-        location: s.room ? `Каб. ${s.room}` : undefined,
+        location: s.room ? translate("ui.roomShort", { room: s.room }) : undefined,
       });
     }
   }

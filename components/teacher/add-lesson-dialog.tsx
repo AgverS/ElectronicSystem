@@ -146,7 +146,7 @@ export function AddLessonDialog({
                   variant={countNum === n ? "default" : "outline"}
                   size="icon"
                   onClick={() => setCount(String(n))}
-                  aria-label={`${n} уроков`}
+                  aria-label={translate("ui.lessonsCount", { count: n })}
                 >
                   {n}
                 </Button>

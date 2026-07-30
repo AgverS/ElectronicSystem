@@ -231,9 +231,7 @@ export function SubstitutionGrid({ groupId }: Props) {
 
   function subgroupTag(sg: string) {
     return sg ? (
-      <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-        Подгр. {sg}
-      </span>
+      <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{translate("ui.subgroupShort", { subgroup: sg })}</span>
     ) : null;
   }
 
@@ -352,9 +350,7 @@ export function SubstitutionGrid({ groupId }: Props) {
                                         {sub.teacher?.name ?? "-"}
                                       </div>
                                       {sub.room && (
-                                        <div className="text-muted-foreground">
-                                          Каб. {sub.room}
-                                        </div>
+                                        <div className="text-muted-foreground">{translate("ui.roomShort", { room: sub.room })}</div>
                                       )}
                                     </div>
                                   )}
@@ -381,9 +377,7 @@ export function SubstitutionGrid({ groupId }: Props) {
                                   <div className="text-muted-foreground truncate">
                                     {base?.teacher.name}
                                   </div>
-                                  <div className="text-muted-foreground">
-                                    Каб. {base?.room}
-                                  </div>
+                                  <div className="text-muted-foreground">{translate("ui.roomShort", { room: base?.room ?? "" })}</div>
                                 </div>
                                 <IconPencil
                                   size={12}
