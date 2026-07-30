@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { IconPencil } from "@tabler/icons-react";
 import {
   Dialog,
@@ -73,7 +74,7 @@ export function EditSubjectDialog({ subject, specialties }: EditSubjectDialogPro
     e.preventDefault();
     setError("");
     if (!name.trim()) {
-      setError("Введите название");
+      setError(translate("ui.enterAName"));
       return;
     }
     startTransition(async () => {
@@ -87,7 +88,7 @@ export function EditSubjectDialog({ subject, specialties }: EditSubjectDialogPro
         refresh();
         setOpen(false);
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Ошибка");
+        setError(err instanceof Error ? err.message : translate("common.error"));
       }
     });
   }
@@ -95,29 +96,29 @@ export function EditSubjectDialog({ subject, specialties }: EditSubjectDialogPro
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <IconBtn tooltip="Редактировать">
+        <IconBtn tooltip={translate("common.edit")}>
           <IconPencil size={15} />
         </IconBtn>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Редактировать предмет</DialogTitle>
+          <DialogTitle>{translate("ui.editTheSubject")}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSave} className="flex flex-col gap-4 pt-2">
           <div className="flex flex-col gap-1">
-            <Label required>Название</Label>
+            <Label required>{translate("common.name")}</Label>
             <Input value={name} onChange={(e) => setName(e.target.value)} />
           </div>
 
           <div className="flex flex-col gap-1">
-            <Label>Часы (за семестр)</Label>
+            <Label>{translate("ui.hoursPerSemester")}</Label>
             <Input
               type="number"
               min={0}
               step={1}
               value={hours}
               onChange={(e) => setHours(e.target.value)}
-              placeholder="не задано"
+              placeholder={translate("ui.notSet")}
             />
           </div>
 
@@ -127,7 +128,7 @@ export function EditSubjectDialog({ subject, specialties }: EditSubjectDialogPro
               checked={isPractical}
               onCheckedChange={setIsPractical}
             />
-            <Label htmlFor="edit-practical">Практический предмет</Label>
+            <Label htmlFor="edit-practical">{translate("ui.practicalSubject")}</Label>
           </div>
 
           <SpecialtyMultiSelect
@@ -143,10 +144,10 @@ export function EditSubjectDialog({ subject, specialties }: EditSubjectDialogPro
               variant="outline"
               onClick={() => setOpen(false)}
             >
-              Отмена
+              {translate("common.cancel")}
             </Button>
             <Button type="submit" disabled={pending}>
-              {pending ? "Сохранение..." : "Сохранить"}
+              {pending ? translate("common.saving") : translate("common.save")}
             </Button>
           </div>
         </form>

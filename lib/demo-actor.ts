@@ -9,7 +9,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
-import { translate } from "@/lib/i18n/provider";
+import { translate } from "@/lib/i18n/translate";
 import type { Role } from "@/lib/prisma-client";
 import type { User } from "@/lib/demo-db/types";
 

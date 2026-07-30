@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import {
   Dialog,
   DialogContent,
@@ -49,11 +50,11 @@ export function CreateSemesterDialog() {
     e.preventDefault();
     setError("");
 
-    if (!startDate) { setError("Укажите корректную дату начала"); return; }
-    if (!endDate) { setError("Укажите корректную дату окончания (например, 31.06 не существует)"); return; }
+    if (!startDate) { setError(translate("ui.enterAValidStartDate")); return; }
+    if (!endDate) { setError(translate("ui.enterAValidEndDate31JuneFor")); return; }
 
     if (new Date(startDate) >= new Date(endDate)) {
-      setError("Дата начала должна быть раньше даты окончания");
+      setError(translate("ui.theStartDateMustComeBeforeTheEnd"));
       return;
     }
 
@@ -68,7 +69,7 @@ export function CreateSemesterDialog() {
         refresh();
         handleOpenChange(false);
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Ошибка");
+        setError(err instanceof Error ? err.message : translate("common.error"));
       }
     });
   }
@@ -77,18 +78,18 @@ export function CreateSemesterDialog() {
     <>
       <Button onClick={() => setOpen(true)} className="gap-2">
         <IconPlus size={16} />
-        Создать семестр
+        {translate("ui.createTheSemester")}
       </Button>
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Новый семестр</DialogTitle>
+            <DialogTitle>{translate("ui.newSemester")}</DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
             <div className="flex flex-col gap-1">
-              <Label required>Номер семестра</Label>
+              <Label required>{translate("ui.semesterNumber")}</Label>
               <Select value={number} onValueChange={setNumber}>
                 <SelectTrigger className="w-full">
                   <SelectValue />
@@ -101,7 +102,7 @@ export function CreateSemesterDialog() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="flex flex-col gap-1">
-                <Label required>Начало</Label>
+                <Label required>{translate("bells.start")}</Label>
                 <Input
                   type="date"
                   value={startDate}
@@ -110,7 +111,7 @@ export function CreateSemesterDialog() {
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <Label required>Конец</Label>
+                <Label required>{translate("bells.end")}</Label>
                 <Input
                   type="date"
                   value={endDate}
@@ -128,10 +129,10 @@ export function CreateSemesterDialog() {
                 onClick={() => handleOpenChange(false)}
                 disabled={pending}
               >
-                Отмена
+                {translate("common.cancel")}
               </Button>
               <Button type="submit" disabled={pending}>
-                {pending ? "Создание..." : "Создать"}
+                {pending ? translate("ui.creating") : translate("common.create")}
               </Button>
             </DialogFooter>
           </form>

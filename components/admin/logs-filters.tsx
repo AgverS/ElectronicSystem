@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { translate } from "@/lib/i18n/translate";
 import { useCallback, useRef, useState, useTransition } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,47 +14,55 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
-const ACTION_OPTIONS = [
-  { value: "LOGIN", label: "Вход в систему" },
-  { value: "LOGOUT", label: "Выход из системы" },
-  { value: "CREATE_USER", label: "Создание пользователя" },
-  { value: "UPDATE_USER", label: "Изменение пользователя" },
-  { value: "DELETE_USER", label: "Удаление пользователя" },
-  { value: "CREATE_GROUP", label: "Создание группы" },
-  { value: "UPDATE_GROUP", label: "Изменение группы" },
-  { value: "DELETE_GROUP", label: "Удаление группы" },
-  { value: "CREATE_SUBJECT", label: "Создание предмета" },
-  { value: "UPDATE_SUBJECT", label: "Изменение предмета" },
-  { value: "DELETE_SUBJECT", label: "Удаление предмета" },
-  { value: "CREATE_SEMESTER", label: "Создание семестра" },
-  { value: "UPDATE_SEMESTER", label: "Изменение семестра" },
-  { value: "DELETE_SEMESTER", label: "Удаление семестра" },
-  { value: "CREATE_ASSIGNMENT", label: "Создание назначения" },
-  { value: "DELETE_ASSIGNMENT", label: "Удаление назначения" },
-  { value: "CREATE_LESSON", label: "Создание урока" },
-  { value: "DELETE_LESSON", label: "Удаление урока" },
-  { value: "UPDATE_LESSON_TOPIC", label: "Изменение темы урока" },
-  { value: "UPSERT_GRADE", label: "Выставление отметки" },
-  { value: "DELETE_GRADE", label: "Удаление отметки" },
-  { value: "ADD_STUDENT_TO_GROUP", label: "Студент в группу" },
-  { value: "UPSERT_SCHEDULE_ENTRY", label: "Изменение расписания" },
-  { value: "DELETE_SCHEDULE_ENTRY", label: "Удаление расписания" },
-  { value: "UPSERT_SUBSTITUTION", label: "Замена" },
-  { value: "DELETE_SUBSTITUTION", label: "Удаление замены" },
+// Built on each call: the labels are translated, and the catalog is not
+// loaded yet when this module is first imported.
+function ACTION_OPTIONS() {
+  return [
+  { value: "LOGIN", label: translate("ui.signIn") },
+  { value: "LOGOUT", label: translate("ui.signOut") },
+  { value: "CREATE_USER", label: translate("audit.action.CREATE_USER") },
+  { value: "UPDATE_USER", label: translate("audit.action.UPDATE_USER") },
+  { value: "DELETE_USER", label: translate("ui.removeThePerson") },
+  { value: "CREATE_GROUP", label: translate("audit.action.CREATE_GROUP") },
+  { value: "UPDATE_GROUP", label: translate("audit.action.UPDATE_GROUP") },
+  { value: "DELETE_GROUP", label: translate("ui.deleteTheGroup") },
+  { value: "CREATE_SUBJECT", label: translate("audit.action.CREATE_SUBJECT") },
+  { value: "UPDATE_SUBJECT", label: translate("audit.action.UPDATE_SUBJECT") },
+  { value: "DELETE_SUBJECT", label: translate("ui.deleteTheSubject") },
+  { value: "CREATE_SEMESTER", label: translate("audit.action.CREATE_SEMESTER") },
+  { value: "UPDATE_SEMESTER", label: translate("audit.action.UPDATE_SEMESTER") },
+  { value: "DELETE_SEMESTER", label: translate("ui.deleteTheSemester") },
+  { value: "CREATE_ASSIGNMENT", label: translate("audit.action.CREATE_ASSIGNMENT") },
+  { value: "DELETE_ASSIGNMENT", label: translate("ui.deleteTheAssignment2") },
+  { value: "CREATE_LESSON", label: translate("audit.action.CREATE_LESSON") },
+  { value: "DELETE_LESSON", label: translate("ui.deleteTheLesson") },
+  { value: "UPDATE_LESSON_TOPIC", label: translate("audit.action.UPDATE_LESSON_TOPIC") },
+  { value: "UPSERT_GRADE", label: translate("audit.action.UPSERT_GRADE") },
+  { value: "DELETE_GRADE", label: translate("ui.clearTheGrade") },
+  { value: "ADD_STUDENT_TO_GROUP", label: translate("audit.action.ADD_STUDENT_TO_GROUP") },
+  { value: "UPSERT_SCHEDULE_ENTRY", label: translate("audit.action.UPSERT_SCHEDULE_ENTRY") },
+  { value: "DELETE_SCHEDULE_ENTRY", label: translate("ui.removeTheTimetableEntry") },
+  { value: "UPSERT_SUBSTITUTION", label: translate("audit.entity.schedule_substitution") },
+  { value: "DELETE_SUBSTITUTION", label: translate("ui.removeTheCoverLesson2") },
 ];
+}
 
-const ENTITY_OPTIONS = [
-  { value: "session", label: "Сессия" },
-  { value: "user", label: "Пользователь" },
-  { value: "group", label: "Группа" },
-  { value: "subject", label: "Предмет" },
-  { value: "semester", label: "Семестр" },
-  { value: "assignment", label: "Назначение" },
-  { value: "lesson", label: "Урок" },
-  { value: "grade", label: "Отметка" },
-  { value: "schedule_entry", label: "Расписание" },
-  { value: "schedule_substitution", label: "Замена" },
+// Built on each call: the labels are translated, and the catalog is not
+// loaded yet when this module is first imported.
+function ENTITY_OPTIONS() {
+  return [
+  { value: "session", label: translate("audit.entity.session") },
+  { value: "user", label: translate("audit.user") },
+  { value: "group", label: translate("term.group") },
+  { value: "subject", label: translate("term.subject") },
+  { value: "semester", label: translate("term.semester") },
+  { value: "assignment", label: translate("audit.entity.assignment") },
+  { value: "lesson", label: translate("term.lesson") },
+  { value: "grade", label: translate("audit.action.UPSERT_GRADE") },
+  { value: "schedule_entry", label: translate("nav.schedule") },
+  { value: "schedule_substitution", label: translate("audit.entity.schedule_substitution") },
 ];
+}
 
 const LIMIT_OPTIONS = [
   { value: "25", label: "25" },
@@ -115,11 +124,11 @@ export function LogsFilters() {
         onValueChange={(v) => pushParams({ action: v === "_all" ? "" : v })}
       >
         <SelectTrigger size="sm" className="w-56">
-          <SelectValue placeholder="Все действия" />
+          <SelectValue placeholder={translate("ui.allActions")} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="_all">Все действия</SelectItem>
-          {ACTION_OPTIONS.map((o) => (
+          <SelectItem value="_all">{translate("ui.allActions")}</SelectItem>
+          {ACTION_OPTIONS().map((o) => (
             <SelectItem key={o.value} value={o.value}>
               {o.label}
             </SelectItem>
@@ -132,11 +141,11 @@ export function LogsFilters() {
         onValueChange={(v) => pushParams({ entity: v === "_all" ? "" : v })}
       >
         <SelectTrigger size="sm" className="w-40">
-          <SelectValue placeholder="Все сущности" />
+          <SelectValue placeholder={translate("ui.allObjects")} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="_all">Все сущности</SelectItem>
-          {ENTITY_OPTIONS.map((o) => (
+          <SelectItem value="_all">{translate("ui.allObjects")}</SelectItem>
+          {ENTITY_OPTIONS().map((o) => (
             <SelectItem key={o.value} value={o.value}>
               {o.label}
             </SelectItem>
@@ -146,7 +155,7 @@ export function LogsFilters() {
 
       <Input
         className="h-8 w-52 text-sm"
-        placeholder="Поиск (имя, логин, IP...)"
+        placeholder={translate("ui.searchByNameUsernameOrIp")}
         value={searchVal}
         onChange={(e) => {
           setSearchVal(e.target.value);
@@ -204,7 +213,7 @@ export function LogsFilters() {
             router.push("/admin/logs");
           }}
         >
-          Сбросить
+          {translate("common.reset")}
         </Button>
       )}
     </div>

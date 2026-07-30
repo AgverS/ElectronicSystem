@@ -1,8 +1,9 @@
 import { RecordKind } from "@/lib/prisma-client";
+import { translate } from "@/lib/i18n/translate";
 
 export const RECORD_KIND_LABELS: Record<RecordKind, string> = {
-  REWARD: "Поощрение",
-  PENALTY: "Взыскание",
+  REWARD: translate("record.kind.REWARD"),
+  PENALTY: translate("record.kind.PENALTY"),
 };
 
 // Colours pulled from the same palette as the grade cells (green = positive,

@@ -42,6 +42,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "../ui/switch";
 import { useT } from "@/lib/i18n/provider";
+import { translate } from "@/lib/i18n/translate";
 import {
   downloadBackup,
   createBackupAction,
@@ -89,13 +90,13 @@ export function BackupsView({
     try {
       const result = await createBackupAction();
       if (result.success) {
-        toast.success("Бэкап успешно создан");
+        toast.success(translate("audit.action.CREATE_BACKUP"));
         // Reload list (simplest for now)
         window.location.reload();
       }
     } catch (error: unknown) {
       toast.error(
-        error instanceof Error ? error.message : "Ошибка создания бэкапа",
+        error instanceof Error ? error.message : translate("ui.couldNotCreateTheBackup"),
       );
     } finally {
       setIsCreating(false);
@@ -106,9 +107,9 @@ export function BackupsView({
     try {
       await deleteBackupAction(filename);
       setBackups(backups.filter((b) => b.filename !== filename));
-      toast.success("Бэкап удален");
+      toast.success(translate("audit.action.DELETE_BACKUP"));
     } catch (error: unknown) {
-      toast.error(error instanceof Error ? error.message : "Ошибка удаления");
+      toast.error(error instanceof Error ? error.message : translate("ui.couldNotDelete"));
     }
   }
 
@@ -116,12 +117,12 @@ export function BackupsView({
     setIsRestoring(filename);
     try {
       await restoreBackupAction(filename);
-      toast.success("База данных успешно восстановлена");
+      toast.success(translate("ui.dataRestoredSuccessfully"));
       // Session might be invalid after restore if users table changed
       setTimeout(() => window.location.reload(), 2000);
     } catch (error: unknown) {
       toast.error(
-        error instanceof Error ? error.message : "Ошибка восстановления",
+        error instanceof Error ? error.message : translate("ui.restoreFailed"),
       );
     } finally {
       setIsRestoring(null);
@@ -133,9 +134,9 @@ export function BackupsView({
     setIsSavingSettings(true);
     try {
       await updateBackupSettingsAction(settings);
-      toast.success("Настройки сохранены");
+      toast.success(translate("ui.settingsSaved"));
     } catch (error: unknown) {
-      toast.error(error instanceof Error ? error.message : "Ошибка сохранения");
+      toast.error(error instanceof Error ? error.message : translate("ui.couldNotSave2"));
     } finally {
       setIsSavingSettings(false);
     }
@@ -145,7 +146,7 @@ export function BackupsView({
     <div className="grid gap-6 md:grid-cols-[1fr,300px]">
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-medium">Список бэкапов</h2>
+          <h2 className="text-lg font-medium">{translate("nav.backups")}</h2>
           <Button onClick={handleCreateBackup} disabled={isCreating}>
             {isCreating ? (
               <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -160,10 +161,10 @@ export function BackupsView({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Файл</TableHead>
-                <TableHead>Размер</TableHead>
-                <TableHead>Дата создания</TableHead>
-                <TableHead className="w-40 text-right">Действия</TableHead>
+                <TableHead>{translate("ui.file")}</TableHead>
+                <TableHead>{translate("ui.size")}</TableHead>
+                <TableHead>{translate("common.created")}</TableHead>
+                <TableHead className="w-40 text-right">{translate("common.actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -173,7 +174,7 @@ export function BackupsView({
                     colSpan={4}
                     className="h-24 text-center text-muted-foreground"
                   >
-                    Бэкапы не найдены
+                    {translate("ui.noBackupsYet")}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -202,7 +203,7 @@ export function BackupsView({
                             <Button
                               variant="ghost"
                               size="icon"
-                              title="Восстановить"
+                              title={translate("ui.restore")}
                               className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
                             >
                               <IconRestore size={16} />
@@ -211,7 +212,7 @@ export function BackupsView({
                           <AlertDialogContent>
                             <AlertDialogHeader>
                               <AlertDialogTitle>
-                                Восстановление БД
+                                {translate("ui.restoreData")}
                               </AlertDialogTitle>
                               <AlertDialogDescription>
                                 Вы уверены, что хотите восстановить базу данных
@@ -224,7 +225,7 @@ export function BackupsView({
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel>Отмена</AlertDialogCancel>
+                              <AlertDialogCancel>{translate("common.cancel")}</AlertDialogCancel>
                               <AlertDialogAction
                                 variant="destructive"
                                 disabled={!!isRestoring}
@@ -248,7 +249,7 @@ export function BackupsView({
                             <Button
                               variant="ghost"
                               size="icon"
-                              title="Удалить"
+                              title={translate("common.delete")}
                               className="text-destructive hover:bg-destructive/10"
                             >
                               <IconTrash size={16} />
@@ -257,7 +258,7 @@ export function BackupsView({
                           <AlertDialogContent>
                             <AlertDialogHeader>
                               <AlertDialogTitle>
-                                Удаление бэкапа
+                                {translate("ui.deleteTheBackup")}
                               </AlertDialogTitle>
                               <AlertDialogDescription>
                                 Вы уверены, что хотите удалить файл бэкапа{" "}
@@ -266,14 +267,14 @@ export function BackupsView({
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel>Отмена</AlertDialogCancel>
+                              <AlertDialogCancel>{translate("common.cancel")}</AlertDialogCancel>
                               <AlertDialogAction
                                 variant="destructive"
                                 onClick={() =>
                                   handleDeleteBackup(backup.filename)
                                 }
                               >
-                                Удалить
+                                {translate("common.delete")}
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
@@ -293,16 +294,16 @@ export function BackupsView({
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <IconSettings size={18} />
-              Автобэкапы
+              {translate("ui.automaticBackups")}
             </CardTitle>
             <CardDescription>
-              Настройка периодического копирования
+              {translate("ui.scheduledBackupSettings")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSaveSettings} className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label htmlFor="enabled">Включено</Label>
+                <Label htmlFor="enabled">{translate("ui.enabled")}</Label>
                 <Switch
                   id="enabled"
                   checked={settings.enabled}
@@ -313,7 +314,7 @@ export function BackupsView({
               </div>
 
               <div className="space-y-1.5">
-                <Label required htmlFor="interval">Интервал (часов)</Label>
+                <Label required htmlFor="interval">{translate("ui.intervalHours")}</Label>
                 <Input
                   id="interval"
                   type="number"
@@ -330,7 +331,7 @@ export function BackupsView({
               </div>
 
               <div className="space-y-1.5">
-                <Label required htmlFor="keep">Хранить копий</Label>
+                <Label required htmlFor="keep">{translate("ui.backupsToKeep")}</Label>
                 <Input
                   id="keep"
                   type="number"
@@ -371,7 +372,7 @@ export function BackupsView({
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
   <IconDatabase size={18} />
-              Инфо
+              {translate("ui.info")}
             </CardTitle>
           </CardHeader>
           <CardContent className="text-xs text-muted-foreground space-y-2">

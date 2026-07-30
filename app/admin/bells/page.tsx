@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { translate } from "@/lib/i18n/translate";
 import { toISODate } from "@/lib/week";
 import { BellPermanentEditor } from "@/components/admin/bell-permanent-editor";
 import { BellOverridesManager } from "@/components/admin/bell-overrides-manager";
@@ -17,9 +18,9 @@ export default async function BellsPage() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="mb-1 text-2xl font-bold tracking-tight">Расписание звонков</h1>
+        <h1 className="mb-1 text-2xl font-bold tracking-tight">{translate("nav.bells")}</h1>
         <p className="text-sm text-muted-foreground">
-          Постоянное расписание по дням недели и временные изменения на праздники.
+          {translate("ui.theStandardTimetableByDayOfTheWeek")}
         </p>
       </div>
 

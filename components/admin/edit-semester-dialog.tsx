@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { IconPencil } from "@tabler/icons-react";
 import {
   Dialog,
@@ -53,11 +54,11 @@ export function EditSemesterDialog({ semester }: EditSemesterDialogProps) {
     e.preventDefault();
     setError("");
 
-    if (!startDate) { setError("Укажите корректную дату начала"); return; }
-    if (!endDate) { setError("Укажите корректную дату окончания (например, 31.06 не существует)"); return; }
+    if (!startDate) { setError(translate("ui.enterAValidStartDate")); return; }
+    if (!endDate) { setError(translate("ui.enterAValidEndDate31JuneFor")); return; }
 
     if (new Date(startDate) >= new Date(endDate)) {
-      setError("Дата начала должна быть раньше даты окончания");
+      setError(translate("ui.theStartDateMustComeBeforeTheEnd"));
       return;
     }
 
@@ -72,7 +73,7 @@ export function EditSemesterDialog({ semester }: EditSemesterDialogProps) {
         refresh();
         setOpen(false);
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Ошибка");
+        setError(err instanceof Error ? err.message : translate("common.error"));
       }
     });
   }
@@ -81,17 +82,17 @@ export function EditSemesterDialog({ semester }: EditSemesterDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <IconBtn tooltip="Редактировать">
+        <IconBtn tooltip={translate("common.edit")}>
           <IconPencil size={15} />
         </IconBtn>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Редактировать семестр</DialogTitle>
+          <DialogTitle>{translate("ui.editTheSemester")}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSave} className="flex flex-col gap-3 pt-2">
           <div className="flex flex-col gap-1">
-            <Label required>Номер семестра</Label>
+            <Label required>{translate("ui.semesterNumber")}</Label>
             <Select value={number} onValueChange={setNumber}>
               <SelectTrigger className="w-full">
                 <SelectValue />
@@ -103,17 +104,17 @@ export function EditSemesterDialog({ semester }: EditSemesterDialogProps) {
             </Select>
           </div>
           <div className="flex flex-col gap-1">
-            <Label required>Начало</Label>
+            <Label required>{translate("bells.start")}</Label>
             <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
           </div>
           <div className="flex flex-col gap-1">
-            <Label required>Конец</Label>
+            <Label required>{translate("bells.end")}</Label>
             <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
           </div>
           {error && <p className="text-xs text-destructive">{error}</p>}
           <DialogFooter className="pt-2">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>Отмена</Button>
-            <Button type="submit" disabled={pending}>{pending ? "Сохранение..." : "Сохранить"}</Button>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>{translate("common.cancel")}</Button>
+            <Button type="submit" disabled={pending}>{pending ? translate("common.saving") : translate("common.save")}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

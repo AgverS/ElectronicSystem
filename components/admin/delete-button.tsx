@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -20,7 +21,7 @@ interface DeleteButtonProps {
   label?: string;
 }
 
-export function DeleteButton({ action, label = "Удалить" }: DeleteButtonProps) {
+export function DeleteButton({ action, label = translate("common.delete") }: DeleteButtonProps) {
   const [pending, startTransition] = useTransition();
 
   return (
@@ -32,9 +33,9 @@ export function DeleteButton({ action, label = "Удалить" }: DeleteButtonP
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Уверены?</AlertDialogTitle>
+          <AlertDialogTitle>{translate("ui.areYouSure")}</AlertDialogTitle>
           <AlertDialogDescription>
-            Это действие нельзя отменить.
+            {translate("ui.thisCannotBeUndone")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -44,7 +45,7 @@ export function DeleteButton({ action, label = "Удалить" }: DeleteButtonP
             disabled={pending}
             onClick={() => startTransition(action)}
           >
-            {pending ? "Удаление..." : "Да, удалить"}
+            {pending ? translate("ui.deleting") : translate("ui.yesDelete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

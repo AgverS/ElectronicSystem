@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { useRouter } from "next/navigation";
 import {
   Select,
@@ -42,14 +43,14 @@ export function SemesterSelector({
     <div className={pending ? "opacity-50 pointer-events-none" : ""}>
       <Select value={currentId} onValueChange={handleChange}>
         <SelectTrigger className="h-8 w-[240px] text-xs">
-          <SelectValue placeholder="Выберите семестр" />
+          <SelectValue placeholder={translate("ui.selectASemester")} />
         </SelectTrigger>
         <SelectContent>
           {semesters.map((s) => (
             <SelectItem key={s.id} value={s.id} className="text-xs">
               {formatSemesterName(s, groupName)}
               {s.id === markCurrentId && (
-                <span className="ml-1 text-muted-foreground">(текущий)</span>
+                <span className="ml-1 text-muted-foreground">{translate("ui.current2")}</span>
               )}
             </SelectItem>
           ))}

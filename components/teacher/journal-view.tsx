@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, useRef } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { ABSENT } from "@/lib/grades";
 import { useRouter } from "next/navigation";
 import { GradeCell, type GradeEntry } from "@/components/teacher/grade-cell";
@@ -61,9 +62,9 @@ function calcAvg(grades: string[]) {
 }
 
 function lessonTypeAbbr(type: string) {
-  if (type === "lecture") return "Лек.";
-  if (type === "practical") return "ПР";
-  if (type === "lab") return "ЛР";
+  if (type === "lecture") return translate("lessonType.lecture.short");
+  if (type === "practical") return translate("lessonType.practical.short");
+  if (type === "lab") return translate("lessonType.lab.short");
   if (type === "assessment") return "assessment";
   return type;
 }
@@ -114,7 +115,7 @@ function LessonTopicCell({
             if (e.key === "Escape") cancelEdit();
           }}
           className="w-20 rounded border border-input bg-background px-1 py-0.5 text-[10px] outline-none focus:ring-1 focus:ring-ring"
-          placeholder="Примечание..."
+          placeholder={translate("ui.note3")}
         />
         <button onClick={saveTopic} disabled={pending} className="text-green-600 hover:text-green-700">
           <IconCheck size={11} />
@@ -147,7 +148,7 @@ function LessonTopicCell({
         onClick={startEdit}
         className="text-[10px] text-muted-foreground/30 hover:text-muted-foreground transition-colors"
       >
-        + примечание
+        {translate("ui.note")}
       </button>
     );
   }
@@ -327,7 +328,7 @@ export function JournalView({
           className="-ml-2 h-8 gap-1 px-2"
         >
           <IconChevronLeft size={16} />
-          Назад
+          {translate("common.back")}
         </Button>
         <h2 className="font-medium text-muted-foreground">Группа {assignment.group.name}</h2>
       </div>
@@ -341,7 +342,7 @@ export function JournalView({
             {assignment.teachers.map((t) => shortName(t.name)).join(", ")}
             {readonly && (
               <span className="ml-2 rounded bg-muted px-1.5 py-0.5 text-xs">
-                Только просмотр
+                {translate("ui.readOnly")}
               </span>
             )}
           </p>
@@ -367,9 +368,9 @@ export function JournalView({
 
       <Tabs defaultValue="journal" className="w-full">
         <TabsList className="grid w-full grid-cols-3 max-w-[500px]">
-          <TabsTrigger value="journal">Журнал</TabsTrigger>
-          <TabsTrigger value="lateness">Опоздания</TabsTrigger>
-          <TabsTrigger value="labs">Лабораторные работы</TabsTrigger>
+          <TabsTrigger value="journal">{translate("ui.journal")}</TabsTrigger>
+          <TabsTrigger value="lateness">{translate("ui.lateness2")}</TabsTrigger>
+          <TabsTrigger value="labs">{translate("nav.labs")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="journal" className="mt-4 flex flex-col gap-4">
@@ -410,7 +411,7 @@ export function JournalView({
 
           {lessons.length === 0 && (
             <p className="text-muted-foreground">
-              Уроков пока нет.{!readonly && " Добавьте первый урок."}
+              Уроков пока нет.{!readonly && translate("ui.addTheFirstLesson")}
             </p>
           )}
 
@@ -426,7 +427,7 @@ export function JournalView({
                         "sticky left-0 z-20 min-w-44 text-left font-semibold text-foreground border-b-2",
                       )}
                     >
-                      ФИО
+                      {translate("ui.fullName")}
                     </th>
                     {monthGroups.map((mg) => (
                       <th
@@ -446,7 +447,7 @@ export function JournalView({
                     >
                       <span className={remainingColor}>
                         {remainingHours == null
-                          ? "осталось —"
+                          ? translate("ui.remaining")
                           : remainingHours < 0
                             ? `перерасход ${-remainingHours}`
                             : `осталось ${remainingHours}`}
@@ -473,7 +474,7 @@ export function JournalView({
                         "min-w-16 border-l-2 font-semibold text-foreground border-b-2",
                       )}
                     >
-                      Текущая
+                      {translate("ui.current3")}
                     </th>
                     <th
                       className={cn(
@@ -481,7 +482,7 @@ export function JournalView({
                         "min-w-14 font-semibold text-foreground border-b-2",
                       )}
                     >
-                      Итог
+                      {translate("ui.result")}
                     </th>
                     <th
                       className={cn(
@@ -608,7 +609,7 @@ export function JournalView({
                 <tfoot>
                   <tr className="bg-muted/20">
                     <td className="sticky left-0 z-10 bg-background border-t-2 border-b border-r px-3 py-1 text-xs font-semibold text-muted-foreground whitespace-nowrap">
-                      Ср. за урок
+                      {translate("ui.averagePerLesson")}
                     </td>
                     {lessonStats.map((stat, i) => (
                       <td key={lessons[i].id} className={cn("border-t-2 border-b border-r px-2 py-1 text-center", lessons[i].type === "assessment" && "bg-amber-50 dark:bg-amber-950/30")}>
@@ -635,7 +636,7 @@ export function JournalView({
                   </tr>
                   <tr className="bg-muted/20">
                     <td className="sticky left-0 z-10 bg-background border-b border-r px-3 py-1 text-xs font-semibold text-muted-foreground whitespace-nowrap">
-                      Н за урок
+                      {translate("ui.absencesPerLesson")}
                     </td>
                     {lessonStats.map((stat, i) => (
                       <td key={lessons[i].id} className={cn("border-b border-r px-2 py-1 text-center", lessons[i].type === "assessment" && "bg-amber-50 dark:bg-amber-950/30")}>
@@ -662,7 +663,7 @@ export function JournalView({
                   </tr>
                   <tr className="bg-muted/10">
                     <td className="sticky left-0 z-10 bg-background border-b border-r px-3 py-1 text-xs font-semibold text-muted-foreground whitespace-nowrap">
-                      Примечание
+                      {translate("ui.note2")}
                     </td>
                     {lessons.map((l) => (
                       <td key={l.id} className={cn("border-b border-r px-2 py-1 text-center", l.type === "assessment" && "bg-amber-50 dark:bg-amber-950/30")}>
@@ -679,7 +680,7 @@ export function JournalView({
                   </tr>
                   <tr className="bg-muted/10">
                     <td className="sticky left-0 z-10 bg-background border-b border-r px-3 py-1 text-xs font-semibold text-muted-foreground whitespace-nowrap">
-                      Тип урока
+                      {translate("ui.lessonType")}
                     </td>
                     {lessons.map((l) => (
                       <td key={l.id} className={cn("border-b border-r px-2 py-1 text-center", l.type === "assessment" && "bg-amber-50 dark:bg-amber-950/30")}>
@@ -700,7 +701,7 @@ export function JournalView({
 
         <TabsContent value="lateness" className="mt-4">
           {lessons.length === 0 && (
-            <p className="text-muted-foreground">Уроков пока нет.</p>
+            <p className="text-muted-foreground">{translate("ui.noLessonsYet")}</p>
           )}
 
           {lessons.length > 0 && (
@@ -714,7 +715,7 @@ export function JournalView({
                         "sticky left-0 z-20 min-w-44 text-left font-semibold text-foreground border-b-2",
                       )}
                     >
-                      ФИО
+                      {translate("ui.fullName")}
                     </th>
                     {lessons.map((l) => (
                       <th
@@ -774,7 +775,7 @@ export function JournalView({
           </div>
 
           {labLessons.length === 0 ? (
-            <p className="text-muted-foreground">Лабораторных работ пока нет.</p>
+            <p className="text-muted-foreground">{translate("ui.noLaboratoryWorkYet")}</p>
           ) : (
             <div className="overflow-auto rounded-lg border">
               <table className="w-full border-separate border-spacing-0 text-sm">
@@ -786,7 +787,7 @@ export function JournalView({
                         "sticky left-0 z-20 min-w-44 text-left font-semibold text-foreground border-b-2",
                       )}
                     >
-                      ФИО
+                      {translate("ui.fullName")}
                     </th>
                     {labLessons.map((l) => (
                       <th
@@ -808,7 +809,7 @@ export function JournalView({
                         "min-w-12 border-l-2 font-semibold text-foreground border-b-2",
                       )}
                     >
-                      Сдано
+                      {translate("lab.status.passed")}
                     </th>
                     <th
                       className={cn(
@@ -816,7 +817,7 @@ export function JournalView({
                         "min-w-12 font-semibold text-foreground border-b-2",
                       )}
                     >
-                      Не зачтено
+                      {translate("lab.status.failing")}
                     </th>
                     <th
                       className={cn(
@@ -824,7 +825,7 @@ export function JournalView({
                         "min-w-12 font-semibold text-foreground border-b-2",
                       )}
                     >
-                      Выдано
+                      {translate("lab.issued")}
                     </th>
                     <th
                       className={cn(
@@ -832,7 +833,7 @@ export function JournalView({
                         "min-w-12 border-r-0 font-semibold text-foreground border-b-2",
                       )}
                     >
-                      Всего
+                      {translate("common.total")}
                     </th>
                   </tr>
                 </thead>
@@ -877,11 +878,11 @@ export function JournalView({
                             <td key={l.id} className={tdBase}>
                               {status === "passed" ? (
                                 <span className="inline-flex items-center justify-center rounded-full bg-green-100 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-green-700 dark:bg-green-950/60 dark:text-green-300">
-                                  Зачтено
+                                  {translate("lab.status.passed")}
                                 </span>
                               ) : status === "paid" ? (
                                 <span className="inline-flex items-center justify-center rounded-full bg-red-100 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-red-700 dark:bg-red-950/60 dark:text-red-300">
-                                  Платная
+                                  {translate("lab.status.paid")}
                                 </span>
                               ) : g ? (
                                 <span className="font-mono text-sm font-bold tabular-nums text-red-600 dark:text-red-400">

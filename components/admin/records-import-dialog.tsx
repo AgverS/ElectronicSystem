@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { translate } from "@/lib/i18n/translate";
 import {
   IconUpload,
   IconCheck,
@@ -53,11 +54,11 @@ interface Props {
 type Step = "upload" | "map" | "preview" | "done";
 
 const FIELD_LABELS: Record<keyof Omit<ColumnMapping, "hasHeader">, string> = {
-  orderNumber: "№ приказа",
-  name: "ФИО",
-  kind: "Тип (взыскание/поощрение)",
-  date: "Дата приказа",
-  reason: "Основание",
+  orderNumber: translate("ui.orderNo"),
+  name: translate("ui.fullName"),
+  kind: translate("ui.kindPenaltyReward"),
+  date: translate("ui.orderDate"),
+  reason: translate("record.reason"),
 };
 
 type MappingState = Record<keyof Omit<ColumnMapping, "hasHeader">, number>;
@@ -116,7 +117,7 @@ export function RecordsImportDialog({ onImported }: Props) {
         setStep("map");
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Ошибка");
+      setError(e instanceof Error ? e.message : translate("common.error"));
     } finally {
       setLoading(false);
     }
@@ -135,7 +136,7 @@ export function RecordsImportDialog({ onImported }: Props) {
     try {
       await runParse(file, mapping, hasHeader);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Ошибка");
+      setError(e instanceof Error ? e.message : translate("common.error"));
     } finally {
       setLoading(false);
     }
@@ -152,7 +153,7 @@ export function RecordsImportDialog({ onImported }: Props) {
         studentId: r.studentId as string,
         date: r.date as string,
       }));
-    if (!rows.length) { setError("Нет строк с совпавшими учащимися и датой"); return; }
+    if (!rows.length) { setError(translate("ui.noRowsWithBothAMatchedStudentAnd")); return; }
     setLoading(true);
     setError(null);
     try {
@@ -161,7 +162,7 @@ export function RecordsImportDialog({ onImported }: Props) {
       setStep("done");
       onImported();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Ошибка импорта");
+      setError(e instanceof Error ? e.message : translate("ui.importFailed"));
     } finally {
       setLoading(false);
     }
@@ -177,7 +178,7 @@ export function RecordsImportDialog({ onImported }: Props) {
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="gap-1.5">
           <IconUpload size={15} />
-          Импорт из файла
+          {translate("ui.importFromAFile")}
         </Button>
       </DialogTrigger>
 
@@ -193,10 +194,10 @@ export function RecordsImportDialog({ onImported }: Props) {
               </button>
             )}
             <DialogTitle>
-              {step === "upload" && "Импорт поощрений и взысканий"}
-              {step === "map"    && "Укажите столбцы"}
-              {step === "preview" && "Предварительный просмотр"}
-              {step === "done"   && "Импорт завершён"}
+              {step === "upload" && translate("ui.importRewardsAndPenalties")}
+              {step === "map"    && translate("ui.mapTheColumns")}
+              {step === "preview" && translate("ui.preview")}
+              {step === "done"   && translate("ui.importFinished")}
             </DialogTitle>
           </div>
         </DialogHeader>
@@ -207,7 +208,7 @@ export function RecordsImportDialog({ onImported }: Props) {
           {step === "upload" && (
             <>
               <div className="flex flex-col gap-1.5">
-                <Label>Файл (CSV или XLSX)</Label>
+                <Label>{translate("ui.fileCsvOrXlsx")}</Label>
                 <Input
                   ref={fileRef}
                   type="file"
@@ -221,7 +222,7 @@ export function RecordsImportDialog({ onImported }: Props) {
               </div>
               {error && <ErrorBanner message={error} />}
               <Button onClick={handleDetect} disabled={!file || loading} size="sm" className="self-start">
-                {loading ? "Читаем файл…" : "Далее →"}
+                {loading ? translate("ui.readingTheFile") : translate("ui.next")}
               </Button>
             </>
           )}
@@ -238,7 +239,7 @@ export function RecordsImportDialog({ onImported }: Props) {
                   className="h-4 w-4 rounded border-border accent-primary cursor-pointer"
                 />
                 <Label htmlFor="hasHeader" className="cursor-pointer font-normal">
-                  Первая строка — заголовки
+                  {translate("ui.theFirstRowContainsHeadings")}
                 </Label>
               </div>
 
@@ -246,9 +247,9 @@ export function RecordsImportDialog({ onImported }: Props) {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-48">Поле</TableHead>
-                      <TableHead>Столбец из файла</TableHead>
-                      <TableHead className="text-muted-foreground font-normal">Пример</TableHead>
+                      <TableHead className="w-48">{translate("ui.field")}</TableHead>
+                      <TableHead>{translate("ui.columnInTheFile")}</TableHead>
+                      <TableHead className="text-muted-foreground font-normal">{translate("ui.example")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -288,7 +289,7 @@ export function RecordsImportDialog({ onImported }: Props) {
 
               <details className="text-sm">
                 <summary className="cursor-pointer text-muted-foreground hover:text-foreground transition-colors">
-                  Первые строки файла
+                  {translate("ui.theFirstRowsOfTheFile")}
                 </summary>
                 <div className="mt-2 overflow-x-auto rounded-md border">
                   <table className="text-xs w-full">
@@ -315,7 +316,7 @@ export function RecordsImportDialog({ onImported }: Props) {
 
               {error && <ErrorBanner message={error} />}
               <Button onClick={handleParse} disabled={loading} size="sm" className="self-start">
-                {loading ? "Разбираем…" : "Разобрать →"}
+                {loading ? translate("ui.reading") : translate("ui.continue")}
               </Button>
             </>
           )}
@@ -341,12 +342,12 @@ export function RecordsImportDialog({ onImported }: Props) {
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-8" />
-                      <TableHead className="w-24">№ приказа</TableHead>
-                      <TableHead>ФИО в файле</TableHead>
-                      <TableHead>Учащийся</TableHead>
-                      <TableHead className="w-28">Тип</TableHead>
-                      <TableHead className="w-24">Дата</TableHead>
-                      <TableHead>Основание</TableHead>
+                      <TableHead className="w-24">{translate("ui.orderNo")}</TableHead>
+                      <TableHead>{translate("ui.nameInTheFile")}</TableHead>
+                      <TableHead>{translate("landing.role.student.title")}</TableHead>
+                      <TableHead className="w-28">{translate("ui.kind")}</TableHead>
+                      <TableHead className="w-24">{translate("common.date")}</TableHead>
+                      <TableHead>{translate("record.reason")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -365,7 +366,7 @@ export function RecordsImportDialog({ onImported }: Props) {
                           <TableCell className="text-sm">
                             {row.studentName
                               ? <>{row.studentName}{row.groupName && <span className="ml-1 text-xs text-muted-foreground">{row.groupName}</span>}</>
-                              : <span className="text-muted-foreground">Не найден</span>
+                              : <span className="text-muted-foreground">{translate("common.notFound")}</span>
                             }
                           </TableCell>
                           <TableCell>
@@ -390,9 +391,9 @@ export function RecordsImportDialog({ onImported }: Props) {
               {error && <ErrorBanner message={error} />}
               <div className="flex gap-2">
                 <Button onClick={handleImport} disabled={loading || matched === 0} size="sm">
-                  {loading ? "Импортируется…" : `Импортировать ${matched} записей`}
+                  {loading ? translate("ui.importing") : `Импортировать ${matched} записей`}
                 </Button>
-                <Button variant="ghost" size="sm" onClick={reset}>Отмена</Button>
+                <Button variant="ghost" size="sm" onClick={reset}>{translate("common.cancel")}</Button>
               </div>
             </>
           )}
@@ -404,7 +405,7 @@ export function RecordsImportDialog({ onImported }: Props) {
                 <IconCheck size={24} className="text-green-600 dark:text-green-400" />
               </div>
               <p className="font-medium">Импортировано {importedCount} записей</p>
-              <Button size="sm" onClick={() => { reset(); setOpen(false); }}>Закрыть</Button>
+              <Button size="sm" onClick={() => { reset(); setOpen(false); }}>{translate("common.close")}</Button>
             </div>
           )}
         </div>

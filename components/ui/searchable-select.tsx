@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -27,8 +28,8 @@ export function SearchableSelect({
   value,
   onValueChange,
   options,
-  placeholder = "Выберите…",
-  searchPlaceholder = "Поиск…",
+  placeholder = translate("ui.select"),
+  searchPlaceholder = translate("ui.search"),
   allLabel,
   className,
   disabled,
@@ -128,7 +129,7 @@ export function SearchableSelect({
 
           {filtered.length === 0 ? (
             <p className="py-4 text-center text-sm text-muted-foreground">
-              Не найдено
+              {translate("common.notFound")}
             </p>
           ) : (
             filtered.map((o) => (

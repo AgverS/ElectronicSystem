@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { IconTrash } from "@tabler/icons-react";
 import {
   AlertDialog,
@@ -21,7 +22,7 @@ interface DeleteDialogProps {
   label?: string;
 }
 
-export function DeleteDialog({ action, label = "Удалить" }: DeleteDialogProps) {
+export function DeleteDialog({ action, label = translate("common.delete") }: DeleteDialogProps) {
   const [pending, startTransition] = useTransition();
   const refresh = useRefresh();
 
@@ -46,17 +47,17 @@ export function DeleteDialog({ action, label = "Удалить" }: DeleteDialogP
         <AlertDialogHeader>
           <AlertDialogTitle>{label}?</AlertDialogTitle>
           <AlertDialogDescription>
-            Это действие нельзя отменить.
+            {translate("ui.thisCannotBeUndone")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Отмена</AlertDialogCancel>
+          <AlertDialogCancel>{translate("common.cancel")}</AlertDialogCancel>
           <AlertDialogAction
             variant="destructive"
             onClick={handleDelete}
             disabled={pending}
           >
-            {pending ? "Удаление..." : "Удалить"}
+            {pending ? translate("ui.deleting") : translate("common.delete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

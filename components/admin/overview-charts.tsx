@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { translate } from "@/lib/i18n/translate";
 
 /* Маленький спарклайн для KPI-плиток. Значения нормализуются в 0..1. */
 export function Sparkline({
@@ -132,7 +133,7 @@ export function AbsenceHeatmap({
         ))}
       </div>
       <div className="mt-3 flex items-center gap-2 text-[11px] text-muted-foreground/70">
-        меньше
+        {translate("ui.fewer")}
         <span className="flex gap-[3px]">
           {[0.08, 0.28, 0.5, 0.72, 0.92].map((a) => (
             <span
@@ -142,7 +143,7 @@ export function AbsenceHeatmap({
             />
           ))}
         </span>
-        больше пропусков
+        {translate("ui.moreAbsences")}
       </div>
     </div>
   );
@@ -157,7 +158,7 @@ function FragmentRow({ label, row, max }: { label: string; row: number[]; max: n
         return (
           <span
             key={i}
-            title={`${label} · ${v} ${v === 1 ? "пропуск" : "пропусков"}`}
+            title={`${label} · ${v} ${v === 1 ? translate("ui.absence") : translate("ui.absences")}`}
             className="grid h-[26px] place-items-center rounded-[6px] text-[11px] font-bold text-foreground/70"
             style={{ background: `color-mix(in oklch, var(--destructive) ${Math.round(a * 100)}%, transparent)` }}
           >

@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { ABSENT } from "@/lib/grades";
-import { translate } from "@/lib/i18n/provider";
+import { translate } from "@/lib/i18n/translate";
 import { requireRole } from "@/lib/demo-actor";
 import { Role } from "@/lib/prisma-client";
 import { logAction } from "@/lib/audit";
@@ -361,7 +361,7 @@ export async function createGroup(data: {
       return {
         ok: false,
         error:
-          "Группа с таким названием уже существует (возможно, в другой специальности — обратитесь к главному администратору).",
+          translate("ui.aGroupWithThisNameAlreadyExistsPossibly"),
       };
 
     // Курс вычисляется из названия группы (см. lib/group-course), не хранится.
@@ -738,7 +738,7 @@ export async function createSemester(data: {
   const sDate = new Date(data.startDate);
   const eDate = new Date(data.endDate);
 
-  if (sDate > eDate) throw new Error("Дата начала должна быть раньше даты окончания");
+  if (sDate > eDate) throw new Error(translate("ui.theStartDateMustComeBeforeTheEnd"));
   await checkSemesterOverlap(sDate, eDate);
 
   if (data.isCurrent) {
@@ -794,7 +794,7 @@ export async function updateSemester(
   const sDate = new Date(data.startDate);
   const eDate = new Date(data.endDate);
 
-  if (sDate > eDate) throw new Error("Дата начала должна быть раньше даты окончания");
+  if (sDate > eDate) throw new Error(translate("ui.theStartDateMustComeBeforeTheEnd"));
   await checkSemesterOverlap(sDate, eDate, id);
 
   if (data.isCurrent) {
@@ -1070,7 +1070,7 @@ function cleanSlots(
 
   for (const r of clean) {
     if (!Number.isFinite(r.number) || r.number < 1 || r.number > 50)
-      throw new Error("Номер пары должен быть от 1 до 50");
+      throw new Error(translate("ui.thePeriodNumberMustBeBetween1And"));
     if (seen.has(r.number)) throw new Error(`Пара №${r.number} указана дважды`);
     seen.add(r.number);
     if (!TIME_RE.test(r.startTime) || !TIME_RE.test(r.endTime))

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Dialog,
@@ -53,7 +54,11 @@ type Subject = { id: string; name: string };
 type Teacher = { id: string; name: string };
 type Assignment = { teacherId: string; subjectId: string };
 
-const DAY_NAMES = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
+// Built on each call: the labels are translated, and the catalog is not
+// loaded yet when this module is first imported.
+function DAY_NAMES() {
+  return [translate("day.1.short"), translate("day.2.short"), translate("day.3.short"), translate("day.4.short"), translate("day.5.short"), translate("day.6.short")];
+}
 const LESSONS = Array.from({ length: 13 }, (_, i) => i + 1);
 
 interface DialogState {
@@ -221,7 +226,7 @@ export function SubstitutionGrid({ groupId }: Props) {
 
   const dialogDate = dialog.date ? fromISODate(dialog.date) : new Date();
   const dialogDayName =
-    DAY_NAMES[dialogDate.getUTCDay() === 0 ? 6 : dialogDate.getUTCDay() - 1] ??
+    DAY_NAMES()[dialogDate.getUTCDay() === 0 ? 6 : dialogDate.getUTCDay() - 1] ??
     "";
 
   function subgroupTag(sg: string) {
@@ -253,7 +258,7 @@ export function SubstitutionGrid({ groupId }: Props) {
             onClick={goToday}
             className="text-muted-foreground"
           >
-            Перейти к текущей неделе
+            {translate("ui.goToTheCurrentWeek")}
           </Button>
         )}
       </div>
@@ -270,7 +275,7 @@ export function SubstitutionGrid({ groupId }: Props) {
                   key={i}
                   className="px-3 py-2 text-center font-medium min-w-44"
                 >
-                  <div>{DAY_NAMES[i]}</div>
+                  <div>{DAY_NAMES()[i]}</div>
                   <div className="text-xs font-normal text-muted-foreground">
                     {fmtShort(date)}
                   </div>
@@ -325,7 +330,7 @@ export function SubstitutionGrid({ groupId }: Props) {
                                   {sub.cancelled ? (
                                     <div className="relative pt-4">
                                       <span className="absolute right-0 top-0 rounded-bl bg-red-600 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
-                                        Отменено
+                                        {translate("ui.cancelled")}
                                       </span>
                                       {subgroupTag(sg)}
                                       {base && (
@@ -337,7 +342,7 @@ export function SubstitutionGrid({ groupId }: Props) {
                                   ) : (
                                     <div className="relative pt-4">
                                       <span className="absolute right-0 top-0 rounded-bl bg-yellow-600 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
-                                        Замена
+                                        {translate("audit.entity.schedule_substitution")}
                                       </span>
                                       {subgroupTag(sg)}
                                       <div className="font-medium text-foreground truncate">
@@ -434,7 +439,7 @@ export function SubstitutionGrid({ groupId }: Props) {
 
           {dialog.base && (
             <div className="rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
-              <span className="font-medium">По расписанию:</span>{" "}
+              <span className="font-medium">{translate("ui.scheduled")}</span>{" "}
               {dialog.base.subgroup ? `подгр. ${dialog.base.subgroup} · ` : ""}
               {dialog.base.subject.name} · {dialog.base.teacher.name} · Каб.{" "}
               {dialog.base.room}
@@ -449,13 +454,13 @@ export function SubstitutionGrid({ groupId }: Props) {
                 onChange={(e) => setCancelled(e.target.checked)}
                 className="rounded"
               />
-              <span className="text-sm">Урок отменён</span>
+              <span className="text-sm">{translate("ui.lessonCancelled")}</span>
             </Label>
 
             {!cancelled && (
               <>
                 <div className="flex flex-col gap-1.5">
-                  <Label required={!cancelled}>Предмет</Label>
+                  <Label required={!cancelled}>{translate("term.subject")}</Label>
                   <SearchableSelect
                     value={subjectId}
                     onValueChange={(val) => {
@@ -469,14 +474,14 @@ export function SubstitutionGrid({ groupId }: Props) {
                       value: s.id,
                       label: s.name,
                     }))}
-                    placeholder="Выберите предмет"
+                    placeholder={translate("ui.selectASubject")}
                     className="w-full"
                     portalled={false}
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <Label required={!cancelled}>Преподаватель</Label>
+                  <Label required={!cancelled}>{translate("landing.role.teacher.title")}</Label>
                   <SearchableSelect
                     value={teacherId}
                     onValueChange={setTeacherId}
@@ -484,7 +489,7 @@ export function SubstitutionGrid({ groupId }: Props) {
                       value: t.id,
                       label: t.name,
                     }))}
-                    placeholder="Выберите преподавателя"
+                    placeholder={translate("ui.selectATeacher")}
                     className="w-full"
                     portalled={false}
                   />
@@ -492,15 +497,15 @@ export function SubstitutionGrid({ groupId }: Props) {
 
                 <div className="flex gap-3">
                   <div className="flex flex-col gap-1.5 flex-1">
-                    <Label required={!cancelled}>Кабинет</Label>
+                    <Label required={!cancelled}>{translate("common.room")}</Label>
                     <Input
                       value={room}
                       onChange={(e) => setRoom(e.target.value)}
-                      placeholder="Например: 301"
+                      placeholder={translate("ui.forExample301")}
                     />
                   </div>
                   <div className="flex flex-col gap-1.5 w-28">
-                    <Label>Подгруппа</Label>
+                    <Label>{translate("term.subgroup")}</Label>
                     <Input
                       value={subgroup}
                       onChange={(e) => setSubgroup(e.target.value)}
@@ -526,7 +531,7 @@ export function SubstitutionGrid({ groupId }: Props) {
                   onClick={handleDelete}
                   disabled={saving}
                 >
-                  Удалить замену
+                  {translate("ui.removeTheCoverLesson")}
                 </Button>
               ) : (
                 <div />
@@ -538,7 +543,7 @@ export function SubstitutionGrid({ groupId }: Props) {
                   onClick={() => setDialog((d) => ({ ...d, open: false }))}
                   disabled={saving}
                 >
-                  Отмена
+                  {translate("common.cancel")}
                 </Button>
                 <Button
                   size="sm"
@@ -548,7 +553,7 @@ export function SubstitutionGrid({ groupId }: Props) {
                     (!cancelled && (!subjectId || !teacherId || !room.trim()))
                   }
                 >
-                  {saving ? "Сохранение…" : "Сохранить"}
+                  {saving ? translate("common.saving") : translate("common.save")}
                 </Button>
               </div>
             </div>

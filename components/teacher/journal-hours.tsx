@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import {
   Dialog,
   DialogContent,
@@ -49,7 +50,7 @@ export function JournalHours({
     setError("");
     const hours = value.trim() === "" ? null : Number(value);
     if (hours != null && (!Number.isInteger(hours) || hours < 0)) {
-      setError("Введите целое неотрицательное число");
+      setError(translate("ui.enterAWholeNumberZeroOrMore"));
       return;
     }
     startTransition(async () => {
@@ -58,7 +59,7 @@ export function JournalHours({
         refresh();
         setOpen(false);
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Ошибка");
+        setError(err instanceof Error ? err.message : translate("common.error"));
       }
     });
   }
@@ -77,7 +78,7 @@ export function JournalHours({
           </strong>
         </span>
       ) : (
-        <span>Часы не заданы</span>
+        <span>{translate("ui.hoursNotSet")}</span>
       )}
 
       {canEdit && (
@@ -85,7 +86,7 @@ export function JournalHours({
           <DialogTrigger asChild>
             <button
               type="button"
-              aria-label="Изменить часы по предмету"
+              aria-label={translate("ui.changeTheSubjectSHours")}
               className="inline-flex h-5 w-5 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               <IconPencil size={14} />
@@ -93,27 +94,27 @@ export function JournalHours({
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Часы по предмету</DialogTitle>
+              <DialogTitle>{translate("ui.subjectHours")}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="flex flex-col gap-3 pt-2">
               <div className="flex flex-col gap-1">
-                <Label>Количество часов</Label>
+                <Label>{translate("ui.numberOfHours")}</Label>
                 <Input
                   type="number"
                   min={0}
                   step={1}
                   value={value}
                   onChange={(e) => setValue(e.target.value)}
-                  placeholder="например, 72"
+                  placeholder={translate("ui.forExample72")}
                   autoFocus
                 />
                 <p className="text-xs text-muted-foreground">
-                  Часы задаются на предмет. Пусто или 0 — снять.
+                  {translate("ui.hoursAreSetPerSubjectLeaveEmptyOr")}
                 </p>
               </div>
               {error && <p className="text-xs text-destructive">{error}</p>}
               <Button type="submit" disabled={pending}>
-                {pending ? "Сохранение..." : "Сохранить"}
+                {pending ? translate("common.saving") : translate("common.save")}
               </Button>
             </form>
           </DialogContent>

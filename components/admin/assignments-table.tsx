@@ -1,6 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { translate } from "@/lib/i18n/translate";
 import { useQuery } from "@tanstack/react-query";
 import { Suspense, useState, useTransition } from "react";
 import { IconX, IconPencil, IconTrash } from "@tabler/icons-react";
@@ -96,20 +97,20 @@ function AssignmentsTableInner({ teachers, groups, subjects }: AssignmentsTableP
   const filters: FilterConfig[] = [
     {
       key: "teacherId",
-      placeholder: "Преподаватель",
-      allLabel: "Все преподаватели",
+      placeholder: translate("landing.role.teacher.title"),
+      allLabel: translate("ui.allTeachers"),
       options: teachers.map((t) => ({ value: t.id, label: t.name })),
     },
     {
       key: "groupId",
-      placeholder: "Группа",
-      allLabel: "Все группы",
+      placeholder: translate("term.group"),
+      allLabel: translate("ui.allGroups"),
       options: groups.map((g) => ({ value: g.id, label: g.name })),
     },
     {
       key: "subjectId",
-      placeholder: "Предмет",
-      allLabel: "Все предметы",
+      placeholder: translate("term.subject"),
+      allLabel: translate("ui.allSubjects"),
       options: subjects.map((s) => ({ value: s.id, label: s.name })),
     },
   ];
@@ -118,7 +119,7 @@ function AssignmentsTableInner({ teachers, groups, subjects }: AssignmentsTableP
     <div className="flex flex-col gap-4">
       <Suspense>
         <TableToolbar
-          searchPlaceholder="Поиск по преподавателю, группе или предмету…"
+          searchPlaceholder={translate("ui.searchByTeacherGroupOrSubject")}
           filters={filters}
         />
       </Suspense>
@@ -130,9 +131,9 @@ function AssignmentsTableInner({ teachers, groups, subjects }: AssignmentsTableP
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Преподаватель</TableHead>
-              <TableHead>Предмет</TableHead>
-              <TableHead>Группы</TableHead>
+              <TableHead>{translate("landing.role.teacher.title")}</TableHead>
+              <TableHead>{translate("term.subject")}</TableHead>
+              <TableHead>{translate("nav.groups")}</TableHead>
               <TableHead className="w-[1%]" />
             </TableRow>
           </TableHeader>
@@ -140,7 +141,7 @@ function AssignmentsTableInner({ teachers, groups, subjects }: AssignmentsTableP
             {!data?.data?.length ? (
               <TableRow>
                 <TableCell colSpan={4} className="py-12 text-center text-muted-foreground">
-                  {isFetching ? "Загрузка…" : "Назначения не найдены"}
+                  {isFetching ? translate("common.loading") : translate("ui.noAssignmentsFound")}
                 </TableCell>
               </TableRow>
             ) : (
@@ -185,7 +186,7 @@ function AssignmentsTableInner({ teachers, groups, subjects }: AssignmentsTableP
                     <div className="flex items-center justify-end gap-1">
                       <button
                         type="button"
-                        aria-label="Редактировать назначение"
+                        aria-label={translate("ui.editTheAssignment")}
                         onClick={() =>
                           setEditing({
                             subjectId: row.subjectId,
@@ -201,7 +202,7 @@ function AssignmentsTableInner({ teachers, groups, subjects }: AssignmentsTableP
                       </button>
                       <button
                         type="button"
-                        aria-label="Удалить назначение полностью"
+                        aria-label={translate("ui.deleteTheAssignmentEntirely2")}
                         onClick={() =>
                           setToDeleteRow({
                             ids: row.groups.map((g) => g.assignmentId),
@@ -235,13 +236,13 @@ function AssignmentsTableInner({ teachers, groups, subjects }: AssignmentsTableP
       <AlertDialog open={!!toDelete} onOpenChange={(open) => !open && setToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Удалить назначение?</AlertDialogTitle>
+            <AlertDialogTitle>{translate("ui.deleteTheAssignment")}</AlertDialogTitle>
             <AlertDialogDescription>
               {toDelete?.label}. Это действие нельзя отменить.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={pending}>Отмена</AlertDialogCancel>
+            <AlertDialogCancel disabled={pending}>{translate("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               onClick={(e) => {
@@ -250,7 +251,7 @@ function AssignmentsTableInner({ teachers, groups, subjects }: AssignmentsTableP
               }}
               disabled={pending}
             >
-              {pending ? "Удаление..." : "Удалить"}
+              {pending ? translate("ui.deleting") : translate("common.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -259,7 +260,7 @@ function AssignmentsTableInner({ teachers, groups, subjects }: AssignmentsTableP
       <AlertDialog open={!!toDeleteRow} onOpenChange={(open) => !open && setToDeleteRow(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Удалить назначение полностью?</AlertDialogTitle>
+            <AlertDialogTitle>{translate("ui.deleteTheAssignmentEntirely")}</AlertDialogTitle>
             <AlertDialogDescription>
               {toDeleteRow?.label}
               {toDeleteRow && toDeleteRow.ids.length > 1
@@ -269,7 +270,7 @@ function AssignmentsTableInner({ teachers, groups, subjects }: AssignmentsTableP
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={pending}>Отмена</AlertDialogCancel>
+            <AlertDialogCancel disabled={pending}>{translate("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               onClick={(e) => {
@@ -278,7 +279,7 @@ function AssignmentsTableInner({ teachers, groups, subjects }: AssignmentsTableP
               }}
               disabled={pending}
             >
-              {pending ? "Удаление..." : "Удалить"}
+              {pending ? translate("ui.deleting") : translate("common.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

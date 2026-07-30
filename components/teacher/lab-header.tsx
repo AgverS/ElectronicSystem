@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import {
   Popover,
   PopoverContent,
@@ -89,7 +90,7 @@ export function LabHeader({
           </PopoverTrigger>
           <PopoverContent className="w-56 p-3" align="center">
             <div className="flex flex-col gap-2">
-              <p className="text-xs font-medium">Срок сдачи лабы</p>
+              <p className="text-xs font-medium">{translate("ui.laboratoryDeadline2")}</p>
               <Input
                 type="date"
                 value={draft}
@@ -107,7 +108,7 @@ export function LabHeader({
                   disabled={pending || !draft}
                   onClick={() => save(draft)}
                 >
-                  Сохранить
+                  {translate("common.save")}
                 </Button>
                 {isExtended && (
                   <Button
@@ -116,9 +117,9 @@ export function LabHeader({
                     className="h-7 text-xs"
                     disabled={pending}
                     onClick={() => save(null)}
-                    title="Вернуть срок по умолчанию (+14 дней)"
+                    title={translate("ui.restoreTheDefaultDeadline14Days")}
                   >
-                    Сброс
+                    {translate("common.reset")}
                   </Button>
                 )}
               </div>

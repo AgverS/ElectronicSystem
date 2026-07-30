@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -23,9 +24,9 @@ export type SearchResult = {
 };
 
 const KIND_LABEL: Record<ResultKind, string> = {
-  group: "Группа",
-  teacher: "Преподаватель",
-  room: "Кабинет",
+  group: translate("term.group"),
+  teacher: translate("landing.role.teacher.title"),
+  room: translate("common.room"),
 };
 
 const KIND_ICON: Record<ResultKind, React.ElementType> = {
@@ -159,7 +160,7 @@ export function ScheduleSearch({ onSelect }: ScheduleSearchProps = {}) {
           }}
           onKeyDown={handleKeyDown}
           onFocus={() => results.length > 0 && setOpen(true)}
-          placeholder="Группа, преподаватель или кабинет…"
+          placeholder={translate("ui.groupTeacherOrRoom")}
           className="pl-9"
           autoComplete="off"
         />
@@ -169,7 +170,7 @@ export function ScheduleSearch({ onSelect }: ScheduleSearchProps = {}) {
         <div className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-md border bg-popover shadow-md">
           {results.length === 0 ? (
             <p className="px-3 py-4 text-center text-sm text-muted-foreground">
-              Ничего не найдено
+              {translate("ui.nothingFound")}
             </p>
           ) : (
             results.map((r, i) => {

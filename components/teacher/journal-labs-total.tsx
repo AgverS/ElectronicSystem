@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import {
   Dialog,
   DialogContent,
@@ -47,7 +48,7 @@ export function JournalLabsTotal({
     setError("");
     const t = value.trim() === "" ? null : Number(value);
     if (t != null && (!Number.isInteger(t) || t < 0)) {
-      setError("Введите целое неотрицательное число");
+      setError(translate("ui.enterAWholeNumberZeroOrMore"));
       return;
     }
     startTransition(async () => {
@@ -56,7 +57,7 @@ export function JournalLabsTotal({
         refresh();
         setOpen(false);
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Ошибка");
+        setError(err instanceof Error ? err.message : translate("common.error"));
       }
     });
   }
@@ -73,7 +74,7 @@ export function JournalLabsTotal({
         </span>
       ) : (
         <span>
-          Выдано: <strong className="text-foreground">{issued}</strong> · план не
+          {translate("ui.set")} <strong className="text-foreground">{issued}</strong> · план не
           задан
         </span>
       )}
@@ -83,7 +84,7 @@ export function JournalLabsTotal({
           <DialogTrigger asChild>
             <button
               type="button"
-              aria-label="Изменить количество лаб"
+              aria-label={translate("ui.changeTheNumberOfLaboratoryWorks")}
               className="inline-flex h-5 w-5 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               <IconPencil size={14} />
@@ -91,27 +92,27 @@ export function JournalLabsTotal({
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Всего лабораторных работ</DialogTitle>
+              <DialogTitle>{translate("ui.laboratoryWorksInTotal")}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="flex flex-col gap-3 pt-2">
               <div className="flex flex-col gap-1">
-                <Label>Количество лаб (план)</Label>
+                <Label>{translate("ui.laboratoryWorksPlanned")}</Label>
                 <Input
                   type="number"
                   min={0}
                   step={1}
                   value={value}
                   onChange={(e) => setValue(e.target.value)}
-                  placeholder="например, 12"
+                  placeholder={translate("ui.forExample12")}
                   autoFocus
                 />
                 <p className="text-xs text-muted-foreground">
-                  Сколько всего лаб должно быть в семестре. Пусто или 0 — снять.
+                  {translate("ui.howManyLaboratoryWorksThereShouldBeThis")}
                 </p>
               </div>
               {error && <p className="text-xs text-destructive">{error}</p>}
               <Button type="submit" disabled={pending}>
-                {pending ? "Сохранение..." : "Сохранить"}
+                {pending ? translate("common.saving") : translate("common.save")}
               </Button>
             </form>
           </DialogContent>

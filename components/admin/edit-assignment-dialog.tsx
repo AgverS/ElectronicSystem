@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import {
   Dialog,
   DialogContent,
@@ -114,7 +115,7 @@ export function EditAssignmentDialog({
     setError("");
     if (!retained) return;
     if (teacherIds.size === 0 || groupIds.size === 0) {
-      setError("Выберите хотя бы одного преподавателя и хотя бы одну группу");
+      setError(translate("ui.selectAtLeastOneTeacherAndAtLeast"));
       return;
     }
     startTransition(async () => {
@@ -128,7 +129,7 @@ export function EditAssignmentDialog({
         refresh();
         onOpenChange(false);
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Ошибка");
+        setError(err instanceof Error ? err.message : translate("common.error"));
       }
     });
   }
@@ -137,12 +138,12 @@ export function EditAssignmentDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[88vh] flex-col gap-4 overflow-hidden">
         <DialogHeader>
-          <DialogTitle>Редактирование назначения</DialogTitle>
+          <DialogTitle>{translate("ui.editTheAssignment2")}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden">
           <div className="rounded-lg border bg-muted/20 px-3 py-2 text-sm">
-            <span className="block text-xs text-muted-foreground">Предмет</span>
+            <span className="block text-xs text-muted-foreground">{translate("term.subject")}</span>
             <span className="font-semibold text-foreground">{retained?.subjectName}</span>
           </div>
 
@@ -163,7 +164,7 @@ export function EditAssignmentDialog({
                 <Input
                   value={teacherSearch}
                   onChange={(e) => setTeacherSearch(e.target.value)}
-                  placeholder="Поиск преподавателя…"
+                  placeholder={translate("ui.searchTeachers")}
                   className="h-8 pl-8"
                 />
               </div>
@@ -171,7 +172,7 @@ export function EditAssignmentDialog({
               <div className="overflow-y-auto rounded-md border p-1" style={{ maxHeight: "10rem" }}>
                 {filteredTeachers.length === 0 ? (
                   <p className="py-6 text-center text-sm text-muted-foreground">
-                    Преподаватели не найдены
+                    {translate("ui.noTeachersFound")}
                   </p>
                 ) : (
                   <div className="grid grid-cols-1 gap-0.5">
@@ -220,7 +221,7 @@ export function EditAssignmentDialog({
                     onClick={toggleAllFiltered}
                     className="text-xs text-muted-foreground hover:text-foreground"
                   >
-                    {allFilteredSelected ? "Снять все" : "Выбрать все"}
+                    {allFilteredSelected ? translate("ui.clearAll") : translate("ui.selectAll")}
                   </button>
                 )}
               </div>
@@ -233,14 +234,14 @@ export function EditAssignmentDialog({
                 <Input
                   value={groupSearch}
                   onChange={(e) => setGroupSearch(e.target.value)}
-                  placeholder="Поиск группы…"
+                  placeholder={translate("ui.searchGroups")}
                   className="h-8 pl-8"
                 />
               </div>
 
               <div className="overflow-y-auto rounded-md border p-1" style={{ maxHeight: "13rem" }}>
                 {filteredGroups.length === 0 ? (
-                  <p className="py-6 text-center text-sm text-muted-foreground">Группы не найдены</p>
+                  <p className="py-6 text-center text-sm text-muted-foreground">{translate("ui.noGroupsFound2")}</p>
                 ) : (
                   <div className="grid grid-cols-2 gap-0.5">
                     {filteredGroups.map((g) => {
@@ -279,10 +280,10 @@ export function EditAssignmentDialog({
 
           <DialogFooter className="mt-auto border-t pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={pending}>
-              Отмена
+              {translate("common.cancel")}
             </Button>
             <Button type="submit" disabled={pending}>
-              {pending ? "Сохранение..." : "Сохранить"}
+              {pending ? translate("common.saving") : translate("common.save")}
             </Button>
           </DialogFooter>
         </form>

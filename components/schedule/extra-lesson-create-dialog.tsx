@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { useQuery } from "@tanstack/react-query";
 import {
   Dialog,
@@ -54,7 +55,7 @@ export function ExtraLessonCreateDialog({ open, onClose, date, lessonNumber, onC
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!room.trim()) {
-      setError("Укажите кабинет");
+      setError(translate("ui.enterARoom"));
       return;
     }
     setError(null);
@@ -70,7 +71,7 @@ export function ExtraLessonCreateDialog({ open, onClose, date, lessonNumber, onC
         onCreated();
         handleClose();
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Ошибка");
+        setError(e instanceof Error ? e.message : translate("common.error"));
       }
     });
   }
@@ -82,20 +83,20 @@ export function ExtraLessonCreateDialog({ open, onClose, date, lessonNumber, onC
     <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Дополнительное занятие</DialogTitle>
+          <DialogTitle>{translate("audit.entity.extra_lesson")}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-4 text-sm text-muted-foreground">
             <div>
-              <span className="font-medium text-foreground">Дата:</span> {dateLabel}
+              <span className="font-medium text-foreground">{translate("ui.date")}</span> {dateLabel}
             </div>
             <div>
-              <span className="font-medium text-foreground">Урок:</span> {lessonNumber}
+              <span className="font-medium text-foreground">{translate("ui.lesson")}</span> {lessonNumber}
             </div>
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="el-room">Кабинет *</Label>
+            <Label htmlFor="el-room">{translate("ui.room")}</Label>
             <Input
               id="el-room"
               value={room}
@@ -106,14 +107,14 @@ export function ExtraLessonCreateDialog({ open, onClose, date, lessonNumber, onC
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="el-group">Группа (необязательно)</Label>
+            <Label htmlFor="el-group">{translate("ui.groupOptional")}</Label>
             <select
               id="el-group"
               value={groupId}
               onChange={(e) => setGroupId(e.target.value)}
               className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
             >
-              <option value="">Все группы (кому я преподаю)</option>
+              <option value="">{translate("ui.allGroupsITeach")}</option>
               {groups.map((g) => (
                 <option key={g.id} value={g.id}>{g.name}</option>
               ))}
@@ -121,13 +122,13 @@ export function ExtraLessonCreateDialog({ open, onClose, date, lessonNumber, onC
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="el-comment">Комментарий</Label>
+            <Label htmlFor="el-comment">{translate("ui.comment")}</Label>
             <textarea
               id="el-comment"
               className={TEXTAREA_CLS}
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Тема, подготовка..."
+              placeholder={translate("ui.topicPreparation")}
               rows={3}
             />
           </div>
@@ -136,10 +137,10 @@ export function ExtraLessonCreateDialog({ open, onClose, date, lessonNumber, onC
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={handleClose} disabled={isPending}>
-              Отмена
+              {translate("common.cancel")}
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending ? "Создание..." : "Добавить"}
+              {isPending ? translate("ui.creating") : translate("common.add")}
             </Button>
           </DialogFooter>
         </form>

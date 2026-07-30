@@ -1,6 +1,7 @@
 "use client";
 
 import { IconDownload, IconPrinter } from "@tabler/icons-react";
+import { translate } from "@/lib/i18n/translate";
 import { Button } from "@/components/ui/button";
 
 interface Student {
@@ -18,8 +19,8 @@ export function GroupExportButtons({ groupName, curatorName, students }: GroupEx
   async function handleExportExcel() {
     const { Workbook } = await import("exceljs");
     const wb = new Workbook();
-    wb.creator = "Электронный журнал";
-    const ws = wb.addWorksheet("Список группы");
+    wb.creator = translate("app.name");
+    const ws = wb.addWorksheet(translate("ui.groupList"));
 
     const COL_COUNT = 2;
     const thin = { style: "thin" as const, color: { argb: "FFD1D5DB" } };
@@ -34,7 +35,7 @@ export function GroupExportButtons({ groupName, curatorName, students }: GroupEx
     ws.getRow(1).height = 30;
 
     // Curator
-    ws.addRow([`Куратор: ${curatorName || "не назначен"}`]);
+    ws.addRow([`Куратор: ${curatorName || translate("ui.notAssigned")}`]);
     ws.mergeCells(2, 1, 2, COL_COUNT);
     const s = ws.getRow(2).getCell(1);
     s.font = { size: 11, italic: true };
@@ -42,7 +43,7 @@ export function GroupExportButtons({ groupName, curatorName, students }: GroupEx
     ws.getRow(2).height = 20;
 
     // Header
-    ws.addRow(["№", "ФИО"]);
+    ws.addRow(["№", translate("ui.fullName")]);
     const headerRow = ws.getRow(3);
     headerRow.eachCell((cell) => {
       cell.font = { bold: true, size: 11 };
@@ -91,7 +92,7 @@ export function GroupExportButtons({ groupName, curatorName, students }: GroupEx
     <div className="flex items-center gap-2 print:hidden">
       <Button size="sm" variant="outline" onClick={handlePrint}>
         <IconPrinter size={16} />
-        Печать
+        {translate("common.print")}
       </Button>
       <Button size="sm" variant="outline" onClick={handleExportExcel}>
         <IconDownload size={16} />

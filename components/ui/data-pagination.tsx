@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { translate } from "@/lib/i18n/translate";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 
@@ -55,7 +56,7 @@ export function DataPagination({
             className="flex h-8 items-center gap-1 rounded-md px-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             <IconChevronLeft size={14} />
-            Назад
+            {translate("common.back")}
           </button>
         )}
 
@@ -91,7 +92,7 @@ export function DataPagination({
             onClick={() => goToPage(page + 1)}
             className="flex h-8 items-center gap-1 rounded-md px-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
-            Вперёд
+            {translate("common.next")}
             <IconChevronRight size={14} />
           </button>
         )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { setAbsenceExcused } from "@/lib/actions/teacher";
@@ -129,7 +130,7 @@ export function AttendanceSheet({
         else next.add(k);
         return next;
       });
-      toast.error(e instanceof Error ? e.message : "Не удалось сохранить");
+      toast.error(e instanceof Error ? e.message : translate("ui.couldNotSave"));
     } finally {
       setPending((prev) => {
         const next = new Set(prev);
@@ -142,11 +143,11 @@ export function AttendanceSheet({
   // Данные для экспорта в Excel.
   const csvHeader: (string | number)[] = [
     "№",
-    "ФИО",
+    translate("ui.fullName"),
     ...days,
-    "Всего",
-    "Уваж.",
-    "Неуваж.",
+    translate("common.total"),
+    translate("ui.excused2"),
+    translate("ui.unexcused2"),
   ];
   const csvRows: (string | number)[][] = rows.map((r) => [
     r.idx,
@@ -158,15 +159,15 @@ export function AttendanceSheet({
   ]);
   csvRows.push([
     "",
-    "ИТОГО",
+    translate("ui.total"),
     ...days.map((d) => dayTotals[d] || ""),
     grand.total,
     grand.excused,
     grand.unexcused,
   ]);
   const safeName = groupName.replace(/[^0-9A-Za-zА-Яа-я]+/g, "_");
-  const fileName = "Ведомость_" + safeName + "_" + month + ".xlsx";
-  const exportTitle = "Ведомость пропусков · " + groupName + " · " + monthLabel;
+  const fileName = translate("ui.absenceReport") + safeName + "_" + month + ".xlsx";
+  const exportTitle = translate("ui.absenceReport2") + groupName + " · " + monthLabel;
 
   const thDay =
     "border-b-2 border-r px-1 py-2 text-center text-[11px] font-medium text-muted-foreground";
@@ -176,7 +177,7 @@ export function AttendanceSheet({
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Ведомость пропусков</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{translate("nav.attendanceReport")}</h1>
           <p className="mt-0.5 font-mono text-xs text-muted-foreground">
             Группа {groupName} · {monthLabel}
           </p>
@@ -206,11 +207,11 @@ export function AttendanceSheet({
           Н
         </span>{" "}
         в кружке — пропуск по{" "}
-        <span className="font-medium">уважительной</span> причине, без кружка —{" "}
-        <span className="font-medium">неуважительный</span>.
+        <span className="font-medium">{translate("ui.excused")}</span> причине, без кружка —{" "}
+        <span className="font-medium">{translate("ui.unexcused")}</span>.
         {canEdit
-          ? " Нажмите на ячейку, чтобы переключить. Итоги пересчитываются автоматически."
-          : " Отмечать уважительность пропусков может только куратор группы."}
+          ? translate("ui.clickACellToToggleItTotalsRecalculate")
+          : translate("ui.onlyTheGroupSCuratorCanMarkAn")}
       </p>
 
       <div className="attendance-overflow overflow-auto rounded-lg border">
@@ -221,7 +222,7 @@ export function AttendanceSheet({
                 №
               </th>
               <th className="sticky left-10 z-20 min-w-[180px] border-b-2 border-r bg-muted px-3 py-2 text-left font-semibold">
-                ФИО учащегося
+                {translate("ui.studentSFullName")}
               </th>
               {days.map((d) => (
                 <th key={d} className={cn(thDay, "min-w-[26px]")}>
@@ -229,13 +230,13 @@ export function AttendanceSheet({
                 </th>
               ))}
               <th className="min-w-[44px] border-b-2 border-l-2 bg-muted px-2 py-2 text-center font-semibold">
-                Всего
+                {translate("common.total")}
               </th>
               <th className="min-w-[44px] border-b-2 border-r bg-muted px-2 py-2 text-center font-semibold text-green-700 dark:text-green-400">
-                Уваж.
+                {translate("ui.excused2")}
               </th>
               <th className="min-w-[44px] border-b-2 bg-muted px-2 py-2 text-center font-semibold text-red-700 dark:text-red-400">
-                Неуваж.
+                {translate("ui.unexcused2")}
               </th>
             </tr>
           </thead>
@@ -246,7 +247,7 @@ export function AttendanceSheet({
                   colSpan={daysInMonth + 5}
                   className="px-4 py-10 text-center text-muted-foreground"
                 >
-                  В группе нет студентов
+                  {translate("ui.thisGroupHasNoStudents")}
                 </td>
               </tr>
             )}
@@ -272,9 +273,9 @@ export function AttendanceSheet({
                       title={
                         v > 0
                           ? isExcused
-                            ? "Уважительный пропуск" +
+                            ? translate("audit.entity.excused_absence") +
                             (canEdit ? " — нажмите, чтобы снять" : "")
-                            : "Неуважительный пропуск" +
+                            : translate("ui.unexcusedAbsence") +
                             (canEdit ? " — нажмите, чтобы отметить уважительным" : "")
                           : undefined
                       }
@@ -320,7 +321,7 @@ export function AttendanceSheet({
               <tr className="bg-muted font-semibold">
                 <td className="sticky left-0 z-10 border-t-2 border-r bg-muted px-2 py-1.5" />
                 <td className="sticky left-10 z-10 border-t-2 border-r bg-muted px-3 py-1.5 text-right text-[11px] uppercase tracking-wide">
-                  Итого за день
+                  {translate("ui.dayTotal")}
                 </td>
                 {days.map((d) => (
                   <td
@@ -355,16 +356,16 @@ export function AttendanceSheet({
             {curatorName ?? ""}
           </span>
           <span>/</span>
-          <span className="ml-8 whitespace-nowrap">Дата:</span>
+          <span className="ml-8 whitespace-nowrap">{translate("ui.date")}</span>
           <span className="flex-none inline-block w-28 border-b border-black" />
         </div>
         <div className="flex gap-2 mt-0.5 text-[10px] text-gray-500">
           <span className="w-fit whitespace-nowrap opacity-0">
             Куратор группы {groupName}:
           </span>
-          <span className="w-36 text-center">(подпись)</span>
+          <span className="w-36 text-center">{translate("ui.signature")}</span>
           <span className="w-2" />
-          <span className="w-48 text-center">(ФИО)</span>
+          <span className="w-48 text-center">{translate("ui.fullName3")}</span>
         </div>
       </div>
     </div>

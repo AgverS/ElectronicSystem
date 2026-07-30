@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import {
   Dialog,
   DialogContent,
@@ -53,7 +54,7 @@ export function ExtraLessonViewDialog(props: Props) {
         setRsvps(data as RsvpRow[]);
         setShowRsvps(true);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Ошибка");
+        setError(e instanceof Error ? e.message : translate("common.error"));
       }
     });
   }
@@ -65,7 +66,7 @@ export function ExtraLessonViewDialog(props: Props) {
         if (props.role === "teacher") props.onDeleted();
         onClose();
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Ошибка");
+        setError(e instanceof Error ? e.message : translate("common.error"));
       }
     });
   }
@@ -76,7 +77,7 @@ export function ExtraLessonViewDialog(props: Props) {
         const attending = await toggleExtraLessonRsvp(lesson.id);
         if (props.role === "student") props.onRsvpChanged(lesson.id, attending);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Ошибка");
+        setError(e instanceof Error ? e.message : translate("common.error"));
       }
     });
   }
@@ -85,27 +86,27 @@ export function ExtraLessonViewDialog(props: Props) {
     <Dialog open onOpenChange={(v) => !v && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Дополнительное занятие</DialogTitle>
+          <DialogTitle>{translate("audit.entity.extra_lesson")}</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col gap-3 text-sm">
           <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
-            <div className="text-muted-foreground">Дата</div>
+            <div className="text-muted-foreground">{translate("common.date")}</div>
             <div className="font-medium">{dateLabel}, урок {lesson.lessonNumber}</div>
-            <div className="text-muted-foreground">Преподаватель</div>
+            <div className="text-muted-foreground">{translate("landing.role.teacher.title")}</div>
             <div className="font-medium">{lesson.teacher.name}</div>
-            <div className="text-muted-foreground">Кабинет</div>
+            <div className="text-muted-foreground">{translate("common.room")}</div>
             <div className="font-medium">{lesson.room}</div>
             {lesson.group && (
               <>
-                <div className="text-muted-foreground">Группа</div>
+                <div className="text-muted-foreground">{translate("term.group")}</div>
                 <div className="font-medium">{lesson.group.name}</div>
               </>
             )}
             {!lesson.group && (
               <>
-                <div className="text-muted-foreground">Группа</div>
-                <div className="text-muted-foreground italic">Все группы</div>
+                <div className="text-muted-foreground">{translate("term.group")}</div>
+                <div className="text-muted-foreground italic">{translate("ui.allGroups")}</div>
               </>
             )}
           </div>
@@ -129,7 +130,7 @@ export function ExtraLessonViewDialog(props: Props) {
               {showRsvps && rsvps && (
                 <div className="mt-2 flex flex-col gap-1">
                   {rsvps.length === 0 ? (
-                    <p className="text-muted-foreground text-xs">Никто не отметился</p>
+                    <p className="text-muted-foreground text-xs">{translate("ui.nobodyHasSignedUp")}</p>
                   ) : (
                     rsvps.map((r) => (
                       <div key={r.id} className="flex items-center justify-between text-sm">
@@ -148,7 +149,7 @@ export function ExtraLessonViewDialog(props: Props) {
           {props.role === "student" && (
             <div className="flex items-center justify-between rounded-md border px-3 py-2">
               <span className="text-sm">
-                {lesson.rsvpCount > 0 ? `${lesson.rsvpCount} чел. придут` : "Пока никто не отметился"}
+                {lesson.rsvpCount > 0 ? `${lesson.rsvpCount} чел. придут` : translate("ui.nobodyHasSignedUpYet")}
               </span>
               <Button
                 size="sm"
@@ -156,7 +157,7 @@ export function ExtraLessonViewDialog(props: Props) {
                 onClick={handleRsvp}
                 disabled={isPending}
               >
-                {lesson.myRsvp ? "✓ Приду" : "Приду"}
+                {lesson.myRsvp ? translate("ui.attending") : translate("ui.iWillAttend")}
               </Button>
             </div>
           )}
@@ -174,11 +175,11 @@ export function ExtraLessonViewDialog(props: Props) {
               className="text-destructive hover:text-destructive mr-auto"
             >
               <IconTrash size={14} className="mr-1" />
-              Удалить
+              {translate("common.delete")}
             </Button>
           )}
           <Button variant="outline" onClick={onClose} disabled={isPending}>
-            Закрыть
+            {translate("common.close")}
           </Button>
         </DialogFooter>
       </DialogContent>

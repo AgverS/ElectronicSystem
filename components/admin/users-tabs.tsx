@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { UsersTable, type UsersTableProps } from "@/components/admin/users-table";
@@ -20,8 +21,8 @@ function UsersTabsInner(props: Props) {
   return (
     <Tabs value={tab} onValueChange={handleTabChange}>
       <TabsList className="mb-4">
-        <TabsTrigger value="students">Учащиеся</TabsTrigger>
-        <TabsTrigger value="staff">Сотрудники</TabsTrigger>
+        <TabsTrigger value="students">{translate("term.students")}</TabsTrigger>
+        <TabsTrigger value="staff">{translate("ui.staff")}</TabsTrigger>
       </TabsList>
       <TabsContent value="students">
         <UsersTable {...props} lockedRoles={[Role.STUDENT]} />

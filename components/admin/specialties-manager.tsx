@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { IconPlus, IconPencil, IconDeviceFloppy, IconX } from "@tabler/icons-react";
 import {
   Table,
@@ -50,8 +51,8 @@ export function SpecialtiesManager({ specialties, canManage }: Props) {
     const name = newName.trim();
     const abbreviation = newAbbreviation.trim();
     const letter = newLetter.trim().toUpperCase().slice(0, 1);
-    if (!name) { setAddError("Введите название"); return; }
-    if (!letter) { setAddError("Введите букву"); return; }
+    if (!name) { setAddError(translate("ui.enterAName")); return; }
+    if (!letter) { setAddError(translate("ui.enterALetter")); return; }
     setAddError("");
     startTransition(async () => {
       try {
@@ -62,7 +63,7 @@ export function SpecialtiesManager({ specialties, canManage }: Props) {
         setAdding(false);
         refresh();
       } catch (err: unknown) {
-        setAddError(err instanceof Error ? err.message : "Ошибка");
+        setAddError(err instanceof Error ? err.message : translate("common.error"));
       }
     });
   }
@@ -74,33 +75,33 @@ export function SpecialtiesManager({ specialties, canManage }: Props) {
           {!adding ? (
             <Button onClick={() => setAdding(true)} className="gap-2">
               <IconPlus size={16} />
-              Добавить специальность
+              {translate("ui.addASpecialty")}
             </Button>
           ) : (
             <div className="flex items-end gap-2">
               <div className="flex flex-col gap-1">
-                <Label required className="text-xs text-muted-foreground">Название</Label>
+                <Label required className="text-xs text-muted-foreground">{translate("common.name")}</Label>
                 <Input
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  placeholder="Программное обеспечение..."
+                  placeholder={translate("ui.softwareDevelopment")}
                   className="w-48"
                   autoFocus
                   onKeyDown={(e) => { if (e.key === "Enter") handleAdd(); if (e.key === "Escape") setAdding(false); }}
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <Label className="text-xs text-muted-foreground">Сокращение</Label>
+                <Label className="text-xs text-muted-foreground">{translate("ui.abbreviation")}</Label>
                 <Input
                   value={newAbbreviation}
                   onChange={(e) => setNewAbbreviation(e.target.value)}
-                  placeholder="ПОИТ"
+                  placeholder={translate("ui.sd")}
                   className="w-24"
                   onKeyDown={(e) => { if (e.key === "Enter") handleAdd(); if (e.key === "Escape") setAdding(false); }}
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <Label required className="text-xs text-muted-foreground">Буква</Label>
+                <Label required className="text-xs text-muted-foreground">{translate("ui.letter")}</Label>
                 <Input
                   value={newLetter}
                   onChange={(e) => setNewLetter(e.target.value.slice(0, 1))}
@@ -112,7 +113,7 @@ export function SpecialtiesManager({ specialties, canManage }: Props) {
               </div>
               <Button onClick={handleAdd} disabled={pending} className="gap-1.5">
                 <IconDeviceFloppy size={16} />
-                Сохранить
+                {translate("common.save")}
               </Button>
               <Button variant="outline" onClick={() => { setAdding(false); setAddError(""); }} disabled={pending}>
                 <IconX size={16} />
@@ -127,12 +128,12 @@ export function SpecialtiesManager({ specialties, canManage }: Props) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Название</TableHead>
-              <TableHead className="w-32">Сокращение</TableHead>
-              <TableHead className="w-24">Буква</TableHead>
-              <TableHead className="w-28">Предметов</TableHead>
-              <TableHead className="w-24">Групп</TableHead>
-              <TableHead className="w-28">Сотрудников</TableHead>
+              <TableHead>{translate("common.name")}</TableHead>
+              <TableHead className="w-32">{translate("ui.abbreviation")}</TableHead>
+              <TableHead className="w-24">{translate("ui.letter")}</TableHead>
+              <TableHead className="w-28">{translate("nav.subjects")}</TableHead>
+              <TableHead className="w-24">{translate("nav.groups")}</TableHead>
+              <TableHead className="w-28">{translate("ui.staff2")}</TableHead>
               {canManage && <TableHead className="w-20" />}
             </TableRow>
           </TableHeader>
@@ -143,7 +144,7 @@ export function SpecialtiesManager({ specialties, canManage }: Props) {
                   colSpan={canManage ? 7 : 6}
                   className="py-12 text-center text-muted-foreground"
                 >
-                  Специальностей пока нет
+                  {translate("ui.noSpecialtiesYet")}
                 </TableCell>
               </TableRow>
             ) : (
@@ -235,10 +236,10 @@ function SpecialtyRow({
         <TableCell>{specialty.usersCount}</TableCell>
         <TableCell>
           <div className="flex items-center gap-1">
-            <IconBtn tooltip="Сохранить" onClick={handleSave} disabled={pending || !changed} className="disabled:opacity-40">
+            <IconBtn tooltip={translate("common.save")} onClick={handleSave} disabled={pending || !changed} className="disabled:opacity-40">
               <IconDeviceFloppy size={16} />
             </IconBtn>
-            <IconBtn tooltip="Отмена" onClick={handleCancel} disabled={pending}>
+            <IconBtn tooltip={translate("common.cancel")} onClick={handleCancel} disabled={pending}>
               <IconX size={16} />
             </IconBtn>
           </div>
@@ -266,7 +267,7 @@ function SpecialtyRow({
       {canManage && (
         <TableCell>
           <div className="flex items-center gap-1">
-            <IconBtn tooltip="Редактировать" onClick={() => setEditing(true)}>
+            <IconBtn tooltip={translate("common.edit")} onClick={() => setEditing(true)}>
               <IconPencil size={15} />
             </IconBtn>
             <DeleteDialog

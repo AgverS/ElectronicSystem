@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import {
   IconPlus,
   IconPencil,
@@ -106,15 +107,15 @@ export function StudentRecordFormDialog({
         setExisting((prev) => prev.filter((a) => a.id !== id));
         onSaved();
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Ошибка удаления файла");
+        setError(err instanceof Error ? err.message : translate("ui.couldNotDeleteTheFile"));
       }
     });
   }
 
   function handleSubmit() {
-    if (!number.trim()) return setError("Укажите номер приказа");
-    if (!date) return setError("Укажите дату приказа");
-    if (!reason.trim()) return setError("Укажите основание");
+    if (!number.trim()) return setError(translate("ui.enterTheOrderNumber"));
+    if (!date) return setError(translate("ui.enterTheOrderDate"));
+    if (!reason.trim()) return setError(translate("ui.enterAReason"));
 
     const formData = new FormData();
     formData.set("kind", kind);
@@ -138,7 +139,7 @@ export function StudentRecordFormDialog({
         onSaved();
         setOpen(false);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Не удалось сохранить");
+        setError(err instanceof Error ? err.message : translate("ui.couldNotSave"));
       }
     });
   }
@@ -149,10 +150,10 @@ export function StudentRecordFormDialog({
         {mode === "create" ? (
           <Button className="gap-2">
             <IconPlus size={16} />
-            Создать
+            {translate("common.create")}
           </Button>
         ) : (
-          <IconBtn tooltip="Редактировать">
+          <IconBtn tooltip={translate("common.edit")}>
             <IconPencil size={15} />
           </IconBtn>
         )}
@@ -161,7 +162,7 @@ export function StudentRecordFormDialog({
       <DialogContent className="sm:max-w-lg gap-4">
         <DialogHeader>
           <DialogTitle>
-            {mode === "create" ? "Новая запись" : "Редактировать запись"}
+            {mode === "create" ? translate("ui.newRecord") : translate("ui.editTheRecord")}
           </DialogTitle>
         </DialogHeader>
 
@@ -188,20 +189,20 @@ export function StudentRecordFormDialog({
           <div className="grid grid-cols-2 gap-2">
             <div className="flex flex-col gap-1">
               <Label required className="text-xs font-medium text-muted-foreground">
-                Номер приказа
+                {translate("ui.orderNumber")}
               </Label>
               <Input
                 value={number}
                 onChange={(e) =>
                   setNumber(e.target.value.replace(/^\s*№\s*/, ""))
                 }
-                placeholder="№ 12/п"
+                placeholder={translate("ui.r12")}
                 className="h-9"
               />
             </div>
             <div className="flex flex-col gap-1">
               <Label required className="text-xs font-medium text-muted-foreground">
-                Дата приказа
+                {translate("ui.orderDate")}
               </Label>
               <Input
                 type="date"
@@ -214,12 +215,12 @@ export function StudentRecordFormDialog({
 
           <div className="flex flex-col gap-1">
             <Label required className="text-xs font-medium text-muted-foreground">
-              Основание
+              {translate("record.reason")}
             </Label>
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="За что выписан приказ…"
+              placeholder={translate("ui.whatTheOrderIsFor")}
               className={TEXTAREA_CLS}
             />
           </div>
@@ -228,7 +229,7 @@ export function StudentRecordFormDialog({
           {existing.length > 0 && (
             <div className="flex flex-col gap-1.5">
               <span className="text-xs font-medium text-muted-foreground">
-                Прикреплённые файлы
+                {translate("ui.attachedFiles")}
               </span>
               {existing.map((a) => (
                 <div
@@ -269,7 +270,7 @@ export function StudentRecordFormDialog({
               className="flex w-fit items-center gap-1.5 rounded-md border border-dashed px-2.5 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               <IconPaperclip size={14} />
-              Прикрепить файлы
+              {translate("ui.attachFiles")}
             </button>
 
             {files.map((file, i) => (
@@ -292,7 +293,7 @@ export function StudentRecordFormDialog({
               </div>
             ))}
             <p className="text-xs text-muted-foreground">
-              PDF или изображения, до 10 МБ каждый.
+              {translate("ui.pdfOrImagesUpTo10MbEach")}
             </p>
           </div>
 
@@ -305,10 +306,10 @@ export function StudentRecordFormDialog({
             onClick={() => setOpen(false)}
             disabled={pending}
           >
-            Отмена
+            {translate("common.cancel")}
           </Button>
           <Button onClick={handleSubmit} disabled={pending}>
-            {pending ? "Сохранение…" : "Сохранить"}
+            {pending ? translate("common.saving") : translate("common.save")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { translate } from "@/lib/i18n/translate";
 import { ABSENT } from "@/lib/grades";
 import { Role } from "@/lib/prisma-client";
 import Link from "next/link";
@@ -11,56 +12,56 @@ const DAY = 86_400_000;
 const WEEKS = 8;
 
 const ACTION_LABEL: Record<string, string> = {
-  LOGIN: "Вход",
-  LOGOUT: "Выход",
-  CREATE_USER: "Создание польз.",
-  UPDATE_USER: "Изм. польз.",
-  DELETE_USER: "Удал. польз.",
-  CREATE_GROUP: "Создание группы",
-  UPDATE_GROUP: "Изм. группы",
-  DELETE_GROUP: "Удал. группы",
-  CREATE_SUBJECT: "Создание предм.",
-  UPDATE_SUBJECT: "Изм. предм.",
-  DELETE_SUBJECT: "Удал. предм.",
-  CREATE_SEMESTER: "Создание семестра",
-  UPDATE_SEMESTER: "Изм. семестра",
-  DELETE_SEMESTER: "Удал. семестра",
-  CREATE_ASSIGNMENT: "Создание назнач.",
-  DELETE_ASSIGNMENT: "Удал. назнач.",
-  CREATE_LESSON: "Создание урока",
-  DELETE_LESSON: "Удал. урока",
-  UPDATE_LESSON_TOPIC: "Изм. темы урока",
-  UPSERT_GRADE: "Отметка",
-  DELETE_GRADE: "Удал. отметки",
-  ADD_STUDENT_TO_GROUP: "Студент в группу",
-  UPSERT_SCHEDULE_ENTRY: "Изм. расписания",
-  DELETE_SCHEDULE_ENTRY: "Удал. расписания",
-  UPSERT_SUBSTITUTION: "Замена",
-  DELETE_SUBSTITUTION: "Удал. замены",
-  SET_ABSENCE_EXCUSED: "Уваж. причина",
-  SAVE_LATENESS: "Опоздание",
-  SET_SUBJECT_HOURS: "Часы предм.",
-  SET_LABS_TOTAL: "Кол-во лаб.",
-  SET_LAB_DEADLINE: "Дедлайн лаб.",
-  ADD_RETAKE: "Пересдача",
-  RESET_PASSWORD: "Сброс пароля",
-  SAVE_BELL_TIMES: "Звонки (пост.)",
-  CREATE_BELL_OVERRIDE: "Создание звонков",
-  UPDATE_BELL_OVERRIDE: "Изм. звонков",
-  DELETE_BELL_OVERRIDE: "Удал. звонков",
-  CREATE_BACKUP: "Создание бэкапа",
-  DELETE_BACKUP: "Удаление бэкапа",
-  RESTORE_BACKUP: "Восст. бэкапа",
-  UPDATE_BACKUP_SETTINGS: "Настр. бэкапа",
-  CREATE_SPECIALTY: "Создание спец.",
-  UPDATE_SPECIALTY: "Изм. спец.",
-  DELETE_SPECIALTY: "Удал. спец.",
-  CREATE_STUDENT_RECORD: "Создание приказа",
-  UPDATE_STUDENT_RECORD: "Изм. приказа",
-  DELETE_STUDENT_RECORD: "Удал. приказа",
-  WRITE_OFF_STUDENT_RECORD: "Списание взыскания",
-  CANCEL_RECORD_WRITE_OFF: "Отмена списания",
-  DELETE_RECORD_ATTACHMENT: "Удал. вложения",
+  LOGIN: translate("audit.action.LOGIN"),
+  LOGOUT: translate("audit.action.LOGOUT"),
+  CREATE_USER: translate("audit.action.CREATE_USER"),
+  UPDATE_USER: translate("audit.action.UPDATE_USER"),
+  DELETE_USER: translate("audit.action.DELETE_USER"),
+  CREATE_GROUP: translate("audit.action.CREATE_GROUP"),
+  UPDATE_GROUP: translate("audit.action.UPDATE_GROUP"),
+  DELETE_GROUP: translate("audit.action.DELETE_GROUP"),
+  CREATE_SUBJECT: translate("audit.action.CREATE_SUBJECT"),
+  UPDATE_SUBJECT: translate("audit.action.UPDATE_SUBJECT"),
+  DELETE_SUBJECT: translate("audit.action.DELETE_SUBJECT"),
+  CREATE_SEMESTER: translate("audit.action.CREATE_SEMESTER"),
+  UPDATE_SEMESTER: translate("audit.action.UPDATE_SEMESTER"),
+  DELETE_SEMESTER: translate("audit.action.DELETE_SEMESTER"),
+  CREATE_ASSIGNMENT: translate("audit.action.CREATE_ASSIGNMENT"),
+  DELETE_ASSIGNMENT: translate("audit.action.DELETE_ASSIGNMENT"),
+  CREATE_LESSON: translate("audit.action.CREATE_LESSON"),
+  DELETE_LESSON: translate("audit.action.DELETE_LESSON"),
+  UPDATE_LESSON_TOPIC: translate("audit.action.UPDATE_LESSON_TOPIC"),
+  UPSERT_GRADE: translate("audit.action.UPSERT_GRADE"),
+  DELETE_GRADE: translate("audit.action.DELETE_GRADE"),
+  ADD_STUDENT_TO_GROUP: translate("audit.action.ADD_STUDENT_TO_GROUP"),
+  UPSERT_SCHEDULE_ENTRY: translate("audit.action.UPSERT_SCHEDULE_ENTRY"),
+  DELETE_SCHEDULE_ENTRY: translate("audit.action.DELETE_SCHEDULE_ENTRY"),
+  UPSERT_SUBSTITUTION: translate("audit.entity.schedule_substitution"),
+  DELETE_SUBSTITUTION: translate("audit.action.DELETE_SUBSTITUTION"),
+  SET_ABSENCE_EXCUSED: translate("audit.entity.excused_absence"),
+  SAVE_LATENESS: translate("ui.lateness"),
+  SET_SUBJECT_HOURS: translate("audit.action.SET_SUBJECT_HOURS"),
+  SET_LABS_TOTAL: translate("ui.laboratoryWorks"),
+  SET_LAB_DEADLINE: translate("ui.laboratoryDeadline"),
+  ADD_RETAKE: translate("grade.retake"),
+  RESET_PASSWORD: translate("audit.action.RESET_PASSWORD"),
+  SAVE_BELL_TIMES: translate("audit.action.SAVE_BELL_TIMES"),
+  CREATE_BELL_OVERRIDE: translate("ui.bellTimesCreated"),
+  UPDATE_BELL_OVERRIDE: translate("ui.bellTimesChanged"),
+  DELETE_BELL_OVERRIDE: translate("ui.bellTimesDeleted"),
+  CREATE_BACKUP: translate("audit.action.CREATE_BACKUP"),
+  DELETE_BACKUP: translate("ui.deleteTheBackup"),
+  RESTORE_BACKUP: translate("audit.action.RESTORE_BACKUP"),
+  UPDATE_BACKUP_SETTINGS: translate("audit.entity.backup_setting"),
+  CREATE_SPECIALTY: translate("audit.action.CREATE_SPECIALTY"),
+  UPDATE_SPECIALTY: translate("audit.action.UPDATE_SPECIALTY"),
+  DELETE_SPECIALTY: translate("audit.action.DELETE_SPECIALTY"),
+  CREATE_STUDENT_RECORD: translate("ui.orderCreated"),
+  UPDATE_STUDENT_RECORD: translate("ui.orderChanged"),
+  DELETE_STUDENT_RECORD: translate("ui.orderDeleted"),
+  WRITE_OFF_STUDENT_RECORD: translate("ui.penaltyWrittenOff"),
+  CANCEL_RECORD_WRITE_OFF: translate("audit.action.CANCEL_RECORD_WRITE_OFF"),
+  DELETE_RECORD_ATTACHMENT: translate("audit.action.DELETE_RECORD_ATTACHMENT"),
 };
 
 function startOfUTCDay(d: Date) {
@@ -69,7 +70,7 @@ function startOfUTCDay(d: Date) {
 
 function formatRelative(d: Date, now: Date): string {
   const minutes = Math.floor((now.getTime() - d.getTime()) / 60_000);
-  if (minutes < 1) return "только что";
+  if (minutes < 1) return translate("ui.justNow");
   if (minutes < 60) return `${minutes} мин. назад`;
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return `${hours} ч. назад`;
@@ -238,7 +239,7 @@ export default async function AdminDashboard() {
   const d = await loadOverview(now).catch(() => EMPTY);
 
   const weekLabels = Array.from({ length: WEEKS }, (_, i) =>
-    i === WEEKS - 1 ? "сейчас" : `${WEEKS - 1 - i}н`,
+    i === WEEKS - 1 ? translate("ui.now") : `${WEEKS - 1 - i}н`,
   );
   const dateLabel = new Intl.DateTimeFormat("ru-RU", {
     weekday: "long", day: "numeric", month: "long",
@@ -260,28 +261,28 @@ export default async function AdminDashboard() {
         <p className="font-mono text-xs font-medium uppercase tracking-wide text-muted-foreground">
           {dateLabel}
         </p>
-        <h1 className="mt-0.5 text-2xl font-bold tracking-tight sm:text-3xl">Обзор</h1>
+        <h1 className="mt-0.5 text-2xl font-bold tracking-tight sm:text-3xl">{translate("nav.overview")}</h1>
       </div>
 
       <div className="grid grid-cols-12 gap-4">
         {/* KPI ROW */}
-        <Kpi className="col-span-6 lg:col-span-3" label="Посещаемость · нед"
+        <Kpi className="col-span-6 lg:col-span-3" label={translate("ui.attendanceWeek")}
           value={d.attPct === null ? "—" : <AnimatedStat value={d.attPct} />} unit={d.attPct === null ? "" : "%"}
           delta={d.attDelta === null ? null : { good: d.attDelta >= 0, text: `${d.attDelta >= 0 ? "+" : ""}${d.attDelta}% за неделю` }} />
-        <Kpi className="col-span-6 lg:col-span-3" label="Пропусков за неделю"
+        <Kpi className="col-span-6 lg:col-span-3" label={translate("ui.absencesThisWeek")}
           value={<AnimatedStat value={d.absWeek} />}
-          delta={d.absDelta === 0 ? { good: true, text: "без изменений" } : { good: d.absDelta < 0, text: `${d.absDelta < 0 ? "−" : "+"}${Math.abs(d.absDelta)} к прошлой` }}
+          delta={d.absDelta === 0 ? { good: true, text: translate("ui.noChange") } : { good: d.absDelta < 0, text: `${d.absDelta < 0 ? "−" : "+"}${Math.abs(d.absDelta)} к прошлой` }}
           spark={{ points: d.absByWeek, tone: "neg" }} />
-        <Kpi className="col-span-6 lg:col-span-3" label="Активных групп"
+        <Kpi className="col-span-6 lg:col-span-3" label={translate("ui.activeGroups")}
           value={<AnimatedStat value={d.groups} />} />
-        <Kpi className="col-span-6 lg:col-span-3" label="Средний балл · 30 дн"
+        <Kpi className="col-span-6 lg:col-span-3" label={translate("ui.averageGrade30Days")}
           value={d.avgGrade === null ? "—" : d.avgGrade.toFixed(1)} />
 
         {/* TREND + SEMESTER */}
         <section className="col-span-12 rounded-xl border bg-card p-5 shadow-xs lg:col-span-8">
           <h2 className="flex items-center text-sm font-semibold text-muted-foreground">
             Пропуски · {WEEKS} недель
-            <span className="ml-auto text-xs font-medium text-muted-foreground/70">по всем группам</span>
+            <span className="ml-auto text-xs font-medium text-muted-foreground/70">{translate("ui.acrossAllGroups")}</span>
           </h2>
           <div className="mt-3">
             <TrendChart series={d.absByWeek} labels={weekLabels} />
@@ -289,13 +290,13 @@ export default async function AdminDashboard() {
         </section>
 
         <section className="col-span-12 flex flex-col rounded-xl border bg-card p-5 shadow-xs lg:col-span-4">
-          <h2 className="text-sm font-semibold text-muted-foreground">Текущий семестр</h2>
+          <h2 className="text-sm font-semibold text-muted-foreground">{translate("ui.currentSemester")}</h2>
           {currentSem ? (
             <div className="mt-3">
               <div className="flex items-center justify-between gap-2">
                 <span className="font-medium">{currentSem.name}</span>
                 <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 animate-pulse-ring">
-                  Активный
+                  {translate("ui.active")}
                 </span>
               </div>
               <p className="mt-0.5 font-mono text-xs text-muted-foreground">
@@ -306,41 +307,41 @@ export default async function AdminDashboard() {
               </div>
             </div>
           ) : (
-            <p className="mt-3 text-sm text-muted-foreground">Нет активного семестра</p>
+            <p className="mt-3 text-sm text-muted-foreground">{translate("ui.noActiveSemester")}</p>
           )}
           <div className="mt-auto grid grid-cols-2 gap-x-4 gap-y-3 pt-5">
-            <QuickStat label="Студентов" value={d.students} />
-            <QuickStat label="Преподавателей" value={d.teachers} />
-            <QuickStat label="Групп" value={d.groups} />
-            <QuickStat label="Предметов" value={d.subjects} />
+            <QuickStat label={translate("term.students")} value={d.students} />
+            <QuickStat label={translate("term.teachers")} value={d.teachers} />
+            <QuickStat label={translate("nav.groups")} value={d.groups} />
+            <QuickStat label={translate("nav.subjects")} value={d.subjects} />
           </div>
         </section>
 
         {/* HEATMAP + RECORDS */}
         <section className="col-span-12 overflow-hidden rounded-xl border bg-card p-5 shadow-xs lg:col-span-8">
           <h2 className="flex items-center text-sm font-semibold text-muted-foreground">
-            Пропуски по группам · последние дни
-            <span className="ml-auto text-xs font-medium text-muted-foreground/70">наведите на ячейку</span>
+            {translate("ui.absencesByGroupRecentDays")}
+            <span className="ml-auto text-xs font-medium text-muted-foreground/70">{translate("ui.hoverOverACell")}</span>
           </h2>
           {d.heat.groups.length > 0 ? (
             <div className="overflow-x-auto">
               <AbsenceHeatmap groups={d.heat.groups} days={d.heat.days} matrix={d.heat.matrix} />
             </div>
           ) : (
-            <p className="mt-6 text-sm text-muted-foreground">Нет данных о пропусках за период</p>
+            <p className="mt-6 text-sm text-muted-foreground">{translate("ui.noAbsencesRecordedForThisPeriod")}</p>
           )}
         </section>
 
         <section className="col-span-12 flex flex-col rounded-xl border bg-card p-5 shadow-xs lg:col-span-4">
           <h2 className="flex items-center text-sm font-semibold text-muted-foreground">
-            Последние записи
+            {translate("ui.recentRecords")}
             <Link href="/admin/records" className="ml-auto flex items-center gap-1 text-xs font-medium transition-colors hover:text-foreground">
               все <IconArrowRight size={12} />
             </Link>
           </h2>
           <div className="mt-1">
             {d.records.length === 0 ? (
-              <p className="py-6 text-sm text-muted-foreground">Нет записей</p>
+              <p className="py-6 text-sm text-muted-foreground">{translate("ui.noRecords")}</p>
             ) : (
               d.records.map((r) => (
                 <div key={r.id} className="flex gap-3 border-b py-2.5 last:border-none">
@@ -349,7 +350,7 @@ export default async function AdminDashboard() {
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium">
-                      {r.kind === "REWARD" ? "Поощрение" : "Взыскание"} · {r.studentName}
+                      {r.kind === "REWARD" ? translate("record.kind.REWARD") : translate("record.kind.PENALTY")} · {r.studentName}
                     </p>
                     <p className="truncate text-xs text-muted-foreground">{r.reason}</p>
                   </div>
@@ -365,14 +366,14 @@ export default async function AdminDashboard() {
         {/* ACTIVITY */}
         <section className="col-span-12 rounded-xl border bg-card shadow-xs">
           <div className="flex items-center justify-between border-b px-5 py-4">
-            <h2 className="text-sm font-semibold text-muted-foreground">Последние действия</h2>
+            <h2 className="text-sm font-semibold text-muted-foreground">{translate("ui.recentActivity")}</h2>
             <Link href="/admin/logs" className="flex items-center gap-1 text-xs font-medium transition-colors hover:text-foreground">
-              Все записи <IconArrowRight size={12} />
+              {translate("ui.allRecords")} <IconArrowRight size={12} />
             </Link>
           </div>
           <div className="divide-y">
             {d.logs.length === 0 ? (
-              <p className="px-5 py-8 text-center text-sm text-muted-foreground">Нет записей</p>
+              <p className="px-5 py-8 text-center text-sm text-muted-foreground">{translate("ui.noRecords")}</p>
             ) : (
               d.logs.map((log) => (
                 <div key={log.id} className="flex items-center gap-3 px-5 py-3">

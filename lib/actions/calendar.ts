@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { translate } from "@/lib/i18n/provider";
+import { translate } from "@/lib/i18n/translate";
 import { getCurrentUser } from "@/lib/demo-actor";
 
 /**

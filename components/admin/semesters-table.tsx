@@ -1,6 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { translate } from "@/lib/i18n/translate";
 import { useQuery } from "@tanstack/react-query";
 import { Suspense, useEffect, useState, useTransition } from "react";
 import { IconTrash } from "@tabler/icons-react";
@@ -91,7 +92,7 @@ function SemestersTableInner() {
   return (
     <div className="flex flex-col gap-4">
       <Suspense>
-        <TableToolbar searchPlaceholder="Поиск по названию…" />
+        <TableToolbar searchPlaceholder={translate("ui.searchByName")} />
       </Suspense>
 
       {selected.size > 0 && (
@@ -104,7 +105,7 @@ function SemestersTableInner() {
             onClick={() => setBulkDeleteOpen(true)}
           >
             <IconTrash size={14} />
-            Удалить выбранные
+            {translate("ui.deleteSelected")}
           </Button>
         </div>
       )}
@@ -120,12 +121,12 @@ function SemestersTableInner() {
                 <Checkbox
                   checked={isIndeterminate(visibleIds) ? "indeterminate" : isAllSelected(visibleIds)}
                   onCheckedChange={() => toggleAll(visibleIds)}
-                  aria-label="Выбрать все"
+                  aria-label={translate("ui.selectAll")}
                 />
               </TableHead>
-              <TableHead>Название</TableHead>
-              <TableHead>Начало</TableHead>
-              <TableHead>Конец</TableHead>
+              <TableHead>{translate("common.name")}</TableHead>
+              <TableHead>{translate("bells.start")}</TableHead>
+              <TableHead>{translate("bells.end")}</TableHead>
               <TableHead className="w-20" />
             </TableRow>
           </TableHeader>
@@ -133,7 +134,7 @@ function SemestersTableInner() {
             {!data?.data?.length ? (
               <TableRow>
                 <TableCell colSpan={5} className="py-12 text-center text-muted-foreground">
-                  {isFetching ? "Загрузка…" : "Семестры не найдены"}
+                  {isFetching ? translate("common.loading") : translate("ui.noSemestersFound")}
                 </TableCell>
               </TableRow>
             ) : (
@@ -156,7 +157,7 @@ function SemestersTableInner() {
                           variant="outline"
                           className="shrink-0 text-[10px] bg-primary/10 text-primary border-primary/20"
                         >
-                          Текущий
+                          {translate("ui.current")}
                         </Badge>
                       )}
                     </div>
@@ -200,16 +201,16 @@ function SemestersTableInner() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Удалить {selected.size} семестров?</AlertDialogTitle>
-            <AlertDialogDescription>Это действие нельзя отменить.</AlertDialogDescription>
+            <AlertDialogDescription>{translate("ui.thisCannotBeUndone")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={bulkPending}>Отмена</AlertDialogCancel>
+            <AlertDialogCancel disabled={bulkPending}>{translate("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               onClick={(e) => { e.preventDefault(); handleBulkDelete(); }}
               disabled={bulkPending}
             >
-              {bulkPending ? "Удаление..." : "Удалить"}
+              {bulkPending ? translate("ui.deleting") : translate("common.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import {
   Dialog,
   DialogContent,
@@ -61,7 +62,7 @@ export function CreateSubjectDialog({ specialties }: Props) {
     setError("");
     const trimmed = name.trim();
     if (!trimmed) {
-      setError("Введите название");
+      setError(translate("ui.enterAName"));
       return;
     }
     startTransition(async () => {
@@ -75,7 +76,7 @@ export function CreateSubjectDialog({ specialties }: Props) {
         refresh();
         handleOpenChange(false);
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Ошибка");
+        setError(err instanceof Error ? err.message : translate("common.error"));
       }
     });
   }
@@ -84,22 +85,22 @@ export function CreateSubjectDialog({ specialties }: Props) {
     <>
       <Button onClick={() => setOpen(true)} className="gap-2">
         <IconPlus size={16} />
-        Создать предмет
+        {translate("ui.createTheSubject")}
       </Button>
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Новый предмет</DialogTitle>
+            <DialogTitle>{translate("ui.newSubject")}</DialogTitle>
           </DialogHeader>
 
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
-              <Label required>Название</Label>
+              <Label required>{translate("common.name")}</Label>
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Математика"
+                placeholder={translate("ui.mathematics")}
                 autoFocus
                 onKeyDown={(e) => {
                   if (e.key === "Enter") handleSubmit();
@@ -108,14 +109,14 @@ export function CreateSubjectDialog({ specialties }: Props) {
             </div>
 
             <div className="flex flex-col gap-1">
-              <Label>Часы (за семестр)</Label>
+              <Label>{translate("ui.hoursPerSemester")}</Label>
               <Input
                 type="number"
                 min={0}
                 step={1}
                 value={hours}
                 onChange={(e) => setHours(e.target.value)}
-                placeholder="не задано"
+                placeholder={translate("ui.notSet")}
               />
             </div>
 
@@ -125,7 +126,7 @@ export function CreateSubjectDialog({ specialties }: Props) {
                 checked={isPractical}
                 onCheckedChange={setIsPractical}
               />
-              <Label htmlFor="practical">Практический предмет</Label>
+              <Label htmlFor="practical">{translate("ui.practicalSubject")}</Label>
             </div>
 
             {specialties.length !== 1 && (
@@ -145,10 +146,10 @@ export function CreateSubjectDialog({ specialties }: Props) {
               onClick={() => handleOpenChange(false)}
               disabled={pending}
             >
-              Отмена
+              {translate("common.cancel")}
             </Button>
             <Button onClick={handleSubmit} disabled={pending}>
-              {pending ? "Создание..." : "Создать"}
+              {pending ? translate("ui.creating") : translate("common.create")}
             </Button>
           </DialogFooter>
         </DialogContent>

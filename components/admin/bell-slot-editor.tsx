@@ -1,6 +1,7 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
+import { translate } from "@/lib/i18n/translate";
 import { cn } from "@/lib/utils";
 
 export type SlotCell = { startTime: string; endTime: string };
@@ -27,12 +28,12 @@ export function BellSlotEditor({
     <div className="overflow-hidden rounded-xl border">
       <div className="grid grid-cols-[2rem_minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 border-b bg-muted/50 px-2.5 py-2 font-mono text-[0.6875rem] font-semibold tracking-wide text-muted-foreground uppercase sm:grid-cols-[2.25rem_minmax(0,1fr)_auto_minmax(0,1fr)_3.5rem] sm:gap-3 sm:px-3">
         <span className="text-center">№</span>
-        <span>Начало</span>
+        <span>{translate("bells.start")}</span>
         <span className="text-center" aria-hidden>
           –
         </span>
-        <span>Конец</span>
-        <span className="hidden text-right sm:block">Длит.</span>
+        <span>{translate("bells.end")}</span>
+        <span className="hidden text-right sm:block">{translate("ui.length")}</span>
       </div>
 
       {numbers.map((n, i) => {

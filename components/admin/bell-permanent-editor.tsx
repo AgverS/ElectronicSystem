@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { IconDeviceFloppy, IconRotateClockwise, IconCheck } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -88,7 +89,7 @@ export function BellPermanentEditor({ initial }: { initial: BellTimeRow[] }) {
     setSaved(false);
     const rows: BellTimeRow[] = [];
     for (const n of NUMBERS) {
-      for (const g of DAY_GROUPS) {
+      for (const g of DAY_GROUPS()) {
         const cell = state[n][g.key];
         if (cell.startTime || cell.endTime) {
           rows.push({ dayGroup: g.key, number: n, startTime: cell.startTime, endTime: cell.endTime });
@@ -101,7 +102,7 @@ export function BellPermanentEditor({ initial }: { initial: BellTimeRow[] }) {
         setSaved(true);
         refresh();
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Ошибка");
+        setError(err instanceof Error ? err.message : translate("common.error"));
       }
     });
   }
@@ -109,16 +110,16 @@ export function BellPermanentEditor({ initial }: { initial: BellTimeRow[] }) {
   return (
     <section className="flex flex-col gap-4">
       <div>
-        <h2 className="text-base font-semibold">Постоянное расписание</h2>
+        <h2 className="text-base font-semibold">{translate("bells.permanent")}</h2>
         <p className="text-sm text-muted-foreground">
-          Время каждой пары по дням недели. Выберите группу дней и задайте звонки.
+          {translate("ui.theTimeOfEachPeriodByDayOf")}
         </p>
       </div>
 
       <Tabs value={active} onValueChange={(v) => setActive(v as DayGroup)}>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <TabsList className="h-auto flex-wrap justify-start gap-1 p-1">
-            {DAY_GROUPS.map((g) => (
+            {DAY_GROUPS().map((g) => (
               <TabsTrigger key={g.key} value={g.key} className="gap-1.5 px-3 py-1.5">
                 {g.label}
                 <span className="font-mono text-[0.6875rem] tabular-nums text-muted-foreground">
@@ -135,11 +136,11 @@ export function BellPermanentEditor({ initial }: { initial: BellTimeRow[] }) {
             className="gap-1.5 text-muted-foreground"
           >
             <IconRotateClockwise size={14} />
-            Стандартные
+            {translate("ui.standard2")}
           </Button>
         </div>
 
-        {DAY_GROUPS.map((g) => (
+        {DAY_GROUPS().map((g) => (
           <TabsContent key={g.key} value={g.key} className="mt-3">
             <BellSlotEditor
               numbers={NUMBERS}
@@ -157,17 +158,17 @@ export function BellPermanentEditor({ initial }: { initial: BellTimeRow[] }) {
           ) : saved && !dirty ? (
             <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-500">
               <IconCheck size={15} />
-              Сохранено
+              {translate("common.saved")}
             </span>
           ) : dirty ? (
-            <span className="text-muted-foreground">Есть несохранённые изменения</span>
+            <span className="text-muted-foreground">{translate("ui.youHaveUnsavedChanges")}</span>
           ) : (
-            <span className="text-muted-foreground">Все изменения сохранены</span>
+            <span className="text-muted-foreground">{translate("ui.allChangesSaved")}</span>
           )}
         </p>
         <Button onClick={handleSave} disabled={pending || !dirty} className="shrink-0 gap-2">
           <IconDeviceFloppy size={16} />
-          {pending ? "Сохранение…" : "Сохранить"}
+          {pending ? translate("common.saving") : translate("common.save")}
         </Button>
       </div>
     </section>

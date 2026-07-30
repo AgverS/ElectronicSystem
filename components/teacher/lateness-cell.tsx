@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition, useState } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { ABSENT } from "@/lib/grades";
 import {
   Popover,
@@ -97,7 +98,7 @@ export function LatenessCell({
       <PopoverContent className="w-40 p-3" align="center">
         <div className="flex flex-col gap-2">
           <Label className="text-xs font-medium text-muted-foreground">
-            Минуты (0-45)
+            {translate("ui.minutes045")}
           </Label>
           <div className="flex gap-2">
             <Input
@@ -113,7 +114,7 @@ export function LatenessCell({
               onClick={() => persist(null)}
               className="text-xs text-muted-foreground hover:text-foreground"
             >
-              Сброс
+              {translate("common.reset")}
             </button>
           </div>
           <p className="text-[10px] text-muted-foreground italic">

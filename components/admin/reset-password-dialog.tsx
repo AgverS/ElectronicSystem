@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { IconKey } from "@tabler/icons-react";
 import {
   AlertDialog,
@@ -34,7 +35,7 @@ export function ResetPasswordDialog({ userId, userName }: ResetPasswordDialogPro
         toast.success(`Пароль для ${userName} сброшен`);
         refresh();
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Ошибка сброса пароля");
+        toast.error(err instanceof Error ? err.message : translate("ui.passwordResetFailed"));
       }
     });
   }
@@ -43,7 +44,7 @@ export function ResetPasswordDialog({ userId, userName }: ResetPasswordDialogPro
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <IconBtn
-          tooltip="Сбросить пароль"
+          tooltip={translate("ui.resetThePassword2")}
           className="text-muted-foreground hover:text-foreground"
         >
           <IconKey size={15} />
@@ -51,18 +52,18 @@ export function ResetPasswordDialog({ userId, userName }: ResetPasswordDialogPro
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Сбросить пароль?</AlertDialogTitle>
+          <AlertDialogTitle>{translate("ui.resetThePassword")}</AlertDialogTitle>
           <AlertDialogDescription>
             Пароль пользователя {userName} будет удалён. При следующем входе ему потребуется установить новый пароль.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Отмена</AlertDialogCancel>
+          <AlertDialogCancel>{translate("common.cancel")}</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleReset}
             disabled={pending}
           >
-            {pending ? "Сброс..." : "Сбросить"}
+            {pending ? translate("ui.resetting") : translate("common.reset")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

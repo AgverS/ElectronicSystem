@@ -1,3 +1,4 @@
+import { translate } from "@/lib/i18n/translate";
 // Расписание звонков.
 //
 // Постоянное расписание задаётся для трёх групп дней:
@@ -6,11 +7,15 @@
 
 export type DayGroup = "main" | "thu" | "sat";
 
-export const DAY_GROUPS: { key: DayGroup; label: string }[] = [
-  { key: "main", label: "Пн, Вт, Ср, Пт" },
-  { key: "thu", label: "Четверг" },
-  { key: "sat", label: "Суббота" },
+// Built on each call: the labels are translated, and the catalog is not
+// loaded yet when this module is first imported.
+export function DAY_GROUPS(): { key: DayGroup; label: string }[] {
+  return [
+  { key: "main", label: translate("bells.dayGroup.main") },
+  { key: "thu", label: translate("day.4") },
+  { key: "sat", label: translate("day.6") },
 ];
+}
 
 export interface BellTimeRow {
   dayGroup: string;

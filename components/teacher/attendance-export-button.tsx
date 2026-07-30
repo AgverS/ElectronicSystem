@@ -1,6 +1,7 @@
 "use client";
 
 import { IconDownload } from "@tabler/icons-react";
+import { translate } from "@/lib/i18n/translate";
 import { Button } from "@/components/ui/button";
 
 interface AttendanceExportButtonProps {
@@ -21,8 +22,8 @@ export function AttendanceExportButton({
   async function handleExport() {
     const { Workbook } = await import("exceljs");
     const wb = new Workbook();
-    wb.creator = "Электронный журнал";
-    const ws = wb.addWorksheet("Ведомость пропусков");
+    wb.creator = translate("app.name");
+    const ws = wb.addWorksheet(translate("nav.attendanceReport"));
 
     const colCount = header.length;
     const thin = { style: "thin" as const, color: { argb: "FFD1D5DB" } };
@@ -50,7 +51,7 @@ export function AttendanceExportButton({
     // Data + totals
     for (let i = 0; i < rows.length; i++) {
       const rowData = rows[i];
-      const isTotals = rowData[1] === "ИТОГО";
+      const isTotals = rowData[1] === translate("ui.total");
       ws.addRow(rowData);
       const exRow = ws.getRow(i + 3);
 
@@ -100,7 +101,7 @@ export function AttendanceExportButton({
   return (
     <Button size="sm" variant="outline" onClick={handleExport} disabled={disabled}>
       <IconDownload size={16} />
-      Экспорт Excel
+      {translate("ui.exportToExcel")}
     </Button>
   );
 }

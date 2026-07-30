@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition, useState, useEffect, useRef } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { IconTrash } from "@tabler/icons-react";
 import { deleteLesson } from "@/lib/actions/teacher";
 import { cn } from "@/lib/utils";
@@ -66,7 +67,7 @@ export function LessonHeader({ lessonId, assignmentId, date, readonly }: LessonH
               </button>
             </TooltipTrigger>
             <TooltipContent side="bottom">
-              Нажмите ещё раз для подтверждения
+              {translate("ui.clickAgainToConfirm")}
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

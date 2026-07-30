@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import {
   Dialog,
   DialogContent,
@@ -108,7 +109,7 @@ export function CreateAssignmentDialog({ teachers, groups, subjects }: Props) {
   function handleSubmit() {
     setError("");
     if (teacherIds.size === 0 || !subjectId || groupIds.size === 0) {
-      setError("Выберите преподавателя, предмет и хотя бы одну группу");
+      setError(translate("ui.selectATeacherASubjectAndAtLeast"));
       return;
     }
     startTransition(async () => {
@@ -121,7 +122,7 @@ export function CreateAssignmentDialog({ teachers, groups, subjects }: Props) {
         refresh();
         handleOpenChange(false);
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Ошибка");
+        setError(err instanceof Error ? err.message : translate("common.error"));
       }
     });
   }
@@ -130,13 +131,13 @@ export function CreateAssignmentDialog({ teachers, groups, subjects }: Props) {
     <>
       <Button onClick={() => setOpen(true)} className="gap-2">
         <IconPlus size={16} />
-        Новое назначение
+        {translate("ui.newAssignment")}
       </Button>
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className="flex max-h-[88vh] flex-col gap-4 overflow-hidden">
           <DialogHeader>
-            <DialogTitle>Новое назначение</DialogTitle>
+            <DialogTitle>{translate("ui.newAssignment")}</DialogTitle>
           </DialogHeader>
 
           <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
@@ -160,7 +161,7 @@ export function CreateAssignmentDialog({ teachers, groups, subjects }: Props) {
                 <Input
                   value={teacherSearch}
                   onChange={(e) => setTeacherSearch(e.target.value)}
-                  placeholder="Поиск преподавателя…"
+                  placeholder={translate("ui.searchTeachers")}
                   className="h-8 pl-8"
                 />
               </div>
@@ -171,7 +172,7 @@ export function CreateAssignmentDialog({ teachers, groups, subjects }: Props) {
               >
                 {filteredTeachers.length === 0 ? (
                   <p className="py-6 text-center text-sm text-muted-foreground">
-                    Преподаватели не найдены
+                    {translate("ui.noTeachersFound")}
                   </p>
                 ) : (
                   <div className="grid grid-cols-1 gap-0.5">
@@ -206,13 +207,13 @@ export function CreateAssignmentDialog({ teachers, groups, subjects }: Props) {
               </div>
             </div>
             <div className="flex flex-col gap-1">
-              <Label required>Предмет</Label>
+              <Label required>{translate("term.subject")}</Label>
               <SearchableSelect
                 value={subjectId}
                 onValueChange={setSubjectId}
                 options={subjectOptions}
-                placeholder="- выберите -"
-                searchPlaceholder="Поиск предмета…"
+                placeholder={translate("ui.select2")}
+                searchPlaceholder={translate("ui.searchSubjects")}
                 className="w-full"
                 portalled={false}
               />
@@ -234,7 +235,7 @@ export function CreateAssignmentDialog({ teachers, groups, subjects }: Props) {
                     onClick={toggleAllFiltered}
                     className="text-xs text-muted-foreground hover:text-foreground"
                   >
-                    {allFilteredSelected ? "Снять все" : "Выбрать все"}
+                    {allFilteredSelected ? translate("ui.clearAll") : translate("ui.selectAll")}
                   </button>
                 )}
               </div>
@@ -247,7 +248,7 @@ export function CreateAssignmentDialog({ teachers, groups, subjects }: Props) {
                 <Input
                   value={groupSearch}
                   onChange={(e) => setGroupSearch(e.target.value)}
-                  placeholder="Поиск группы…"
+                  placeholder={translate("ui.searchGroups")}
                   className="h-8 pl-8"
                 />
               </div>
@@ -258,7 +259,7 @@ export function CreateAssignmentDialog({ teachers, groups, subjects }: Props) {
               >
                 {filteredGroups.length === 0 ? (
                   <p className="py-6 text-center text-sm text-muted-foreground">
-                    Группы не найдены
+                    {translate("ui.noGroupsFound2")}
                   </p>
                 ) : (
                   <div className="grid grid-cols-2 gap-0.5">
@@ -302,14 +303,14 @@ export function CreateAssignmentDialog({ teachers, groups, subjects }: Props) {
               onClick={() => handleOpenChange(false)}
               disabled={pending}
             >
-              Отмена
+              {translate("common.cancel")}
             </Button>
             <Button onClick={handleSubmit} disabled={pending}>
               {pending
-                ? "Создание..."
+                ? translate("ui.creating")
                 : groupIds.size > 1
                   ? `Создать (${groupIds.size})`
-                  : "Создать"}
+                  : translate("common.create")}
             </Button>
           </DialogFooter>
         </DialogContent>

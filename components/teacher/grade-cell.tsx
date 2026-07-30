@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition, useState } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { ABSENT } from "@/lib/grades";
 import {
   Popover,
@@ -253,7 +254,7 @@ export function GradeCell({
                 : "text-muted-foreground hover:bg-muted",
             )}
           >
-            {activeRetakeNumber > 0 ? "Удалить" : "Нет"}
+            {activeRetakeNumber > 0 ? translate("common.delete") : "Нет"}
           </button>
         </div>
 
@@ -261,7 +262,7 @@ export function GradeCell({
         {grades.length > 0 && (
           <div className="border-t pt-2 flex flex-col gap-1.5">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-              Пересдачи
+              {translate("ui.retakes")}
             </p>
 
             {grades.length > 1 && (
@@ -269,7 +270,7 @@ export function GradeCell({
                 {grades.map((g, i) => (
                   <div key={g.retakeNumber} className="flex items-center gap-2">
                     <span className="text-[10px] text-muted-foreground w-20 shrink-0">
-                      {i === 0 ? "Оригинал" : `Пересдача ${i}`}
+                      {i === 0 ? translate("ui.original") : `Пересдача ${i}`}
                     </span>
                     <span
                       className={cn(
@@ -295,11 +296,11 @@ export function GradeCell({
                 disabled={pending}
                 className="mt-0.5 text-left text-xs text-primary hover:underline disabled:opacity-40"
               >
-                + Добавить пересдачу
+                {translate("ui.addARetake")}
               </button>
             ) : grades.length >= 4 ? (
               <p className="text-[10px] text-muted-foreground italic">
-                Максимум пересдач достигнут
+                {translate("ui.maximumNumberOfRetakesReached")}
               </p>
             ) : null}
           </div>

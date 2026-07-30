@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { ABSENT } from "@/lib/grades";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -23,9 +24,9 @@ interface UserDetailsDialogProps {
 }
 
 const ROLE_LABELS: Record<Role, string> = {
-  ADMIN: "Администратор",
-  TEACHER: "Преподаватель",
-  STUDENT: "Ученик",
+  ADMIN: translate("landing.role.admin.title"),
+  TEACHER: translate("landing.role.teacher.title"),
+  STUDENT: translate("landing.role.student.title"),
 };
 
 const GRADE_COLORS: Record<string, string> = {
@@ -82,7 +83,7 @@ export function UserDetailsDialog({ userId, userName, trigger }: UserDetailsDial
           <button
             type="button"
             className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            title="Просмотр подробностей"
+            title={translate("ui.viewDetails")}
           >
             <IconEye size={15} />
           </button>
@@ -92,7 +93,7 @@ export function UserDetailsDialog({ userId, userName, trigger }: UserDetailsDial
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <IconUser size={18} className="text-muted-foreground" />
-            <span>Информация о пользователе</span>
+            <span>{translate("ui.personDetails")}</span>
           </DialogTitle>
         </DialogHeader>
 
@@ -102,27 +103,27 @@ export function UserDetailsDialog({ userId, userName, trigger }: UserDetailsDial
           </div>
         ) : !user ? (
           <div className="py-8 text-center text-muted-foreground">
-            Пользователь не найден
+            {translate("ui.personNotFound")}
           </div>
         ) : (
           <div className="flex flex-col gap-4">
             {/* Основная инфа */}
             <div className="grid grid-cols-2 gap-x-4 gap-y-2 rounded-lg border bg-muted/20 p-3 text-sm">
               <div>
-                <span className="text-xs text-muted-foreground">ФИО:</span>
+                <span className="text-xs text-muted-foreground">{translate("ui.fullName2")}</span>
                 <p className="font-semibold">{user.name}</p>
               </div>
               <div>
-                <span className="text-xs text-muted-foreground">Логин:</span>
+                <span className="text-xs text-muted-foreground">{translate("ui.username2")}</span>
                 <p className="font-mono">{user.username ?? "—"}</p>
               </div>
               <div>
-                <span className="text-xs text-muted-foreground">Роль:</span>
+                <span className="text-xs text-muted-foreground">{translate("ui.role2")}</span>
                 <p>{ROLE_LABELS[user.role] || user.role}</p>
               </div>
               {user.role === Role.STUDENT && user.group && (
                 <div>
-                  <span className="text-xs text-muted-foreground">Группа:</span>
+                  <span className="text-xs text-muted-foreground">{translate("ui.group2")}</span>
                   <p className="font-semibold">{user.group.name}</p>
                 </div>
               )}
@@ -133,7 +134,7 @@ export function UserDetailsDialog({ userId, userName, trigger }: UserDetailsDial
               <div className="flex flex-col gap-3">
                 {user.specialties && user.specialties.length > 0 && (
                   <div>
-                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Специальности</h3>
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">{translate("nav.specialties")}</h3>
                     <div className="flex flex-wrap gap-1.5">
                       {user.specialties.map((s) => (
                         <span key={s.id} className="rounded bg-muted px-2 py-0.5 text-xs" title={s.name}>
@@ -145,7 +146,7 @@ export function UserDetailsDialog({ userId, userName, trigger }: UserDetailsDial
                 )}
                 {user.curatedGroups && user.curatedGroups.length > 0 && (
                   <div>
-                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Кураторские группы</h3>
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">{translate("ui.curatedGroups")}</h3>
                     <div className="flex flex-wrap gap-1.5">
                       {user.curatedGroups.map((g) => (
                         <span key={g.id} className="rounded bg-muted px-2 py-0.5 text-xs font-semibold">
@@ -157,7 +158,7 @@ export function UserDetailsDialog({ userId, userName, trigger }: UserDetailsDial
                 )}
                 {user.subjects && user.subjects.length > 0 && (
                   <div>
-                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Преподаваемые предметы</h3>
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">{translate("ui.subjectsTaught")}</h3>
                     <div className="flex flex-wrap gap-1.5">
                       {user.subjects.map((s) => (
                         <span key={s.id} className="rounded bg-muted px-2 py-0.5 text-xs">
@@ -173,10 +174,10 @@ export function UserDetailsDialog({ userId, userName, trigger }: UserDetailsDial
             {/* Успеваемость студента по семестрам */}
             {user.role === Role.STUDENT && (
               <div className="mt-2 flex flex-col gap-3">
-                <h3 className="text-sm font-bold tracking-tight">Успеваемость по семестрам</h3>
+                <h3 className="text-sm font-bold tracking-tight">{translate("ui.resultsBySemester")}</h3>
                 {!academic || academic.semesters.length === 0 ? (
                   <p className="text-sm text-muted-foreground italic">
-                    Учащийся ещё не посещал занятия и не имеет оценок в системе.
+                    {translate("ui.thisStudentHasNotAttendedAnyLessonsAnd")}
                   </p>
                 ) : (
                   <Tabs defaultValue={academic.semesters[0].id} className="w-full">
@@ -198,9 +199,9 @@ export function UserDetailsDialog({ userId, userName, trigger }: UserDetailsDial
                             <table className="w-full border-collapse text-left text-xs">
                               <thead>
                                 <tr className="border-b bg-muted/50 font-mono text-[10px] uppercase text-muted-foreground">
-                                  <th className="px-3 py-2 font-semibold">Предмет</th>
-                                  <th className="px-3 py-2 font-semibold">Отметки</th>
-                                  <th className="px-3 py-2 text-right font-semibold">Средний балл</th>
+                                  <th className="px-3 py-2 font-semibold">{translate("term.subject")}</th>
+                                  <th className="px-3 py-2 font-semibold">{translate("term.grades")}</th>
+                                  <th className="px-3 py-2 text-right font-semibold">{translate("ui.averageGrade")}</th>
                                 </tr>
                               </thead>
                               <tbody>

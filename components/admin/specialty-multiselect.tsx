@@ -1,6 +1,7 @@
 "use client";
 
 import { IconCheck } from "@tabler/icons-react";
+import { translate } from "@/lib/i18n/translate";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
@@ -54,13 +55,13 @@ export function SpecialtyMultiSelect({
             >
               {allSelected && <IconCheck size={10} stroke={3} />}
             </span>
-            <span>Выбрать все</span>
+            <span>{translate("ui.selectAll")}</span>
           </button>
         )}
       </div>
       {specialties.length === 0 ? (
         <p className="rounded-md border px-3 py-2 text-sm text-muted-foreground">
-          Сначала добавьте специальности.
+          {translate("ui.addSomeSpecialtiesFirst")}
         </p>
       ) : (
         <div className="flex max-h-[240px] flex-col gap-0.5 overflow-y-auto rounded-md border p-1 scrollbar-thin scrollbar-thumb-muted-foreground/20 hover:scrollbar-thumb-muted-foreground/40">

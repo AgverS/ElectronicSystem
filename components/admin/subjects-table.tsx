@@ -1,6 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { translate } from "@/lib/i18n/translate";
 import { useQuery } from "@tanstack/react-query";
 import { Suspense, useEffect, useState, useTransition } from "react";
 import { IconTrash } from "@tabler/icons-react";
@@ -92,8 +93,8 @@ function SubjectsTableInner({ specialties }: SubjectsTableProps) {
   const filters: FilterConfig[] = [
     {
       key: "specialtyId",
-      placeholder: "Специальность",
-      allLabel: "Все специальности",
+      placeholder: translate("term.specialty"),
+      allLabel: translate("ui.allSpecialties"),
       options: specialties.map((s) => ({ value: s.id, label: s.abbreviation || s.name })),
     },
   ];
@@ -101,7 +102,7 @@ function SubjectsTableInner({ specialties }: SubjectsTableProps) {
   return (
     <div className="flex flex-col gap-4">
       <Suspense>
-        <TableToolbar searchPlaceholder="Поиск по названию…" filters={filters} />
+        <TableToolbar searchPlaceholder={translate("ui.searchByName")} filters={filters} />
       </Suspense>
 
       {selected.size > 0 && (
@@ -114,7 +115,7 @@ function SubjectsTableInner({ specialties }: SubjectsTableProps) {
             onClick={() => setBulkDeleteOpen(true)}
           >
             <IconTrash size={14} />
-            Удалить выбранные
+            {translate("ui.deleteSelected")}
           </Button>
         </div>
       )}
@@ -130,13 +131,13 @@ function SubjectsTableInner({ specialties }: SubjectsTableProps) {
                 <Checkbox
                   checked={isIndeterminate(visibleIds) ? "indeterminate" : isAllSelected(visibleIds)}
                   onCheckedChange={() => toggleAll(visibleIds)}
-                  aria-label="Выбрать все"
+                  aria-label={translate("ui.selectAll")}
                 />
               </TableHead>
-              <TableHead>Название</TableHead>
-              <TableHead>Специальности</TableHead>
-              <TableHead className="w-40">Тип</TableHead>
-              <TableHead className="w-20 text-right">Часы</TableHead>
+              <TableHead>{translate("common.name")}</TableHead>
+              <TableHead>{translate("nav.specialties")}</TableHead>
+              <TableHead className="w-40">{translate("ui.kind")}</TableHead>
+              <TableHead className="w-20 text-right">{translate("term.hours")}</TableHead>
               <TableHead className="w-20" />
             </TableRow>
           </TableHeader>
@@ -147,7 +148,7 @@ function SubjectsTableInner({ specialties }: SubjectsTableProps) {
                   colSpan={6}
                   className="py-12 text-center text-muted-foreground"
                 >
-                  {isFetching ? "Загрузка…" : "Предметы не найдены"}
+                  {isFetching ? translate("common.loading") : translate("ui.noSubjectsFound")}
                 </TableCell>
               </TableRow>
             ) : (
@@ -194,11 +195,11 @@ function SubjectsTableInner({ specialties }: SubjectsTableProps) {
                   <TableCell>
                     {s.isPractical ? (
                       <span className="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 px-2 py-0.5 rounded-full">
-                        Практический
+                        {translate("lessonType.practical")}
                       </span>
                     ) : (
                       <span className="text-xs text-muted-foreground">
-                        Стандартный
+                        {translate("ui.standard")}
                       </span>
                     )}
                   </TableCell>
@@ -240,16 +241,16 @@ function SubjectsTableInner({ specialties }: SubjectsTableProps) {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Удалить {selected.size} предметов?</AlertDialogTitle>
-            <AlertDialogDescription>Это действие нельзя отменить.</AlertDialogDescription>
+            <AlertDialogDescription>{translate("ui.thisCannotBeUndone")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={bulkPending}>Отмена</AlertDialogCancel>
+            <AlertDialogCancel disabled={bulkPending}>{translate("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               onClick={(e) => { e.preventDefault(); handleBulkDelete(); }}
               disabled={bulkPending}
             >
-              {bulkPending ? "Удаление..." : "Удалить"}
+              {bulkPending ? translate("ui.deleting") : translate("common.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

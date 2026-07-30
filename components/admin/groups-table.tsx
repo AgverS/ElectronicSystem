@@ -1,6 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { translate } from "@/lib/i18n/translate";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Suspense, useEffect, useState, useTransition } from "react";
 import { IconTrash } from "@tabler/icons-react";
@@ -104,7 +105,7 @@ function GroupsTableInner({ teachers, specialties, hideSpecialty }: GroupsTableP
   return (
     <div className="flex flex-col gap-4">
       <Suspense>
-        <TableToolbar searchPlaceholder="Поиск по названию или куратору…" />
+        <TableToolbar searchPlaceholder={translate("ui.searchByNameOrCurator")} />
       </Suspense>
 
       {selected.size > 0 && (
@@ -117,7 +118,7 @@ function GroupsTableInner({ teachers, specialties, hideSpecialty }: GroupsTableP
             onClick={() => setBulkDeleteOpen(true)}
           >
             <IconTrash size={14} />
-            Удалить выбранные
+            {translate("ui.deleteSelected")}
           </Button>
         </div>
       )}
@@ -133,14 +134,14 @@ function GroupsTableInner({ teachers, specialties, hideSpecialty }: GroupsTableP
                 <Checkbox
                   checked={isIndeterminate(visibleIds) ? "indeterminate" : isAllSelected(visibleIds)}
                   onCheckedChange={() => toggleAll(visibleIds)}
-                  aria-label="Выбрать все"
+                  aria-label={translate("ui.selectAll")}
                 />
               </TableHead>
-              <TableHead>Название</TableHead>
-              {!hideSpecialty && <TableHead>Специальность</TableHead>}
-              <TableHead>Курс</TableHead>
-              <TableHead>Куратор</TableHead>
-              <TableHead>Учеников</TableHead>
+              <TableHead>{translate("common.name")}</TableHead>
+              {!hideSpecialty && <TableHead>{translate("term.specialty")}</TableHead>}
+              <TableHead>{translate("term.course")}</TableHead>
+              <TableHead>{translate("term.curator")}</TableHead>
+              <TableHead>{translate("term.students")}</TableHead>
               <TableHead className="w-20" />
             </TableRow>
           </TableHeader>
@@ -151,7 +152,7 @@ function GroupsTableInner({ teachers, specialties, hideSpecialty }: GroupsTableP
                   colSpan={hideSpecialty ? 6 : 7}
                   className="py-12 text-center text-muted-foreground"
                 >
-                  {isFetching ? "Загрузка…" : "Группы не найдены"}
+                  {isFetching ? translate("common.loading") : translate("ui.noGroupsFound2")}
                 </TableCell>
               </TableRow>
             ) : (
@@ -239,16 +240,16 @@ function GroupsTableInner({ teachers, specialties, hideSpecialty }: GroupsTableP
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Удалить {selected.size} групп?</AlertDialogTitle>
-            <AlertDialogDescription>Это действие нельзя отменить.</AlertDialogDescription>
+            <AlertDialogDescription>{translate("ui.thisCannotBeUndone")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={bulkPending}>Отмена</AlertDialogCancel>
+            <AlertDialogCancel disabled={bulkPending}>{translate("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               onClick={(e) => { e.preventDefault(); handleBulkDelete(); }}
               disabled={bulkPending}
             >
-              {bulkPending ? "Удаление..." : "Удалить"}
+              {bulkPending ? translate("ui.deleting") : translate("common.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

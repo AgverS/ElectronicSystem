@@ -2,6 +2,7 @@
 // подставляя время из расписания звонков. Используется для генерации .ics.
 
 import { resolveBellTimes, type BellContext } from "@/lib/bell-times";
+import { translate } from "@/lib/i18n/translate";
 import { toISODate } from "@/lib/week";
 import type { IcsEvent } from "@/lib/calendar/ics";
 
@@ -98,7 +99,7 @@ export function computeGroupEvents(opts: {
       let uid: string;
 
       if (sub) {
-        summary = sub.subject?.name ?? "Замена";
+        summary = sub.subject?.name ?? translate("audit.entity.schedule_substitution");
         teacherName = sub.teacher?.name;
         room = sub.room;
         uid = `sub-${sub.id}`;
@@ -190,7 +191,7 @@ export function computeTeacherEvents(opts: {
         date: iso,
         startTime: time.startTime,
         endTime: time.endTime,
-        summary: `${s.lessonNumber}. ${s.subject?.name ?? "Замена"} — ${s.group.name}${subgroupSuffix(s.subgroup)}`,
+        summary: `${s.lessonNumber}. ${s.subject?.name ?? translate("audit.entity.schedule_substitution")} — ${s.group.name}${subgroupSuffix(s.subgroup)}`,
         location: s.room ? `Каб. ${s.room}` : undefined,
       });
     }
@@ -258,7 +259,7 @@ export function computeRoomEvents(opts: {
         date: iso,
         startTime: time.startTime,
         endTime: time.endTime,
-        summary: `${s.lessonNumber}. ${s.subject?.name ?? "Замена"} — ${s.group.name}${subgroupSuffix(s.subgroup)}`,
+        summary: `${s.lessonNumber}. ${s.subject?.name ?? translate("audit.entity.schedule_substitution")} — ${s.group.name}${subgroupSuffix(s.subgroup)}`,
         description: s.teacher?.name ? `Преподаватель: ${s.teacher.name}` : undefined,
       });
     }

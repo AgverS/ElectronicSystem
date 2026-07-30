@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { ABSENT } from "@/lib/grades";
-import { translate } from "@/lib/i18n/provider";
+import { translate } from "@/lib/i18n/translate";
 import { requireRole } from "@/lib/demo-actor";
 import { Role } from "@/lib/prisma-client";
 import { logAction } from "@/lib/audit";
@@ -410,7 +410,7 @@ export async function setAbsenceExcused(data: {
     where: { id: data.groupId },
     select: { curatorId: true },
   });
-  if (!group) throw new Error("Группа не найдена");
+  if (!group) throw new Error(translate("ui.groupNotFound"));
   if (
     user.role !== Role.ADMIN &&
     !user.isMaster &&

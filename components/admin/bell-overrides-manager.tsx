@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import {
   IconPlus,
   IconPencil,
@@ -86,14 +87,14 @@ export function BellOverridesManager({ overrides }: { overrides: Override[] }) {
     <section className="flex flex-col gap-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-base font-semibold">Временные изменения</h2>
+          <h2 className="text-base font-semibold">{translate("bells.overrides")}</h2>
           <p className="text-sm text-muted-foreground">
-            Другое расписание звонков на период (праздники и т.п.).
+            {translate("ui.differentBellTimesForAPeriodHolidaysAnd")}
           </p>
         </div>
         <Button onClick={openCreate} className="shrink-0 gap-2">
           <IconPlus size={16} />
-          <span className="hidden sm:inline">Добавить</span>
+          <span className="hidden sm:inline">{translate("common.add")}</span>
         </Button>
       </div>
 
@@ -102,13 +103,13 @@ export function BellOverridesManager({ overrides }: { overrides: Override[] }) {
           <div className="flex size-10 items-center justify-center rounded-lg bg-muted text-muted-foreground">
             <IconCalendarEvent size={20} />
           </div>
-          <p className="text-sm font-medium">Временных изменений нет</p>
+          <p className="text-sm font-medium">{translate("ui.noTemporaryChanges")}</p>
           <p className="max-w-xs text-sm text-muted-foreground">
-            Добавьте период, чтобы переопределить звонки на праздники или сокращённые дни.
+            {translate("ui.addAPeriodToOverrideTheBellTimes")}
           </p>
           <Button variant="outline" size="sm" onClick={openCreate} className="mt-1 gap-1.5">
             <IconPlus size={15} />
-            Добавить период
+            {translate("ui.addAPeriod")}
           </Button>
         </div>
       ) : (
@@ -122,7 +123,7 @@ export function BellOverridesManager({ overrides }: { overrides: Override[] }) {
                 <IconCalendarEvent size={18} />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate font-medium">{o.name || "Без названия"}</p>
+                <p className="truncate font-medium">{o.name || translate("ui.untitled")}</p>
                 <p className="font-mono text-xs tabular-nums text-muted-foreground">
                   {fmtDate(o.startDate)} – {fmtDate(o.endDate)}
                 </p>
@@ -131,11 +132,11 @@ export function BellOverridesManager({ overrides }: { overrides: Override[] }) {
                 {o.slots.length} пар
               </span>
               <div className="flex shrink-0 items-center gap-1">
-                <IconBtn tooltip="Редактировать" onClick={() => openEdit(o)}>
+                <IconBtn tooltip={translate("common.edit")} onClick={() => openEdit(o)}>
                   <IconPencil size={15} />
                 </IconBtn>
                 <DeleteDialog
-                  label={`Удалить «${o.name || "Без названия"}»`}
+                  label={`Удалить «${o.name || translate("ui.untitled")}»`}
                   action={async () => {
                     await deleteBellOverride(o.id);
                     refresh();
@@ -198,7 +199,7 @@ function OverrideDialog({
         refresh();
         onClose();
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Ошибка");
+        setError(err instanceof Error ? err.message : translate("common.error"));
       }
     });
   }
@@ -208,20 +209,20 @@ function OverrideDialog({
       <DialogContent className="flex max-h-[90vh] flex-col gap-4 overflow-hidden sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {editing ? "Изменить период" : "Новое временное расписание"}
+            {editing ? translate("ui.changeThePeriod") : translate("ui.newTemporaryTimetable")}
           </DialogTitle>
         </DialogHeader>
 
         <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-0.5">
           <div className="flex flex-col gap-1.5">
-            <Label>Название</Label>
+            <Label>{translate("common.name")}</Label>
             <Input
               value={name}
               onChange={(e) => {
                 setName(e.target.value);
                 if (error) setError("");
               }}
-              placeholder="Предпраздничное"
+              placeholder={translate("ui.shortenedTimetable")}
             />
           </div>
           <div className="grid grid-cols-2 gap-2">
@@ -253,7 +254,7 @@ function OverrideDialog({
 
           <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
             <Label className="text-muted-foreground">
-              Звонки
+              {translate("nav.bells")}
               <span className="ml-1.5 font-mono text-xs tabular-nums">{filled}/13</span>
             </Label>
             <div className="flex items-center gap-1">
@@ -264,7 +265,7 @@ function OverrideDialog({
                 className="gap-1.5 text-muted-foreground"
               >
                 <IconSparkles size={14} />
-                Стандартные
+                {translate("ui.standard2")}
               </Button>
               <Button
                 variant="ghost"
@@ -273,7 +274,7 @@ function OverrideDialog({
                 className="gap-1.5 text-muted-foreground"
               >
                 <IconEraser size={14} />
-                Очистить
+                {translate("grade.clear")}
               </Button>
             </div>
           </div>
@@ -285,10 +286,10 @@ function OverrideDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={pending}>
-            Отмена
+            {translate("common.cancel")}
           </Button>
           <Button onClick={handleSave} disabled={pending}>
-            {pending ? "Сохранение…" : "Сохранить"}
+            {pending ? translate("common.saving") : translate("common.save")}
           </Button>
         </DialogFooter>
       </DialogContent>

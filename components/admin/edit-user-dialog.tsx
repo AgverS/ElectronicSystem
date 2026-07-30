@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { IconPencil } from "@tabler/icons-react";
 import {
   Dialog,
@@ -39,13 +40,13 @@ export function EditUserDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <IconBtn tooltip="Редактировать">
+        <IconBtn tooltip={translate("common.edit")}>
           <IconPencil size={15} />
         </IconBtn>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Редактировать пользователя</DialogTitle>
+          <DialogTitle>{translate("ui.editThePerson")}</DialogTitle>
         </DialogHeader>
         <UserForm
           groups={groups}

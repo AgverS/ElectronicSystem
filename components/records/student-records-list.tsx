@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { IconAward } from "@tabler/icons-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,11 +25,15 @@ export interface StudentRecordItem {
 
 type KindFilter = "" | RecordKind;
 
-const KIND_FILTERS: { value: KindFilter; label: string }[] = [
+// Built on each call: the labels are translated, and the catalog is not
+// loaded yet when this module is first imported.
+function KIND_FILTERS(): { value: KindFilter; label: string }[] {
+  return [
   { value: "", label: "Все" },
-  { value: RecordKind.REWARD, label: "Поощрения" },
-  { value: RecordKind.PENALTY, label: "Взыскания" },
+  { value: RecordKind.REWARD, label: translate("ui.rewards") },
+  { value: RecordKind.PENALTY, label: translate("ui.penalties") },
 ];
+}
 
 export function StudentRecordsList({ records }: { records: StudentRecordItem[] }) {
   const [kind, setKind] = useState<KindFilter>("");
@@ -37,7 +42,7 @@ export function StudentRecordsList({ records }: { records: StudentRecordItem[] }
     return (
       <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed py-20 text-center text-muted-foreground">
         <IconAward size={32} className="opacity-40" />
-        <p>Поощрений и взысканий пока нет.</p>
+        <p>{translate("ui.noRewardsOrPenaltiesYet")}</p>
       </div>
     );
   }
@@ -50,7 +55,7 @@ export function StudentRecordsList({ records }: { records: StudentRecordItem[] }
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-1.5">
-          {KIND_FILTERS.map((f) => (
+          {KIND_FILTERS().map((f) => (
             <Button
               key={f.value || "all"}
               size="sm"
@@ -73,7 +78,7 @@ export function StudentRecordsList({ records }: { records: StudentRecordItem[] }
 
       {visible.length === 0 ? (
         <div className="rounded-lg border border-dashed py-12 text-center text-muted-foreground">
-          Нет записей этого типа.
+          {translate("ui.noRecordsOfThisKind")}
         </div>
       ) : (
         <div className="flex flex-col gap-3">

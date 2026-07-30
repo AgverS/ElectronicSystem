@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { IconPencil } from "@tabler/icons-react";
 import {
   Dialog,
@@ -71,7 +72,7 @@ export function EditGroupDialog({ group, teachers, specialties }: EditGroupDialo
     e.preventDefault();
     setError("");
     if (!name.trim()) {
-      setError("Введите название");
+      setError(translate("ui.enterAName"));
       return;
     }
     startTransition(async () => {
@@ -84,7 +85,7 @@ export function EditGroupDialog({ group, teachers, specialties }: EditGroupDialo
         refresh();
         setOpen(false);
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Ошибка");
+        setError(err instanceof Error ? err.message : translate("common.error"));
       }
     });
   }
@@ -92,17 +93,17 @@ export function EditGroupDialog({ group, teachers, specialties }: EditGroupDialo
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <IconBtn tooltip="Редактировать">
+        <IconBtn tooltip={translate("common.edit")}>
           <IconPencil size={15} />
         </IconBtn>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Редактировать группу</DialogTitle>
+          <DialogTitle>{translate("ui.editTheGroup")}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSave} className="flex flex-col gap-3 pt-2">
           <div className="flex flex-col gap-1">
-            <Label>Специальность</Label>
+            <Label>{translate("term.specialty")}</Label>
             <Select
               value={specialtyId || NONE}
               onValueChange={(v) => {
@@ -111,10 +112,10 @@ export function EditGroupDialog({ group, teachers, specialties }: EditGroupDialo
               }}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="- не выбрана -" />
+                <SelectValue placeholder={translate("ui.notSelected")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={NONE}>- не выбрана -</SelectItem>
+                <SelectItem value={NONE}>{translate("ui.notSelected")}</SelectItem>
                 {specialties.map((s) => (
                   <SelectItem key={s.id} value={s.id}>
                     {s.abbreviation || s.name}
@@ -125,27 +126,27 @@ export function EditGroupDialog({ group, teachers, specialties }: EditGroupDialo
             </Select>
           </div>
           <div className="flex flex-col gap-1">
-            <Label required>Название</Label>
+            <Label required>{translate("common.name")}</Label>
             <Input
               value={name}
               onChange={(e) => handleNameChange(e.target.value)}
-              placeholder="А-101"
+              placeholder={translate("ui.a101")}
             />
             <p className="text-xs text-muted-foreground">
               Курс определяется автоматически: {formatCourse(name || group.name)}
             </p>
           </div>
           <div className="flex flex-col gap-1">
-            <Label>Куратор</Label>
+            <Label>{translate("term.curator")}</Label>
             <Select
               value={curatorId || NONE}
               onValueChange={(v) => setCuratorId(v === NONE ? "" : v)}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="- не назначен -" />
+                <SelectValue placeholder={translate("ui.notAssigned2")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={NONE}>- не назначен -</SelectItem>
+                <SelectItem value={NONE}>{translate("ui.notAssigned2")}</SelectItem>
                 {teachers.map((t) => (
                   <SelectItem key={t.id} value={t.id}>
                     {t.name}
@@ -161,10 +162,10 @@ export function EditGroupDialog({ group, teachers, specialties }: EditGroupDialo
               variant="outline"
               onClick={() => setOpen(false)}
             >
-              Отмена
+              {translate("common.cancel")}
             </Button>
             <Button type="submit" disabled={pending}>
-              {pending ? "Сохранение..." : "Сохранить"}
+              {pending ? translate("common.saving") : translate("common.save")}
             </Button>
           </div>
         </form>

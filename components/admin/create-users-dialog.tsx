@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import {
   Dialog,
   DialogContent,
@@ -28,9 +29,9 @@ import { Role } from "@/lib/prisma-client";
 import { cn } from "@/lib/utils";
 
 const ROLE_LABELS: Record<Role, string> = {
-  ADMIN: "Администратор",
-  TEACHER: "Преподаватель",
-  STUDENT: "Ученик",
+  ADMIN: translate("landing.role.admin.title"),
+  TEACHER: translate("landing.role.teacher.title"),
+  STUDENT: translate("landing.role.student.title"),
 };
 
 // Radix Select запрещает пустое значение у SelectItem — используем sentinel.
@@ -59,13 +60,13 @@ function emptyRow(): Row {
 }
 
 function pluralUsers(n: number) {
-  if (n === 1) return "пользователя";
-  if (n >= 2 && n <= 4) return "пользователей";
-  if (n % 100 >= 11 && n % 100 <= 19) return "пользователей";
+  if (n === 1) return translate("ui.person");
+  if (n >= 2 && n <= 4) return translate("ui.people");
+  if (n % 100 >= 11 && n % 100 <= 19) return translate("ui.people");
   const mod = n % 10;
-  if (mod === 1) return "пользователя";
-  if (mod >= 2 && mod <= 4) return "пользователей";
-  return "пользователей";
+  if (mod === 1) return translate("ui.person");
+  if (mod >= 2 && mod <= 4) return translate("ui.people");
+  return translate("ui.people");
 }
 
 interface Props {
@@ -113,7 +114,7 @@ export function CreateUsersDialog({ groups, specialties, isMasterActor }: Props)
   function handleSubmit() {
     // Client-side validation
     const validated = rows.map((r) => {
-      if (!r.name.trim()) return { ...r, error: "Введите ФИО" };
+      if (!r.name.trim()) return { ...r, error: translate("ui.enterAFullName") };
       return r;
     });
     if (validated.some((r) => r.error)) {
@@ -155,7 +156,7 @@ export function CreateUsersDialog({ groups, specialties, isMasterActor }: Props)
           if (next[0])
             next[0] = {
               ...next[0],
-              error: err instanceof Error ? err.message : "Ошибка",
+              error: err instanceof Error ? err.message : translate("common.error"),
             };
           return next;
         });
@@ -169,29 +170,29 @@ export function CreateUsersDialog({ groups, specialties, isMasterActor }: Props)
     <>
       <Button onClick={() => setOpen(true)} className="gap-2">
         <IconUserPlus size={16} />
-        Добавить пользователей
+        {translate("ui.addPeople")}
       </Button>
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className="sm:max-w-4xl gap-4">
           <DialogHeader>
-            <DialogTitle>Создание пользователей</DialogTitle>
+            <DialogTitle>{translate("ui.addPeople2")}</DialogTitle>
           </DialogHeader>
 
           <div className="flex flex-col gap-2">
             {/* Column headers */}
             <div className="hidden sm:grid grid-cols-[1fr_1fr_9rem_11.5rem_2rem] gap-2 px-0.5">
               <Label required className="text-xs font-medium text-muted-foreground">
-                ФИО
+                {translate("ui.fullName")}
               </Label>
               <Label className="text-xs font-medium text-muted-foreground">
-                Логин
+                {translate("ui.username")}
               </Label>
               <Label className="text-xs font-medium text-muted-foreground">
-                Роль
+                {translate("ui.role")}
               </Label>
               <Label className="text-xs font-medium text-muted-foreground">
-                Группа / куратор
+                {translate("ui.groupCurator")}
               </Label>
               <span />
             </div>
@@ -202,9 +203,9 @@ export function CreateUsersDialog({ groups, specialties, isMasterActor }: Props)
                 <div key={row.key} className="border-b pb-3 sm:border-b-0 sm:pb-0">
                   <div className="flex flex-col gap-2 sm:grid sm:grid-cols-[1fr_1fr_9rem_11.5rem_2rem] sm:items-center sm:gap-2">
                     <div className="flex flex-col gap-1 sm:block">
-                      <Label className="text-[10px] font-medium text-muted-foreground sm:hidden">ФИО</Label>
+                      <Label className="text-[10px] font-medium text-muted-foreground sm:hidden">{translate("ui.fullName")}</Label>
                       <Input
-                        placeholder="Иванов Иван Иванович"
+                        placeholder={translate("ui.ameliaNovak")}
                         value={row.name}
                         onChange={(e) =>
                           handleNameChange(row.key, e.target.value)
@@ -217,9 +218,9 @@ export function CreateUsersDialog({ groups, specialties, isMasterActor }: Props)
                       />
                     </div>
                     <div className="flex flex-col gap-1 sm:block">
-                      <Label className="text-[10px] font-medium text-muted-foreground sm:hidden">Логин</Label>
+                      <Label className="text-[10px] font-medium text-muted-foreground sm:hidden">{translate("ui.username")}</Label>
                       <Input
-                        placeholder="Иванов И.И."
+                        placeholder={translate("ui.aNovak")}
                         value={row.username}
                         onChange={(e) =>
                           patchRow(row.key, { username: e.target.value })
@@ -228,7 +229,7 @@ export function CreateUsersDialog({ groups, specialties, isMasterActor }: Props)
                       />
                     </div>
                     <div className="flex flex-col gap-1 sm:block">
-                      <Label className="text-[10px] font-medium text-muted-foreground sm:hidden">Роль</Label>
+                      <Label className="text-[10px] font-medium text-muted-foreground sm:hidden">{translate("ui.role")}</Label>
                       <Select
                         value={row.role}
                         onValueChange={(v) => {
@@ -256,7 +257,7 @@ export function CreateUsersDialog({ groups, specialties, isMasterActor }: Props)
                     </div>
                     <div className="flex flex-col gap-1 sm:block">
                       <Label className="text-[10px] font-medium text-muted-foreground sm:hidden">
-                        {row.role === Role.STUDENT ? "Группа" : "Группа / специальности"}
+                        {row.role === Role.STUDENT ? translate("term.group") : translate("ui.groupSpecialties")}
                       </Label>
                       {row.role === Role.STUDENT ? (
                         <Select
@@ -266,10 +267,10 @@ export function CreateUsersDialog({ groups, specialties, isMasterActor }: Props)
                           }
                         >
                           <SelectTrigger size="sm" className="w-full">
-                            <SelectValue placeholder="- не выбрана -" />
+                            <SelectValue placeholder={translate("ui.notSelected")} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value={NONE}>- не выбрана -</SelectItem>
+                            <SelectItem value={NONE}>{translate("ui.notSelected")}</SelectItem>
                             {groups.map((g) => (
                               <SelectItem key={g.id} value={g.id}>
                                 {g.name}
@@ -287,7 +288,7 @@ export function CreateUsersDialog({ groups, specialties, isMasterActor }: Props)
                                 className="h-8 w-full justify-start font-normal text-left truncate text-xs"
                               >
                                 {row.specialtyIds.length === 0
-                                  ? "Специальности: нет"
+                                  ? translate("ui.specialtiesNone")
                                   : `Спец-ти: ${row.specialtyIds
                                       .map((sid) => specialties.find((s) => s.id === sid)?.abbreviation || "?")
                                       .join(", ")}`}
@@ -296,7 +297,7 @@ export function CreateUsersDialog({ groups, specialties, isMasterActor }: Props)
                             <PopoverContent className="w-80 p-3" align="start">
                               <div className="flex flex-col gap-2">
                                 <p className="text-xs font-semibold text-muted-foreground">
-                                  Выберите специальности
+                                  {translate("ui.selectSpecialties")}
                                 </p>
                                 <div className="flex flex-col gap-1 max-h-48 overflow-y-auto">
                                   {specialties.map((spec) => {
@@ -331,10 +332,10 @@ export function CreateUsersDialog({ groups, specialties, isMasterActor }: Props)
                             }
                           >
                             <SelectTrigger size="sm" className="w-full">
-                              <SelectValue placeholder="Куратор группы..." />
+                              <SelectValue placeholder={translate("ui.groupCurator2")} />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value={NONE}>Куратор группы...</SelectItem>
+                              <SelectItem value={NONE}>{translate("ui.groupCurator2")}</SelectItem>
                               {groups.map((g) => (
                                 <SelectItem key={g.id} value={g.id}>
                                   {g.name}
@@ -371,7 +372,7 @@ export function CreateUsersDialog({ groups, specialties, isMasterActor }: Props)
               className="flex w-fit items-center gap-1.5 rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               <IconPlus size={14} />
-              Добавить строку
+              {translate("ui.addARow")}
             </button>
           </div>
 
@@ -381,13 +382,13 @@ export function CreateUsersDialog({ groups, specialties, isMasterActor }: Props)
               onClick={() => handleOpenChange(false)}
               disabled={pending}
             >
-              Отмена
+              {translate("common.cancel")}
             </Button>
             <Button onClick={handleSubmit} disabled={pending || filled === 0}>
               {pending
-                ? "Создание..."
+                ? translate("ui.creating")
                 : filled === 0
-                  ? "Создать"
+                  ? translate("common.create")
                   : `Создать ${filled} ${pluralUsers(filled)}`}
             </Button>
           </DialogFooter>

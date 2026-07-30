@@ -1,6 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { translate } from "@/lib/i18n/translate";
 import { useQuery } from "@tanstack/react-query";
 import { Suspense, useState, useMemo } from "react";
 import Link from "next/link";
@@ -75,7 +76,7 @@ function TeacherJournalsViewInner({ userRole }: TeacherJournalsViewProps) {
   return (
     <div>
       <h1 className="mt-0.5 text-2xl font-bold tracking-tight sm:text-3xl">
-        {userRole === Role.ADMIN ? "Журналы" : "Мои журналы"}
+        {userRole === Role.ADMIN ? translate("nav.journals") : translate("nav.myJournals")}
       </h1>
       {data?.data?.length ? (
         <p className="mt-1 font-mono text-xs text-muted-foreground">
@@ -86,7 +87,7 @@ function TeacherJournalsViewInner({ userRole }: TeacherJournalsViewProps) {
 
       <div className="mt-5 flex flex-col gap-4">
         <Suspense>
-          <TableToolbar searchPlaceholder="Поиск по предмету или группе…" />
+          <TableToolbar searchPlaceholder={translate("ui.searchBySubjectOrGroup")} />
         </Suspense>
 
         <div
@@ -96,8 +97,8 @@ function TeacherJournalsViewInner({ userRole }: TeacherJournalsViewProps) {
           {!data?.data?.length ? (
             <p className="text-muted-foreground">
               {isFetching
-                ? "Загрузка…"
-                : "Нет назначений. Обратитесь к администратору."}
+                ? translate("common.loading")
+                : translate("ui.noAssignmentsPleaseContactAnAdministrator")}
             </p>
           ) : (
             <div className="flex flex-col gap-4">
@@ -159,7 +160,7 @@ function TeacherJournalsViewInner({ userRole }: TeacherJournalsViewProps) {
                         className="-ml-2 h-8 gap-1 px-2"
                       >
                         <IconChevronLeft size={16} />
-                        Назад
+                        {translate("common.back")}
                       </Button>
                       <h2 className="font-medium">Группа {currentGroup?.name}</h2>
                     </div>
@@ -210,7 +211,7 @@ function JournalCard({ a, userRole }: { a: Assignment; userRole: Role }) {
           {a.teachers.map((t) => shortName(t.name)).join(", ")}
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
-          <span className="font-mono font-medium text-foreground">{a.lessons.length}</span> уроков
+          <span className="font-mono font-medium text-foreground">{a.lessons.length}</span> {translate("ui.lessons")}
         </p>
       </Link>
     </motion.div>

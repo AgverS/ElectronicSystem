@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { translate } from "@/lib/i18n/translate";
 import { Label as LabelPrimitive } from "radix-ui"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
@@ -30,7 +31,7 @@ function Label({
             </span>
           </TooltipTrigger>
           <TooltipContent side="right" className="text-[10px] px-2 py-1">
-            Обязательное поле
+            {translate("common.required")}
           </TooltipContent>
         </Tooltip>
       )}

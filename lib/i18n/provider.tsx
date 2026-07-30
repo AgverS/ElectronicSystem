@@ -3,10 +3,11 @@
 import * as React from "react";
 import { DEFAULT_LOCALE, detectLocale, isLocale, type Locale } from "./config";
 import en from "./locales/en";
+import { interpolate, setActiveMessages, type Messages } from "./translate";
 
 const STORAGE_KEY = "electronic-system-demo-locale";
 
-export type Messages = Record<string, string>;
+export type { Messages };
 
 /** Catalogs other than English load on demand, so the first paint stays small. */
 const loaders: Record<Exclude<Locale, "en">, () => Promise<{ default: Messages }>> = {
@@ -39,41 +40,11 @@ const I18nContext = React.createContext<I18nValue>({
   intlLocale: INTL_TAGS[DEFAULT_LOCALE],
 });
 
-/**
- * The active catalog, mirrored outside React.
- *
- * Data-mutation modules are plain async functions, not components, so they
- * cannot call a hook to translate the errors they throw. They use `translate()`
- * below, which the provider keeps in step with the chosen language.
- */
-let activeMessages: Messages = en;
-
-/** Translate outside a component — for errors thrown by mutation helpers. */
-export function translate(key: string, params?: Record<string, string | number>) {
-  return interpolate(activeMessages[key] ?? en[key] ?? key, params);
-}
-
-function interpolate(template: string, params?: Record<string, string | number>) {
-  if (!params) return template;
-  return template.replace(/\{(\w+)\}/g, (match, name) =>
-    name in params ? String(params[name]) : match,
-  );
-}
-
 export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = React.useState<Locale>(DEFAULT_LOCALE);
   const [messages, setMessages] = React.useState<Messages>(en);
 
-  // Resolve the initial language once, on the client.
-  React.useEffect(() => {
-    const saved = window.localStorage.getItem(STORAGE_KEY);
-    const initial = isLocale(saved) ? saved : detectLocale(navigator.languages ?? []);
-    if (initial !== DEFAULT_LOCALE) void applyLocale(initial);
-    else document.documentElement.lang = DEFAULT_LOCALE;
-     
-  }, []);
-
-  async function applyLocale(next: Locale) {
+  const applyLocale = React.useCallback(async (next: Locale) => {
     let nextMessages: Messages = en;
     if (next !== "en") {
       try {
@@ -84,17 +55,35 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
         nextMessages = en;
       }
     }
-    activeMessages = nextMessages;
+    // Keep the non-React translator in step for helpers outside components.
+    setActiveMessages(nextMessages);
     setMessages(nextMessages);
     setLocaleState(next);
     document.documentElement.lang = next;
-  }
-
-  const setLocale = React.useCallback((next: Locale) => {
-    window.localStorage.setItem(STORAGE_KEY, next);
-    void applyLocale(next);
-     
   }, []);
+
+  // Resolve the initial language once, on the client: the saved choice and the
+  // browser's preferences are only readable here, not during prerendering.
+  React.useEffect(() => {
+    const saved = window.localStorage.getItem(STORAGE_KEY);
+    const initial = isLocale(saved) ? saved : detectLocale(navigator.languages ?? []);
+    if (initial === DEFAULT_LOCALE) {
+      document.documentElement.lang = DEFAULT_LOCALE;
+      return;
+    }
+    // Not a synchronous state update: applyLocale awaits the catalog's dynamic
+    // import before it touches state. The lint rule cannot see across the await.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void applyLocale(initial);
+  }, [applyLocale]);
+
+  const setLocale = React.useCallback(
+    (next: Locale) => {
+      window.localStorage.setItem(STORAGE_KEY, next);
+      void applyLocale(next);
+    },
+    [applyLocale],
+  );
 
   const t = React.useCallback(
     (key: string, params?: Record<string, string | number>) =>
@@ -107,7 +96,17 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     [locale, setLocale, t],
   );
 
-  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
+  return (
+    <I18nContext.Provider value={value}>
+      {/*
+        Remounting on a language change lets components use the non-reactive
+        `translate()` as well as the `useT()` hook and be correct either way.
+        Switching language is a deliberate, rare action, so paying a remount for
+        it is a good trade against threading a hook through every component.
+      */}
+      <React.Fragment key={locale}>{children}</React.Fragment>
+    </I18nContext.Provider>
+  );
 }
 
 export function useI18n() {

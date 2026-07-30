@@ -1,6 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { translate } from "@/lib/i18n/translate";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Suspense, useEffect, useState, useTransition } from "react";
 import { IconTrash } from "@tabler/icons-react";
@@ -37,9 +38,9 @@ import { Role } from "@/lib/prisma-client";
 import { useTableSelection } from "@/lib/use-table-selection";
 
 const ROLE_LABELS: Record<Role, string> = {
-  ADMIN: "Администратор",
-  TEACHER: "Преподаватель",
-  STUDENT: "Ученик",
+  ADMIN: translate("landing.role.admin.title"),
+  TEACHER: translate("landing.role.teacher.title"),
+  STUDENT: translate("landing.role.student.title"),
 };
 
 const ROLE_VARIANTS: Record<Role, "default" | "secondary" | "outline"> = {
@@ -135,12 +136,12 @@ function UsersTableInner({
     : [
       {
         key: "role",
-        placeholder: "Роль",
-        allLabel: "Все роли",
+        placeholder: translate("ui.role"),
+        allLabel: translate("ui.allRoles"),
         options: [
-          { value: Role.ADMIN, label: "Администратор" },
-          { value: Role.TEACHER, label: "Преподаватель" },
-          { value: Role.STUDENT, label: "Ученик" },
+          { value: Role.ADMIN, label: translate("landing.role.admin.title") },
+          { value: Role.TEACHER, label: translate("landing.role.teacher.title") },
+          { value: Role.STUDENT, label: translate("landing.role.student.title") },
         ],
       },
     ];
@@ -149,8 +150,8 @@ function UsersTableInner({
     ? [
       {
         key: "groupId",
-        placeholder: "Группа",
-        allLabel: "Все группы",
+        placeholder: translate("term.group"),
+        allLabel: translate("ui.allGroups"),
         options: groups.map((g) => ({ value: g.id, label: g.name })),
       },
     ]
@@ -160,7 +161,7 @@ function UsersTableInner({
     <div className="flex flex-col gap-4">
       <Suspense>
         <TableToolbar
-          searchPlaceholder="Поиск по имени или логину…"
+          searchPlaceholder={translate("ui.searchByNameOrUsername")}
           filters={[...roleFilter, ...groupFilter]}
         />
       </Suspense>
@@ -175,7 +176,7 @@ function UsersTableInner({
             onClick={() => setBulkDeleteOpen(true)}
           >
             <IconTrash size={14} />
-            Удалить выбранных
+            {translate("ui.deleteSelected2")}
           </Button>
         </div>
       )}
@@ -191,19 +192,19 @@ function UsersTableInner({
                 <Checkbox
                   checked={isIndeterminate(visibleIds) ? "indeterminate" : isAllSelected(visibleIds)}
                   onCheckedChange={() => toggleAll(visibleIds)}
-                  aria-label="Выбрать все"
+                  aria-label={translate("ui.selectAll")}
                 />
               </TableHead>
-              <TableHead>ФИО</TableHead>
-              <TableHead>Логин</TableHead>
-              {showRole && <TableHead>Роль</TableHead>}
+              <TableHead>{translate("ui.fullName")}</TableHead>
+              <TableHead>{translate("ui.username")}</TableHead>
+              {showRole && <TableHead>{translate("ui.role")}</TableHead>}
               {showGroup && (
                 <>
-                  <TableHead>Группа</TableHead>
-                  <TableHead>Курс</TableHead>
+                  <TableHead>{translate("term.group")}</TableHead>
+                  <TableHead>{translate("term.course")}</TableHead>
                 </>
               )}
-              {showSpecialties && <TableHead>Специальности</TableHead>}
+              {showSpecialties && <TableHead>{translate("nav.specialties")}</TableHead>}
               <TableHead className="w-20" />
             </TableRow>
           </TableHeader>
@@ -214,7 +215,7 @@ function UsersTableInner({
                   colSpan={colCount}
                   className="py-12 text-center text-muted-foreground"
                 >
-                  {isFetching ? "Загрузка…" : "Пользователи не найдены"}
+                  {isFetching ? translate("common.loading") : translate("ui.noPeopleFound")}
                 </TableCell>
               </TableRow>
             ) : (
@@ -329,16 +330,16 @@ function UsersTableInner({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Удалить {selected.size} пользователей?</AlertDialogTitle>
-            <AlertDialogDescription>Это действие нельзя отменить.</AlertDialogDescription>
+            <AlertDialogDescription>{translate("ui.thisCannotBeUndone")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={bulkPending}>Отмена</AlertDialogCancel>
+            <AlertDialogCancel disabled={bulkPending}>{translate("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               onClick={(e) => { e.preventDefault(); handleBulkDelete(); }}
               disabled={bulkPending}
             >
-              {bulkPending ? "Удаление..." : "Удалить"}
+              {bulkPending ? translate("ui.deleting") : translate("common.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

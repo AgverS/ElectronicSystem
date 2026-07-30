@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { translate } from "@/lib/i18n/translate";
 import {
   Dialog,
   DialogContent,
@@ -17,15 +18,15 @@ export function MetaButton({ meta }: { meta: Record<string, unknown> }) {
       <button
         onClick={() => setOpen(true)}
         className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-        title="Подробности"
+        title={translate("common.details")}
       >
         <IconInfoCircle size={13} />
-        Детали
+        {translate("common.details")}
       </button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Подробности события</DialogTitle>
+            <DialogTitle>{translate("ui.eventDetails")}</DialogTitle>
           </DialogHeader>
           <pre className="overflow-auto rounded-md bg-muted p-3 text-xs leading-relaxed">
             {JSON.stringify(meta, null, 2)}

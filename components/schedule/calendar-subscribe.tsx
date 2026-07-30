@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import {
   IconCalendarPlus,
   IconCopy,
@@ -58,7 +59,7 @@ function SubscribeDialogBody({
   return (
     <DialogContent className="sm:max-w-lg">
       <DialogHeader>
-        <DialogTitle>Подписка на расписание</DialogTitle>
+        <DialogTitle>{translate("ui.subscribeToTheTimetable")}</DialogTitle>
         <DialogDescription>
           Добавьте расписание в календарь — оно будет обновляться автоматически
           (включая замены).
@@ -67,11 +68,11 @@ function SubscribeDialogBody({
 
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-1">
-          <Label>Ссылка на календарь</Label>
+          <Label>{translate("ui.calendarLink")}</Label>
           <div className="flex gap-2">
             <Input
               readOnly
-              value={loading ? "Загрузка…" : url}
+              value={loading ? translate("common.loading") : url}
               className="font-mono text-xs"
               onFocus={(e) => e.currentTarget.select()}
             />
@@ -81,7 +82,7 @@ function SubscribeDialogBody({
               size="icon"
               onClick={copy}
               disabled={!url}
-              title="Скопировать"
+              title={translate("ui.copy")}
             >
               {copied ? <IconCheck size={16} /> : <IconCopy size={16} />}
             </Button>
@@ -107,12 +108,12 @@ function SubscribeDialogBody({
             <Button asChild disabled={!url} className="gap-2">
               <a href={googleUrl} target="_blank" rel="noopener noreferrer">
                 <IconBrandGoogle size={16} />
-                Добавить в Google Календарь
+                {translate("ui.addToGoogleCalendar")}
               </a>
             </Button>
             <div className="rounded-md border bg-muted/30 p-3 text-xs text-muted-foreground">
               <p className="mb-1 font-medium text-foreground">
-                Если кнопка не сработала (на компьютере):
+                {translate("ui.ifTheButtonDidNotWorkOnA")}
               </p>
               <p>
                 Google Календарь → «Другие календари» → «+» → «Добавить по
@@ -128,12 +129,12 @@ function SubscribeDialogBody({
             <Button asChild disabled={!url} className="gap-2">
               <a href={webcalUrl}>
                 <IconBrandApple size={16} />
-                Добавить в Apple Календарь
+                {translate("ui.addToAppleCalendar")}
               </a>
             </Button>
             <div className="rounded-md border bg-muted/30 p-3 text-xs text-muted-foreground">
               <p className="mb-1 font-medium text-foreground">
-                Если кнопка не сработала:
+                {translate("ui.ifTheButtonDidNotWork")}
               </p>
               <p className="mb-1">
                 <span className="font-medium text-foreground">iPhone/iPad:</span>{" "}
@@ -152,7 +153,7 @@ function SubscribeDialogBody({
         {personal && (
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-[11px] text-muted-foreground">
-              Ссылка персональная — не передавайте её другим.
+              {translate("ui.thisLinkIsPersonalDoNotShareIt")}
             </p>
             <Button
               type="button"
@@ -163,7 +164,7 @@ function SubscribeDialogBody({
               disabled={resetting}
             >
               <IconRefresh size={15} />
-              Обновить ссылку
+              {translate("ui.refreshTheLink")}
             </Button>
           </div>
         )}
@@ -188,7 +189,7 @@ export function CalendarSubscribe() {
         try {
           setUrl(await getCalendarFeedUrl());
         } catch (e) {
-          setError(e instanceof Error ? e.message : "Ошибка");
+          setError(e instanceof Error ? e.message : translate("common.error"));
         }
       });
     }
@@ -200,7 +201,7 @@ export function CalendarSubscribe() {
         setUrl(await resetCalendarToken());
         setError("");
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Ошибка");
+        setError(e instanceof Error ? e.message : translate("common.error"));
       }
     });
   }
@@ -210,7 +211,7 @@ export function CalendarSubscribe() {
       <DialogTrigger asChild>
         <Button variant="outline" className="gap-2">
           <IconCalendarPlus size={16} />
-          В календарь
+          {translate("ui.addToCalendar")}
         </Button>
       </DialogTrigger>
       <SubscribeDialogBody
@@ -257,7 +258,7 @@ export function PublicCalendarSubscribe({
       <DialogTrigger asChild>
         <Button variant="outline" className="gap-2">
           <IconCalendarPlus size={16} />
-          В календарь
+          {translate("ui.addToCalendar")}
         </Button>
       </DialogTrigger>
       <SubscribeDialogBody url={url} loading={!url} personal={false} />

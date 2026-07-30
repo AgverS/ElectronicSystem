@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { translate } from "@/lib/i18n/translate";
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { IconUsersGroup } from "@tabler/icons-react";
@@ -23,7 +24,7 @@ export async function PublicGroupSelector() {
   if (specialties.length === 0 && orphanGroups.length === 0) {
     return (
       <p className="text-muted-foreground text-sm">
-        Группы не найдены.
+        {translate("ui.noGroupsFound")}
       </p>
     );
   }
@@ -70,7 +71,7 @@ export async function PublicGroupSelector() {
         <div className="space-y-4">
           <div className="flex items-center gap-2 border-b pb-2">
             <h2 className="text-lg font-semibold text-foreground">
-              Без отделения
+              {translate("ui.noDepartment")}
             </h2>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">

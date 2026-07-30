@@ -1,6 +1,7 @@
 "use client";
 
 import { IconDownload } from "@tabler/icons-react";
+import { translate } from "@/lib/i18n/translate";
 import { Button } from "@/components/ui/button";
 
 interface ResultRow {
@@ -20,15 +21,15 @@ export function ResultsExportButton({ rows, semesterLabel, studentName }: Result
   async function handleExport() {
     const { Workbook } = await import("exceljs");
     const wb = new Workbook();
-    wb.creator = "Электронный журнал";
-    const ws = wb.addWorksheet("Итоги семестра");
+    wb.creator = translate("app.name");
+    const ws = wb.addWorksheet(translate("nav.results"));
 
     const COL_COUNT = 4;
     const thin = { style: "thin" as const, color: { argb: "FFD1D5DB" } };
     const medium = { style: "medium" as const, color: { argb: "FF9CA3AF" } };
 
     // Title
-    ws.addRow(["Итоги семестра · " + studentName]);
+    ws.addRow([translate("ui.semesterResults") + studentName]);
     ws.mergeCells(1, 1, 1, COL_COUNT);
     const t = ws.getRow(1).getCell(1);
     t.font = { bold: true, size: 12 };
@@ -44,7 +45,7 @@ export function ResultsExportButton({ rows, semesterLabel, studentName }: Result
     ws.getRow(2).height = 16;
 
     // Header
-    ws.addRow(["Предмет", "Уроков", "Пропусков", "Средний балл"]);
+    ws.addRow([translate("term.subject"), translate("term.lessons"), translate("term.absences"), translate("ui.averageGrade")]);
     const headerRow = ws.getRow(3);
     headerRow.eachCell((cell, colNum) => {
       cell.font = { bold: true, size: 10 };
@@ -83,7 +84,7 @@ export function ResultsExportButton({ rows, semesterLabel, studentName }: Result
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "Итоги_" + semesterLabel.replace(/[^0-9A-Za-zА-Яа-я]+/g, "_") + ".xlsx";
+    a.download = translate("ui.results") + semesterLabel.replace(/[^0-9A-Za-zА-Яа-я]+/g, "_") + ".xlsx";
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -91,7 +92,7 @@ export function ResultsExportButton({ rows, semesterLabel, studentName }: Result
   return (
     <Button size="sm" variant="outline" onClick={handleExport} disabled={rows.length === 0}>
       <IconDownload size={16} />
-      Экспорт Excel
+      {translate("ui.exportToExcel")}
     </Button>
   );
 }

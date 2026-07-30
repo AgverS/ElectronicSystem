@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { IconCheck } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,9 +50,9 @@ interface UserFormProps {
 }
 
 const ROLE_LABELS: Record<Role, string> = {
-  ADMIN: "Администратор",
-  TEACHER: "Преподаватель",
-  STUDENT: "Ученик",
+  ADMIN: translate("landing.role.admin.title"),
+  TEACHER: translate("landing.role.teacher.title"),
+  STUDENT: translate("landing.role.student.title"),
 };
 
 // Radix Select запрещает пустое значение у SelectItem — используем sentinel.
@@ -165,7 +166,7 @@ export function UserForm({
     e.preventDefault();
     setError("");
     if (!name.trim() || !username.trim()) {
-      setError("Заполните все поля");
+      setError(translate("ui.fillInEveryField"));
       return;
     }
     startTransition(async () => {
@@ -192,7 +193,7 @@ export function UserForm({
         refresh();
         onDone?.();
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Ошибка");
+        setError(err instanceof Error ? err.message : translate("common.error"));
       }
     });
   }
@@ -200,23 +201,23 @@ export function UserForm({
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
       <div className="flex flex-col gap-1">
-        <Label required>ФИО</Label>
+        <Label required>{translate("ui.fullName")}</Label>
         <Input
           value={name}
           onChange={(e) => handleNameChange(e.target.value)}
-          placeholder="Иванов Иван Иванович"
+          placeholder={translate("ui.ameliaNovak")}
         />
       </div>
       <div className="flex flex-col gap-1">
-        <Label required>Логин (для входа)</Label>
+        <Label required>{translate("ui.usernameForSigningIn")}</Label>
         <Input
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          placeholder="Иванов И.И."
+          placeholder={translate("ui.aNovak")}
         />
       </div>
       <div className="flex flex-col gap-1">
-        <Label required>Роль</Label>
+        <Label required>{translate("ui.role")}</Label>
         <Select value={role} onValueChange={(v) => setRole(v as Role)}>
           <SelectTrigger className="w-full">
             <SelectValue />
@@ -234,16 +235,16 @@ export function UserForm({
       </div>
       {role === Role.STUDENT && (
         <div className="flex flex-col gap-1">
-          <Label required>Группа</Label>
+          <Label required>{translate("term.group")}</Label>
           <Select
             value={groupId || NONE}
             onValueChange={(v) => setGroupId(v === NONE ? "" : v)}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="- не выбрана -" />
+              <SelectValue placeholder={translate("ui.notSelected")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={NONE}>- не выбрана -</SelectItem>
+              <SelectItem value={NONE}>{translate("ui.notSelected")}</SelectItem>
               {groups.map((g) => (
                 <SelectItem key={g.id} value={g.id}>
                   {g.name}
@@ -256,24 +257,24 @@ export function UserForm({
       {isStaff && (
         <>
           <CheckList
-            label="Специальности"
+            label={translate("nav.specialties")}
             options={allSpecialties}
             selected={specialtyIds}
             onToggle={(id) => toggle(setSpecialtyIds, id)}
-            emptyHint="Сначала создайте специальности."
+            emptyHint={translate("ui.createSomeSpecialtiesFirst")}
           />
           <CheckList
-            label="Кураторские группы"
+            label={translate("ui.curatedGroups")}
             options={groups}
             selected={curatedGroupIds}
             onToggle={(id) => toggle(setCuratedGroupIds, id)}
-            emptyHint="Сначала создайте группы."
+            emptyHint={translate("ui.createSomeGroupsFirst")}
           />
         </>
       )}
       {error && <p className="text-xs text-destructive">{error}</p>}
       <Button type="submit" disabled={pending}>
-        {pending ? "Сохранение..." : initial ? "Сохранить" : "Создать"}
+        {pending ? translate("common.saving") : initial ? translate("common.save") : translate("common.create")}
       </Button>
     </form>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { translate } from "@/lib/i18n/translate";
 import { IconUsersGroup, IconLoader2, IconUser } from "@tabler/icons-react";
 import {
   Table,
@@ -48,7 +49,7 @@ export default function StudentGroupPage() {
     return (
       <div className="flex h-[50vh] flex-col items-center justify-center gap-2 text-muted-foreground">
         <IconUsersGroup size={48} className="opacity-20" />
-        <p>Не удалось загрузить данные группы</p>
+        <p>{translate("ui.couldNotLoadTheGroup")}</p>
       </div>
     );
   }
@@ -57,14 +58,14 @@ export default function StudentGroupPage() {
     <div className="space-y-6 p-4 md:p-6 lg:p-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between print:hidden">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Моя группа</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{translate("nav.myGroup")}</h1>
           <p className="text-muted-foreground">
             Список учащихся группы {group.name} ({formatCourse(group.name)})
           </p>
         </div>
         <GroupExportButtons
           groupName={group.name}
-          curatorName={group.curator?.name ?? "не назначен"}
+          curatorName={group.curator?.name ?? translate("ui.notAssigned")}
           students={group.students}
         />
       </div>
@@ -80,7 +81,7 @@ export default function StudentGroupPage() {
         <CardHeader className="print:hidden">
           <CardTitle className="flex items-center gap-2">
             <IconUsersGroup size={20} className="text-primary" />
-            Состав группы
+            {translate("ui.groupMembers")}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0 sm:p-6">
@@ -88,7 +89,7 @@ export default function StudentGroupPage() {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-12 text-center">№</TableHead>
-                <TableHead>ФИО</TableHead>
+                <TableHead>{translate("ui.fullName")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -108,7 +109,7 @@ export default function StudentGroupPage() {
               {group.students.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={2} className="h-32 text-center text-muted-foreground">
-                    В группе пока нет учащихся
+                    {translate("ui.thisGroupHasNoStudentsYet")}
                   </TableCell>
                 </TableRow>
               )}

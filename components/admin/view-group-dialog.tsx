@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { useQuery } from "@tanstack/react-query";
 import {
   Dialog,
@@ -72,15 +73,15 @@ export function ViewGroupDialog({ groupId, groupName }: Props) {
             </div>
           ) : students.length === 0 ? (
             <div className="py-8 text-center text-muted-foreground">
-              В группе пока нет учащихся
+              {translate("ui.thisGroupHasNoStudentsYet")}
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-10">№</TableHead>
-                  <TableHead>ФИО</TableHead>
-                  <TableHead>Логин</TableHead>
+                  <TableHead>{translate("ui.fullName")}</TableHead>
+                  <TableHead>{translate("ui.username")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

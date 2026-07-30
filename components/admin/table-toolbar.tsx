@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { translate } from "@/lib/i18n/translate";
 import { useRef, useTransition } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -27,7 +28,7 @@ interface TableToolbarProps {
 }
 
 export function TableToolbar({
-  searchPlaceholder = "Поиск…",
+  searchPlaceholder = translate("ui.search"),
   filters = [],
   className,
 }: TableToolbarProps) {
@@ -94,7 +95,7 @@ export function TableToolbar({
       {hasFilters && (
         <Button variant="ghost" onClick={clearAll} className="gap-1.5">
           <IconX size={14} />
-          Сбросить
+          {translate("common.reset")}
         </Button>
       )}
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import {
   Dialog,
   DialogContent,
@@ -36,13 +37,13 @@ interface Props {
 type Mode = "single" | "bulk";
 
 function pluralGroups(n: number) {
-  if (n === 1) return "группу";
-  if (n >= 2 && n <= 4) return "группы";
-  if (n % 100 >= 11 && n % 100 <= 19) return "групп";
+  if (n === 1) return translate("ui.group");
+  if (n >= 2 && n <= 4) return translate("ui.groups");
+  if (n % 100 >= 11 && n % 100 <= 19) return translate("ui.groups2");
   const mod = n % 10;
-  if (mod === 1) return "группу";
-  if (mod >= 2 && mod <= 4) return "группы";
-  return "групп";
+  if (mod === 1) return translate("ui.group");
+  if (mod >= 2 && mod <= 4) return translate("ui.groups");
+  return translate("ui.groups2");
 }
 
 export function CreateGroupDialog({ teachers, specialties }: Props) {
@@ -120,9 +121,9 @@ export function CreateGroupDialog({ teachers, specialties }: Props) {
   function handleSingle() {
     setSingleError("");
     if (!generatedSingleName) {
-      if (!singleSpecialtyId) return setSingleError("Выберите специальность");
+      if (!singleSpecialtyId) return setSingleError(translate("ui.selectASpecialty"));
       if (singleDigits.length !== 3)
-        return setSingleError("Введите 3 цифры (например, 395)");
+        return setSingleError(translate("ui.enter3DigitsForExample395"));
       return;
     }
 
@@ -134,13 +135,13 @@ export function CreateGroupDialog({ teachers, specialties }: Props) {
           specialtyId: singleSpecialtyId || undefined,
         });
         if (!res.ok) {
-          setSingleError(res.error ?? "Не удалось создать группу");
+          setSingleError(res.error ?? translate("ui.couldNotCreateTheGroup"));
           return;
         }
         refresh();
         handleOpenChange(false);
       } catch (err: unknown) {
-        setSingleError(err instanceof Error ? err.message : "Ошибка");
+        setSingleError(err instanceof Error ? err.message : translate("common.error"));
       }
     });
   }
@@ -152,16 +153,16 @@ export function CreateGroupDialog({ teachers, specialties }: Props) {
     const d2 = digit2.trim();
     const n = parseInt(count, 10);
 
-    if (!l) return setBulkError("Введите букву");
+    if (!l) return setBulkError(translate("ui.enterALetter"));
     if (d1.length !== 1 || !/[0-9]/.test(d1))
-      return setBulkError("Первая цифра - один символ 0-9");
+      return setBulkError(translate("ui.firstDigitASingleCharacter09"));
     if (d2.length !== 1 || !/[0-9]/.test(d2))
-      return setBulkError("Вторая цифра - один символ 0-9");
+      return setBulkError(translate("ui.secondDigitASingleCharacter09"));
     if (isNaN(n) || n < 1 || n > 99)
-      return setBulkError("Количество от 1 до 99");
+      return setBulkError(translate("ui.aNumberFrom1To99"));
 
     const names = previewNames();
-    if (!names.length) return setBulkError("Нет групп для создания");
+    if (!names.length) return setBulkError(translate("ui.noGroupsToCreate"));
 
     startTransition(async () => {
       try {
@@ -183,7 +184,7 @@ export function CreateGroupDialog({ teachers, specialties }: Props) {
           refresh();
         }
       } catch (err: unknown) {
-        setBulkError(err instanceof Error ? err.message : "Ошибка");
+        setBulkError(err instanceof Error ? err.message : translate("common.error"));
       }
     });
   }
@@ -195,13 +196,13 @@ export function CreateGroupDialog({ teachers, specialties }: Props) {
     <>
       <Button onClick={() => setOpen(true)} className="gap-2">
         <IconPlus size={16} />
-        Создать группу
+        {translate("ui.createTheGroup")}
       </Button>
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Создание группы</DialogTitle>
+            <DialogTitle>{translate("audit.action.CREATE_GROUP")}</DialogTitle>
           </DialogHeader>
 
           <div className="flex gap-1 rounded-md border bg-muted/40 p-0.5">
@@ -215,7 +216,7 @@ export function CreateGroupDialog({ teachers, specialties }: Props) {
                   : "text-muted-foreground hover:text-foreground",
               )}
             >
-              Одна группа
+              {translate("ui.oneGroup")}
             </button>
             <button
               type="button"
@@ -227,14 +228,14 @@ export function CreateGroupDialog({ teachers, specialties }: Props) {
                   : "text-muted-foreground hover:text-foreground",
               )}
             >
-              Несколько по алгоритму
+              {translate("ui.severalGeneratedAutomatically")}
             </button>
           </div>
 
           {mode === "single" ? (
             <div className="flex flex-col gap-3">
               <div className="flex flex-col gap-1">
-                <Label required>Специальность</Label>
+                <Label required>{translate("term.specialty")}</Label>
                 <Select
                   value={singleSpecialtyId || NONE}
                   onValueChange={(v) => {
@@ -243,10 +244,10 @@ export function CreateGroupDialog({ teachers, specialties }: Props) {
                   }}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="- не выбрана -" />
+                    <SelectValue placeholder={translate("ui.notSelected")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={NONE}>- не выбрана -</SelectItem>
+                    <SelectItem value={NONE}>{translate("ui.notSelected")}</SelectItem>
                     {specialties.map((s) => (
                       <SelectItem key={s.id} value={s.id}>
                         {s.abbreviation || s.name}
@@ -257,7 +258,7 @@ export function CreateGroupDialog({ teachers, specialties }: Props) {
                 </Select>
               </div>
               <div className="flex flex-col gap-1">
-                <Label required>Три цифры (последние в названии)</Label>
+                <Label required>{translate("ui.threeDigitsTheLastOnesInTheName")}</Label>
                 <Input
                   value={singleDigits}
                   onChange={(e) =>
@@ -269,7 +270,7 @@ export function CreateGroupDialog({ teachers, specialties }: Props) {
                 {generatedSingleName && (
                   <div className="rounded-md border bg-muted/30 px-3 py-2 mt-1">
                     <p className="text-xs text-muted-foreground">
-                      Будет создана группа:
+                      {translate("ui.thisGroupWillBeCreated")}
                     </p>
                     <p className="text-sm font-medium">
                       {generatedSingleName}{" "}
@@ -281,16 +282,16 @@ export function CreateGroupDialog({ teachers, specialties }: Props) {
                 )}
               </div>
               <div className="flex flex-col gap-1">
-                <Label>Куратор</Label>
+                <Label>{translate("term.curator")}</Label>
                 <Select
                   value={curatorId || NONE}
                   onValueChange={(v) => setCuratorId(v === NONE ? "" : v)}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="- не назначен -" />
+                    <SelectValue placeholder={translate("ui.notAssigned2")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={NONE}>- не назначен -</SelectItem>
+                    <SelectItem value={NONE}>{translate("ui.notAssigned2")}</SelectItem>
                     {teachers.map((t) => (
                       <SelectItem key={t.id} value={t.id}>
                         {t.name}
@@ -306,16 +307,16 @@ export function CreateGroupDialog({ teachers, specialties }: Props) {
           ) : (
             <div className="flex flex-col gap-3">
               <div className="flex flex-col gap-1">
-                <Label required>Специальность</Label>
+                <Label required>{translate("term.specialty")}</Label>
                 <Select
                   value={bulkSpecialtyId || NONE}
                   onValueChange={(v) => handleSpecialtyChange(v === NONE ? "" : v)}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="- не выбрана -" />
+                    <SelectValue placeholder={translate("ui.notSelected")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={NONE}>- не выбрана -</SelectItem>
+                    <SelectItem value={NONE}>{translate("ui.notSelected")}</SelectItem>
                     {specialties.map((s) => (
                       <SelectItem key={s.id} value={s.id}>
                         {s.abbreviation || s.name}
@@ -327,7 +328,7 @@ export function CreateGroupDialog({ teachers, specialties }: Props) {
               </div>
               <div className="grid grid-cols-[1fr_1fr_1fr_1fr] gap-2">
                 <div className="flex flex-col gap-1">
-                  <Label required>Буква</Label>
+                  <Label required>{translate("ui.letter")}</Label>
                   <Input
                     value={letter}
                     onChange={(e) => setLetter(e.target.value.slice(0, 1))}
@@ -337,7 +338,7 @@ export function CreateGroupDialog({ teachers, specialties }: Props) {
                   />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <Label required>Цифра 1</Label>
+                  <Label required>{translate("ui.digit1")}</Label>
                   <Input
                     value={digit1}
                     onChange={(e) =>
@@ -349,7 +350,7 @@ export function CreateGroupDialog({ teachers, specialties }: Props) {
                   />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <Label required>Цифра 2</Label>
+                  <Label required>{translate("ui.digit2")}</Label>
                   <Input
                     value={digit2}
                     onChange={(e) =>
@@ -361,7 +362,7 @@ export function CreateGroupDialog({ teachers, specialties }: Props) {
                   />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <Label required>Кол-во</Label>
+                  <Label required>{translate("ui.count")}</Label>
                   <Input
                     value={count}
                     onChange={(e) =>
@@ -394,19 +395,19 @@ export function CreateGroupDialog({ teachers, specialties }: Props) {
               onClick={() => handleOpenChange(false)}
               disabled={pending}
             >
-              Отмена
+              {translate("common.cancel")}
             </Button>
             {mode === "single" ? (
               <Button onClick={handleSingle} disabled={pending}>
-                {pending ? "Создание..." : "Создать"}
+                {pending ? translate("ui.creating") : translate("common.create")}
               </Button>
             ) : (
               <Button onClick={handleBulk} disabled={pending || !bulkValid}>
                 {pending
-                  ? "Создание..."
+                  ? translate("ui.creating")
                   : bulkValid
                     ? `Создать ${preview.length} ${pluralGroups(preview.length)}`
-                    : "Создать"}
+                    : translate("common.create")}
               </Button>
             )}
           </DialogFooter>

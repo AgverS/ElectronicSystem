@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import {
   Dialog,
   DialogContent,
@@ -62,7 +63,7 @@ export function AddLessonDialog({
     e.preventDefault();
     setError("");
     if (!date) {
-      setError("Укажите дату");
+      setError(translate("ui.enterADate"));
       return;
     }
     startTransition(async () => {
@@ -79,7 +80,7 @@ export function AddLessonDialog({
         setCount("1");
         setOpen(false);
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Ошибка");
+        setError(err instanceof Error ? err.message : translate("common.error"));
       }
     });
   }
@@ -87,15 +88,15 @@ export function AddLessonDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm">+ Добавить урок</Button>
+        <Button size="sm">{translate("ui.addALesson")}</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Новый урок</DialogTitle>
+          <DialogTitle>{translate("ui.newLesson")}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex flex-col gap-3 pt-2">
           <div className="flex flex-col gap-1">
-            <Label required>Дата</Label>
+            <Label required>{translate("common.date")}</Label>
             <Input
               type="date"
               value={date}
@@ -107,22 +108,22 @@ export function AddLessonDialog({
 
           {!isPractical && (
             <div className="flex flex-col gap-1">
-              <Label required>Тип урока</Label>
+              <Label required>{translate("ui.lessonType")}</Label>
               <Select value={type} onValueChange={setType}>
                 <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="lecture">Лекция</SelectItem>
-                  <SelectItem value="practical">Практика</SelectItem>
-                  <SelectItem value="lab">Лабораторная</SelectItem>
-                  {isOKRAllowed && <SelectItem value="assessment">ОКР</SelectItem>}
+                  <SelectItem value="lecture">{translate("lessonType.lecture")}</SelectItem>
+                  <SelectItem value="practical">{translate("lessonType.practical")}</SelectItem>
+                  <SelectItem value="lab">{translate("nav.labs")}</SelectItem>
+                  {isOKRAllowed && <SelectItem value="assessment">{translate("lessonType.assessment")}</SelectItem>}
                 </SelectContent>
               </Select>
             </div>
           )}
           <div className="flex flex-col gap-1">
-            <Label>Количество уроков</Label>
+            <Label>{translate("ui.numberOfLessons")}</Label>
             <div className="flex gap-2">
               <Input
                 type="number"
@@ -152,25 +153,25 @@ export function AddLessonDialog({
               ))}
             </div>
             <p className="text-xs text-muted-foreground">
-              Добавится сразу столько колонок на выбранную дату
+              {translate("ui.thisManyColumnsWillBeAddedAtOnce")}
             </p>
           </div>
 
           <div className="flex flex-col gap-1">
-            <Label>Тема (необязательно)</Label>
+            <Label>{translate("ui.topicOptional")}</Label>
             <Input
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
-              placeholder="Тема урока"
+              placeholder={translate("ui.lessonTopic")}
             />
           </div>
           {error && <p className="text-xs text-destructive">{error}</p>}
           <Button type="submit" disabled={pending}>
             {pending
-              ? "Добавление..."
+              ? translate("ui.adding")
               : countNum > 1
-                ? `Добавить ${countNum} ${countNum >= 5 ? "уроков" : "урока"}`
-                : "Добавить"}
+                ? `Добавить ${countNum} ${countNum >= 5 ? translate("ui.lessons") : translate("ui.lessons2")}`
+                : translate("common.add")}
           </Button>
         </form>
       </DialogContent>

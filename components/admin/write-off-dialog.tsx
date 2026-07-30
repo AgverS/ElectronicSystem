@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { IconArchive, IconArrowBackUp } from "@tabler/icons-react";
 import {
   AlertDialog,
@@ -34,7 +35,7 @@ export function WriteOffDialog({ action, mode }: WriteOffDialogProps) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <IconBtn
-          tooltip={isCancel ? "Отменить списание" : "Списать досрочно"}
+          tooltip={isCancel ? translate("ui.cancelTheWriteOff") : translate("ui.writeOffEarly")}
           className={
             isCancel
               ? "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -47,18 +48,18 @@ export function WriteOffDialog({ action, mode }: WriteOffDialogProps) {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            {isCancel ? "Отменить списание взыскания?" : "Списать взыскание досрочно?"}
+            {isCancel ? translate("ui.cancelTheWriteOffOfThisPenalty") : translate("ui.writeOffThisPenaltyEarly")}
           </AlertDialogTitle>
           <AlertDialogDescription>
             {isCancel
-              ? "Взыскание снова станет действующим."
-              : "Взыскание останется в истории и будет помечено как списанное, но перестанет считаться действующим. Удалять запись не нужно."}
+              ? translate("ui.thePenaltyWillCountAsActiveAgain")
+              : translate("ui.thePenaltyStaysOnTheRecordMarkedAs")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Отмена</AlertDialogCancel>
+          <AlertDialogCancel>{translate("common.cancel")}</AlertDialogCancel>
           <AlertDialogAction onClick={run} disabled={pending}>
-            {pending ? "Сохранение…" : isCancel ? "Отменить списание" : "Списать"}
+            {pending ? translate("common.saving") : isCancel ? translate("ui.cancelTheWriteOff") : translate("record.writeOff")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

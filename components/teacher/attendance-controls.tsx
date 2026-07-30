@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition, useState } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { useRouter, usePathname } from "next/navigation";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
@@ -9,24 +10,28 @@ import { SearchableSelect } from "@/components/ui/searchable-select";
 import { cn } from "@/lib/utils";
 import { formatCourse } from "@/lib/group-course";
 
-const MONTH_NAMES = [
-  "Январь",
-  "Февраль",
-  "Март",
-  "Апрель",
-  "Май",
-  "Июнь",
-  "Июль",
-  "Август",
-  "Сентябрь",
-  "Октябрь",
-  "Ноябрь",
-  "Декабрь",
+// Built on each call: the labels are translated, and the catalog is not
+// loaded yet when this module is first imported.
+function MONTH_NAMES() {
+  return [
+  translate("ui.january"),
+  translate("ui.february"),
+  translate("ui.march"),
+  translate("ui.april"),
+  translate("ui.may2"),
+  translate("ui.june"),
+  translate("ui.july"),
+  translate("ui.august"),
+  translate("ui.september"),
+  translate("ui.october"),
+  translate("ui.november"),
+  translate("ui.december"),
 ];
+}
 
 function monthLabel(month: string) {
   const [year, mon] = month.split("-").map(Number);
-  return MONTH_NAMES[mon - 1] + " " + year;
+  return MONTH_NAMES()[mon - 1] + " " + year;
 }
 
 function shiftMonth(month: string, delta: number) {
@@ -99,7 +104,7 @@ export function AttendanceControls({
       {showGroupSelect && (
         <div className="flex flex-col gap-1">
           <Label className="text-xs font-medium text-muted-foreground">
-            Группа
+            {translate("term.group")}
           </Label>
           <SearchableSelect
             value={groupId}
@@ -108,8 +113,8 @@ export function AttendanceControls({
               value: g.id,
               label: `${g.name} (${formatCourse(g.name)})`,
             }))}
-            placeholder="Выберите группу"
-            searchPlaceholder="Поиск группы…"
+            placeholder={translate("ui.selectAGroup")}
+            searchPlaceholder={translate("ui.searchGroups")}
             className="w-[180px]"
           />
         </div>
@@ -117,7 +122,7 @@ export function AttendanceControls({
 
       <div className="flex flex-col gap-1">
         <Label className="text-xs font-medium text-muted-foreground">
-          Месяц
+          {translate("ui.month")}
         </Label>
         <div className="flex items-center gap-1">
           <Button
@@ -125,7 +130,7 @@ export function AttendanceControls({
             variant="outline"
             className="h-9 w-9 shrink-0"
             onClick={() => navigate(groupId, shiftMonth(month, -1))}
-            aria-label="Предыдущий месяц"
+            aria-label={translate("ui.previousMonth")}
           >
             <IconChevronLeft size={16} />
           </Button>
@@ -147,7 +152,7 @@ export function AttendanceControls({
                   }
                   if (e.key === "Escape") cancelEdit();
                 }}
-                placeholder="ГГГГ-ММ"
+                placeholder={translate("ui.yyyyMm")}
                 className={cn(
                   "h-9 w-[118px] rounded-md border bg-transparent px-3 text-sm shadow-xs outline-none focus:ring-3 focus:ring-ring/50 transition-[border-color,box-shadow]",
                   error
@@ -157,7 +162,7 @@ export function AttendanceControls({
               />
               {error && (
                 <span className="text-[11px] leading-none text-destructive">
-                  Формат: ГГГГ-ММ (например, 2025-09)
+                  {translate("ui.formatYyyyMmForExample202509")}
                 </span>
               )}
             </div>
@@ -165,7 +170,7 @@ export function AttendanceControls({
             <button
               type="button"
               onClick={startEdit}
-              title="Нажмите для ввода вручную"
+              title={translate("ui.clickToEnterManually")}
               className="h-9 w-[118px] rounded-md border border-input bg-transparent px-3 text-sm text-left transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
             >
               {monthLabel(month)}
@@ -177,7 +182,7 @@ export function AttendanceControls({
             variant="outline"
             className="h-9 w-9 shrink-0"
             onClick={() => navigate(groupId, shiftMonth(month, +1))}
-            aria-label="Следующий месяц"
+            aria-label={translate("ui.nextMonth")}
           >
             <IconChevronRight size={16} />
           </Button>

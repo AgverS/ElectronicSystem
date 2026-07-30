@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { IconSearch, IconUser } from "@tabler/icons-react";
 import {
@@ -58,11 +59,15 @@ interface RecordRow {
 
 type KindFilter = "" | RecordKind;
 
-const KIND_FILTERS: { value: KindFilter; label: string }[] = [
+// Built on each call: the labels are translated, and the catalog is not
+// loaded yet when this module is first imported.
+function KIND_FILTERS(): { value: KindFilter; label: string }[] {
+  return [
   { value: "", label: "Все" },
-  { value: RecordKind.REWARD, label: "Поощрения" },
-  { value: RecordKind.PENALTY, label: "Взыскания" },
+  { value: RecordKind.REWARD, label: translate("ui.rewards") },
+  { value: RecordKind.PENALTY, label: translate("ui.penalties") },
 ];
+}
 
 function StudentPicker({
   value,
@@ -98,7 +103,7 @@ function StudentPicker({
         <Button variant="outline" className="w-72 justify-start gap-2">
           <IconUser size={16} className="shrink-0 text-muted-foreground" />
           <span className="truncate">
-            {value ? value.name : "Выберите учащегося…"}
+            {value ? value.name : translate("ui.selectAStudent")}
           </span>
         </Button>
       </PopoverTrigger>
@@ -113,18 +118,18 @@ function StudentPicker({
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Поиск по имени…"
+              placeholder={translate("ui.searchByName2")}
               className="h-8 pl-8 text-sm"
             />
           </div>
         </div>
         <div className="max-h-64 overflow-y-auto p-1">
           {isFetching && (
-            <p className="py-4 text-center text-sm text-muted-foreground">Загрузка…</p>
+            <p className="py-4 text-center text-sm text-muted-foreground">{translate("common.loading")}</p>
           )}
           {!isFetching && (data?.data.length ?? 0) === 0 && (
             <p className="py-4 text-center text-sm text-muted-foreground">
-              Учащиеся не найдены
+              {translate("ui.noStudentsFound")}
             </p>
           )}
           {data?.data.map((s) => (
@@ -193,12 +198,12 @@ export function RecordsView() {
       {!student ? (
         <div className="flex flex-col items-center gap-2 rounded-md border border-dashed py-16 text-center text-muted-foreground">
           <IconUser size={28} className="opacity-40" />
-          <p>Выберите учащегося, чтобы увидеть его поощрения и взыскания.</p>
+          <p>{translate("ui.selectAStudentToSeeTheirRewardsAnd")}</p>
         </div>
       ) : (
         <>
           <div className="flex flex-wrap items-center gap-1.5">
-            {KIND_FILTERS.map((f) => (
+            {KIND_FILTERS().map((f) => (
               <Button
                 key={f.value || "all"}
                 size="sm"
@@ -217,11 +222,11 @@ export function RecordsView() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-32">Тип</TableHead>
-                  <TableHead className="w-28">Номер</TableHead>
-                  <TableHead className="w-28">Дата</TableHead>
-                  <TableHead>Основание</TableHead>
-                  <TableHead>Файлы</TableHead>
+                  <TableHead className="w-32">{translate("ui.kind")}</TableHead>
+                  <TableHead className="w-28">{translate("ui.number")}</TableHead>
+                  <TableHead className="w-28">{translate("common.date")}</TableHead>
+                  <TableHead>{translate("record.reason")}</TableHead>
+                  <TableHead>{translate("ui.files")}</TableHead>
                   <TableHead className="w-20" />
                 </TableRow>
               </TableHeader>
@@ -232,7 +237,7 @@ export function RecordsView() {
                       colSpan={6}
                       className="py-12 text-center text-muted-foreground"
                     >
-                      {isFetching ? "Загрузка…" : "Записей нет"}
+                      {isFetching ? translate("common.loading") : translate("ui.noEntries")}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -260,7 +265,7 @@ export function RecordsView() {
                               </Badge>
                             ) : expired ? (
                               <Badge variant="outline" className="text-muted-foreground">
-                                Истекла
+                                {translate("ui.expired")}
                               </Badge>
                             ) : null}
                           </div>
@@ -303,7 +308,7 @@ export function RecordsView() {
                                 />
                               ) : null)}
                             <DeleteDialog
-                              label="Удалить запись"
+                              label={translate("ui.deleteTheRecord")}
                               action={async () => {
                                 await deleteStudentRecord(r.id);
                                 invalidate();

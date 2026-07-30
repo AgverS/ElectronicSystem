@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   WeekScheduleTable,
@@ -160,12 +161,12 @@ export function PersonalScheduleClient({
         : `Группа ${active.label}`;
 
   const subtitle = isOwnView
-    ? "Моё расписание"
+    ? translate("ui.myTimetable")
     : active.kind === "teacher"
-      ? "Расписание преподавателя"
+      ? translate("ui.teacherTimetable")
       : active.kind === "room"
-        ? "Расписание кабинета"
-        : "Расписание группы";
+        ? translate("ui.roomTimetable")
+        : translate("ui.groupTimetable");
 
   function handleRsvpChanged(id: string, attending: boolean) {
     queryClient.setQueryData<ExtraLessonEntry[]>(
@@ -196,7 +197,7 @@ export function PersonalScheduleClient({
           className="flex items-center gap-1.5 self-start text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <IconArrowLeft size={14} />
-          Вернуться к своему расписанию
+          {translate("ui.backToMyTimetable")}
         </button>
       )}
 
@@ -231,13 +232,13 @@ export function PersonalScheduleClient({
             onClick={() => setMonday(getMonday(new Date()))}
             className="rounded-md bg-muted/30 px-3 py-1 text-sm text-muted-foreground transition-colors hover:bg-muted"
           >
-            Перейти к текущей неделе
+            {translate("ui.goToTheCurrentWeek")}
           </button>
         )}
       </div>
 
       {baseEntries.length === 0 && substitutions.length === 0 && extraLessons.length === 0 ? (
-        <p className="text-muted-foreground">Расписание не найдено.</p>
+        <p className="text-muted-foreground">{translate("ui.noTimetableFound")}</p>
       ) : (
         <WeekScheduleTable
           baseEntries={baseEntries}

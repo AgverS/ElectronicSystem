@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { translate } from "@/lib/i18n/translate";
 
 export type ScheduleEntry = {
   id: string;
@@ -13,14 +14,18 @@ export type ScheduleEntry = {
 
 export type ScheduleViewMode = "group" | "teacher" | "room";
 
-const DAYS = [
-  { num: 1, label: "Пн" },
-  { num: 2, label: "Вт" },
-  { num: 3, label: "Ср" },
-  { num: 4, label: "Чт" },
-  { num: 5, label: "Пт" },
-  { num: 6, label: "Сб" },
+// Built on each call: the labels are translated, and the catalog is not
+// loaded yet when this module is first imported.
+function DAYS() {
+  return [
+  { num: 1, label: translate("day.1.short") },
+  { num: 2, label: translate("day.2.short") },
+  { num: 3, label: translate("day.3.short") },
+  { num: 4, label: translate("day.4.short") },
+  { num: 5, label: translate("day.5.short") },
+  { num: 6, label: translate("day.6.short") },
 ];
+}
 
 const LESSONS = Array.from({ length: 13 }, (_, i) => i + 1);
 
@@ -53,7 +58,7 @@ export function ScheduleTable({
             <th className="border-r px-3 py-2 text-center font-medium text-muted-foreground w-10">
               №
             </th>
-            {DAYS.map((d) => (
+            {DAYS().map((d) => (
               <th
                 key={d.num}
                 className="border-r last:border-r-0 px-3 py-2 text-center font-medium min-w-44"
@@ -69,7 +74,7 @@ export function ScheduleTable({
               <td className="border-r px-3 py-2 text-center text-muted-foreground font-medium">
                 {lessonNum}
               </td>
-              {DAYS.map((d) => {
+              {DAYS().map((d) => {
                 const entry = map.get(`${d.num}-${lessonNum}`);
                 return (
                   <td

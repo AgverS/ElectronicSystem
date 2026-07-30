@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { translate } from "@/lib/i18n/translate";
 import Link from "next/link";
 import { fmtShort, toISODate } from "@/lib/week";
 import type { BellTimesMap } from "@/lib/bell-times";
@@ -47,7 +48,11 @@ export type ExtraLessonEntry = {
   myRsvp: boolean;
 };
 
-const DAY_NAMES = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
+// Built on each call: the labels are translated, and the catalog is not
+// loaded yet when this module is first imported.
+function DAY_NAMES() {
+  return [translate("day.1.short"), translate("day.2.short"), translate("day.3.short"), translate("day.4.short"), translate("day.5.short"), translate("day.6.short")];
+}
 const LESSONS = Array.from({ length: 13 }, (_, i) => i + 1);
 const ALL_DAYS = [0, 1, 2, 3, 4, 5] as const;
 
@@ -84,7 +89,7 @@ function AllCheckbox({
       checked={checked}
       onChange={onChange}
       className="h-3.5 w-3.5 cursor-pointer accent-primary"
-      title="Показывать замены для всех дней"
+      title={translate("ui.showCoverLessonsForEveryDay")}
     />
   );
 }
@@ -150,7 +155,7 @@ export function WeekScheduleTable({
         className="w-full text-left rounded-md border border-green-200 bg-green-50 px-2 py-1.5 dark:border-green-800 dark:bg-green-950/30 hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors"
       >
         <span className="block text-[9px] font-bold uppercase tracking-wide text-green-700 dark:text-green-400 mb-0.5">
-          Доп. занятие
+          {translate("audit.entity.extra_lesson")}
         </span>
         {mode !== "teacher" && (
           <span className="block text-xs font-medium text-foreground">{el.teacher.name}</span>
@@ -160,7 +165,7 @@ export function WeekScheduleTable({
           <span className="block text-xs text-muted-foreground truncate">{el.comment}</span>
         )}
         {el.myRsvp && (
-          <span className="block text-[10px] text-green-600 dark:text-green-400 mt-0.5">✓ Вы придёте</span>
+          <span className="block text-[10px] text-green-600 dark:text-green-400 mt-0.5">{translate("ui.youAreAttending")}</span>
         )}
         {mode === "teacher" && el.rsvpCount > 0 && (
           <span className="block text-[10px] text-muted-foreground mt-0.5">{el.rsvpCount} чел.</span>
@@ -280,7 +285,7 @@ export function WeekScheduleTable({
       return (
         <div className="relative rounded-md border border-red-200 bg-red-50 px-2 py-1.5 dark:border-red-900 dark:bg-red-950/30 pt-4">
           <span className="absolute right-0 top-0 rounded-bl rounded-tr-md bg-red-600 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
-            Отменено
+            {translate("ui.cancelled")}
           </span>
           <div className="mb-1 flex justify-start">
             {subgroupTag(sub.subgroup)}
@@ -296,7 +301,7 @@ export function WeekScheduleTable({
     return (
       <div className="relative rounded-md border border-yellow-200 bg-yellow-50 px-2 py-1.5 dark:border-yellow-800 dark:bg-yellow-950/30 pt-4">
         <span className="absolute right-0 top-0 rounded-bl rounded-tr-md bg-yellow-600 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
-          Замена
+          {translate("audit.entity.schedule_substitution")}
         </span>
         <div className="mb-1 flex justify-start">
           {subgroupTag(sub.subgroup)}
@@ -401,10 +406,10 @@ export function WeekScheduleTable({
         {extraLesson && onExtraLessonClick && (
           <button
             onClick={() => onExtraLessonClick(extraLesson)}
-            title="Дополнительное занятие"
+            title={translate("audit.entity.extra_lesson")}
             className="absolute top-1.5 right-1.5 flex items-center gap-0.5 rounded-full bg-green-100 dark:bg-green-950/60 px-1.5 py-0.5 text-[9px] font-semibold text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/60 transition-colors"
           >
-            +доп
+            {translate("ui.extra")}
           </button>
         )}
         {bell && (
@@ -458,7 +463,7 @@ export function WeekScheduleTable({
                   i === todayCol ? "bg-primary/15 text-primary" : "bg-muted",
                 )}
               >
-                <div>{DAY_NAMES[i]}</div>
+                <div>{DAY_NAMES()[i]}</div>
 
                 <div className="text-xs font-normal text-muted-foreground">
                   {fmtShort(date)}
@@ -469,7 +474,7 @@ export function WeekScheduleTable({
                     checked={!hiddenDays.has(i)}
                     onChange={() => toggleDay(i)}
                     className="h-3.5 w-3.5 cursor-pointer accent-primary"
-                    title="Показывать замены"
+                    title={translate("ui.showCoverLessons")}
                   />
                 </div>
               </th>
@@ -517,7 +522,7 @@ export function WeekScheduleTable({
                         <button
                           onClick={() => onAddExtraLesson(dateStr, lessonNum)}
                           className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground/40 hover:bg-muted hover:text-muted-foreground transition-colors mx-auto"
-                          title="Добавить дополнительное занятие"
+                          title={translate("ui.addAConsultation")}
                         >
                           <span className="text-base leading-none">+</span>
                         </button>

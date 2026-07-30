@@ -1,6 +1,7 @@
 "use client";
 
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
+import { translate } from "@/lib/i18n/translate";
 import { useQuery } from "@tanstack/react-query";
 import { Suspense, useState } from "react";
 import Link from "next/link";
@@ -61,9 +62,9 @@ function AdminJournalsViewInner({
   }
 
   const tabItems = [
-    { key: "all", label: "Все журналы" },
+    { key: "all", label: translate("ui.allJournals") },
     ...(curatedGroupsCount > 0
-      ? [{ key: "curated", label: "Курируемые группы" }]
+      ? [{ key: "curated", label: translate("nav.curatedGroups") }]
       : []),
   ];
 
@@ -85,8 +86,8 @@ function AdminJournalsViewInner({
   const teacherFilters: FilterConfig[] = [
     {
       key: "teacherId",
-      placeholder: "Преподаватель",
-      allLabel: "Все преподаватели",
+      placeholder: translate("landing.role.teacher.title"),
+      allLabel: translate("ui.allTeachers"),
       options: teachers.map((t) => ({ value: t.id, label: t.name })),
     },
   ];
@@ -105,7 +106,7 @@ function AdminJournalsViewInner({
 
   return (
     <div>
-      <h1 className="mb-1 text-2xl font-bold tracking-tight">Журналы</h1>
+      <h1 className="mb-1 text-2xl font-bold tracking-tight">{translate("nav.journals")}</h1>
 
       {tabItems.length > 1 &&
         <div className="mt-4 border-b">
@@ -135,8 +136,8 @@ function AdminJournalsViewInner({
           <TableToolbar
             searchPlaceholder={
               tab === "all"
-                ? "Поиск по преподавателю, группе или предмету…"
-                : "Поиск по названию группы…"
+                ? translate("ui.searchByTeacherGroupOrSubject")
+                : translate("ui.searchByGroupName")
             }
           />
         </Suspense>
@@ -147,7 +148,7 @@ function AdminJournalsViewInner({
         >
           {!groups.length ? (
             <p className="text-muted-foreground">
-              {isFetching ? "Загрузка…" : tab === "all" ? "Нет назначений." : "Вы не являетесь куратором ни одной группы."}
+              {isFetching ? translate("common.loading") : tab === "all" ? translate("ui.noAssignments") : translate("ui.youAreNotTheCuratorOfAnyGroup")}
             </p>
           ) : (
             <div className="flex flex-col gap-4">
@@ -220,7 +221,7 @@ function AdminJournalsViewInner({
                         className="-ml-2 h-8 gap-1 px-2"
                       >
                         <IconChevronLeft size={16} />
-                        Назад
+                        {translate("common.back")}
                       </Button>
                       <h2 className="font-medium">Группа {currentGroup?.name}</h2>
                     </div>

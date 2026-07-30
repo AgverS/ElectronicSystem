@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { translate } from "@/lib/i18n/translate";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Dialog,
@@ -44,14 +45,18 @@ type Subject = { id: string; name: string };
 type Teacher = { id: string; name: string };
 type Assignment = { teacherId: string; subjectId: string };
 
-const DAYS = [
-  { num: 1, label: "Пн" },
-  { num: 2, label: "Вт" },
-  { num: 3, label: "Ср" },
-  { num: 4, label: "Чт" },
-  { num: 5, label: "Пт" },
-  { num: 6, label: "Сб" },
+// Built on each call: the labels are translated, and the catalog is not
+// loaded yet when this module is first imported.
+function DAYS() {
+  return [
+  { num: 1, label: translate("day.1.short") },
+  { num: 2, label: translate("day.2.short") },
+  { num: 3, label: translate("day.3.short") },
+  { num: 4, label: translate("day.4.short") },
+  { num: 5, label: translate("day.5.short") },
+  { num: 6, label: translate("day.6.short") },
 ];
+}
 
 const LESSONS = Array.from({ length: 13 }, (_, i) => i + 1);
 
@@ -203,23 +208,23 @@ export function AdminScheduleGrid() {
   const subjectList: Subject[] = subjects?.data ?? [];
   const teacherList: Teacher[] = teachersRes?.data ?? [];
 
-  const dayLabel = DAYS.find((d) => d.num === dialog.dayOfWeek)?.label ?? "";
+  const dayLabel = DAYS().find((d) => d.num === dialog.dayOfWeek)?.label ?? "";
 
   const TABS = [
-    { key: "subs" as const, label: "Замены" },
-    { key: "base" as const, label: "Базовое расписание" },
+    { key: "subs" as const, label: translate("ui.coverLessons") },
+    { key: "base" as const, label: translate("bells.permanent") },
   ];
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-4">
         <div className="flex items-center gap-3">
-          <Label className="shrink-0">Группа</Label>
+          <Label className="shrink-0">{translate("term.group")}</Label>
           <SearchableSelect
             value={groupId}
             onValueChange={setGroupId}
             options={groups.map((g) => ({ value: g.id, label: g.name }))}
-            placeholder="Выберите группу"
+            placeholder={translate("ui.selectAGroup")}
             className="w-48"
           />
         </div>
@@ -250,7 +255,7 @@ export function AdminScheduleGrid() {
             <IconUsers size={40} className="text-muted-foreground/60" />
           </div>
           <h3 className="text-lg font-semibold tracking-tight">
-            Группа не выбрана
+            {translate("ui.noGroupSelected")}
           </h3>
           <p className="mt-2 text-sm text-muted-foreground max-w-[280px] leading-relaxed">
             Выберите учебную группу в списке выше, чтобы{" "}
@@ -268,7 +273,7 @@ export function AdminScheduleGrid() {
                 <th className="border-r px-3 py-2 text-center font-medium text-muted-foreground w-10">
                   №
                 </th>
-                {DAYS.map((d) => (
+                {DAYS().map((d) => (
                   <th
                     key={d.num}
                     className="px-3 py-2 text-center font-medium min-w-36"
@@ -284,7 +289,7 @@ export function AdminScheduleGrid() {
                   <td className="border-r px-3 py-2 text-center text-muted-foreground font-medium">
                     {lessonNum}
                   </td>
-                  {DAYS.map((d) => {
+                  {DAYS().map((d) => {
                     const cellEntries =
                       entryMap.get(`${d.num}-${lessonNum}`) ?? [];
                     return (
@@ -375,14 +380,14 @@ export function AdminScheduleGrid() {
                 disabled={saving}
               >
                 <IconCopy size={14} />
-                Скопировать прошлое
+                {translate("ui.copyFromLastWeek")}
               </Button>
             )}
           </DialogHeader>
 
           <div className="flex flex-col gap-4 pt-2">
             <div className="flex flex-col gap-1.5">
-              <Label required>Предмет</Label>
+              <Label required>{translate("term.subject")}</Label>
               <SearchableSelect
                 value={subjectId}
                 onValueChange={(val) => {
@@ -396,14 +401,14 @@ export function AdminScheduleGrid() {
                   value: s.id,
                   label: s.name,
                 }))}
-                placeholder="Выберите предмет"
+                placeholder={translate("ui.selectASubject")}
                 className="w-full"
                 portalled={false}
               />
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label required>Преподаватель</Label>
+              <Label required>{translate("landing.role.teacher.title")}</Label>
               <SearchableSelect
                 value={teacherId}
                 onValueChange={setTeacherId}
@@ -411,7 +416,7 @@ export function AdminScheduleGrid() {
                   value: t.id,
                   label: t.name,
                 }))}
-                placeholder="Выберите преподавателя"
+                placeholder={translate("ui.selectATeacher")}
                 className="w-full"
                 portalled={false}
               />
@@ -434,15 +439,15 @@ export function AdminScheduleGrid() {
 
             <div className="flex gap-3">
               <div className="flex flex-col gap-1.5 flex-1">
-                <Label required>Кабинет</Label>
+                <Label required>{translate("common.room")}</Label>
                 <Input
                   value={room}
                   onChange={(e) => setRoom(e.target.value)}
-                  placeholder="Например: 301"
+                  placeholder={translate("ui.forExample301")}
                 />
               </div>
               <div className="flex flex-col gap-1.5 w-28">
-                <Label>Подгруппа</Label>
+                <Label>{translate("term.subgroup")}</Label>
                 <Input
                   value={subgroup}
                   onChange={(e) => setSubgroup(e.target.value)}
@@ -459,7 +464,7 @@ export function AdminScheduleGrid() {
                   onClick={handleDelete}
                   disabled={saving}
                 >
-                  Удалить
+                  {translate("common.delete")}
                 </Button>
               ) : (
                 <div />
@@ -471,14 +476,14 @@ export function AdminScheduleGrid() {
                   onClick={() => setDialog((d) => ({ ...d, open: false }))}
                   disabled={saving}
                 >
-                  Отмена
+                  {translate("common.cancel")}
                 </Button>
                 <Button
                   size="sm"
                   onClick={handleSave}
                   disabled={saving || !subjectId || !teacherId || !room.trim()}
                 >
-                  {saving ? "Сохранение…" : "Сохранить"}
+                  {saving ? translate("common.saving") : translate("common.save")}
                 </Button>
               </div>
             </div>

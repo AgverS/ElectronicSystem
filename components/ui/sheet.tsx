@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { translate } from "@/lib/i18n/translate";
 import { Dialog as DialogPrimitive } from "radix-ui"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -67,7 +68,7 @@ function SheetContent({
         <DialogPrimitive.Close asChild>
           <Button variant="ghost" size="icon-sm" className="absolute top-4 right-4">
             <IconX />
-            <span className="sr-only">Закрыть</span>
+            <span className="sr-only">{translate("common.close")}</span>
           </Button>
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>

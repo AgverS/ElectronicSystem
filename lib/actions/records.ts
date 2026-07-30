@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { translate } from "@/lib/i18n/provider";
+import { translate } from "@/lib/i18n/translate";
 import { requireRole } from "@/lib/demo-actor";
 import { Role, RecordKind } from "@/lib/prisma-client";
 import { logAction } from "@/lib/audit";
