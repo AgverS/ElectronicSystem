@@ -268,10 +268,10 @@ export default async function AdminDashboard() {
         {/* KPI ROW */}
         <Kpi className="col-span-6 lg:col-span-3" label={translate("ui.attendanceWeek")}
           value={d.attPct === null ? "—" : <AnimatedStat value={d.attPct} />} unit={d.attPct === null ? "" : "%"}
-          delta={d.attDelta === null ? null : { good: d.attDelta >= 0, text: `${d.attDelta >= 0 ? "+" : ""}${d.attDelta}% за неделю` }} />
+          delta={d.attDelta === null ? null : { good: d.attDelta >= 0, text: translate("admin.attendanceDelta", { value: `${d.attDelta >= 0 ? "+" : ""}${d.attDelta}` }) }} />
         <Kpi className="col-span-6 lg:col-span-3" label={translate("ui.absencesThisWeek")}
           value={<AnimatedStat value={d.absWeek} />}
-          delta={d.absDelta === 0 ? { good: true, text: translate("ui.noChange") } : { good: d.absDelta < 0, text: `${d.absDelta < 0 ? "−" : "+"}${Math.abs(d.absDelta)} к прошлой` }}
+          delta={d.absDelta === 0 ? { good: true, text: translate("ui.noChange") } : { good: d.absDelta < 0, text: translate("admin.absencesDelta", { value: `${d.absDelta < 0 ? "\u2212" : "+"}${Math.abs(d.absDelta)}` }) }}
           spark={{ points: d.absByWeek, tone: "neg" }} />
         <Kpi className="col-span-6 lg:col-span-3" label={translate("ui.activeGroups")}
           value={<AnimatedStat value={d.groups} />} />
@@ -281,7 +281,7 @@ export default async function AdminDashboard() {
         {/* TREND + SEMESTER */}
         <section className="col-span-12 rounded-xl border bg-card p-5 shadow-xs lg:col-span-8">
           <h2 className="flex items-center text-sm font-semibold text-muted-foreground">
-            Пропуски · {WEEKS} недель
+            {translate("admin.absencesOverWeeks", { weeks: WEEKS })}
             <span className="ml-auto text-xs font-medium text-muted-foreground/70">{translate("ui.acrossAllGroups")}</span>
           </h2>
           <div className="mt-3">
@@ -336,7 +336,7 @@ export default async function AdminDashboard() {
           <h2 className="flex items-center text-sm font-semibold text-muted-foreground">
             {translate("ui.recentRecords")}
             <Link href="/admin/records" className="ml-auto flex items-center gap-1 text-xs font-medium transition-colors hover:text-foreground">
-              все <IconArrowRight size={12} />
+              {translate("admin.viewAll")} <IconArrowRight size={12} />
             </Link>
           </h2>
           <div className="mt-1">

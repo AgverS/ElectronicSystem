@@ -156,7 +156,7 @@ export async function writeOffStudentRecord(id: string) {
   if (record.kind !== RecordKind.PENALTY) {
     throw new Error(translate("errors.onlyPenaltiesWrittenOff"));
   }
-  if (record.writtenOffAt) return; // уже списано
+  if (record.writtenOffAt) return; // already written off
 
   await prisma.studentRecord.update({
     where: { id },

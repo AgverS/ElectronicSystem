@@ -202,9 +202,9 @@ interface JournalViewProps {
   labsTotal: number | null;
 }
 
-// Текущий семестр определяется по сегодняшней дате: ищем семестр, в чей
-// промежуток [startDate, endDate] попадает сегодня. Если такого нет (каникулы) —
-// откатываемся на отмеченный вручную или самый свежий по списку.
+// The current semester is the one whose [startDate, endDate] range contains
+// today. During a break no semester matches, so fall back to the one flagged
+// current, or failing that the most recent.
 function resolveCurrentSemester(semesters: Semester[]): Semester | undefined {
   if (semesters.length === 0) return undefined;
   const now = new Date();
@@ -256,7 +256,7 @@ export function JournalView({
   const students = assignment.group.students;
   const monthGroups = groupByMonth(lessons);
 
-  // У практических предметов каждый урок считается лабораторной работой.
+  // In a practical subject every lesson counts as laboratory work.
   const labLessons = lessons.filter(
     (l) => l.type === "lab" || assignment.subject.isPractical,
   );
@@ -292,7 +292,7 @@ export function JournalView({
       const g = lastVal(lesson.id + ":" + student.id);
       if (g === ABSENT) totalAbsences++;
       else if (g !== "") {
-        // Для практических и 1 курса считаем всё, для остальных исключаем ОКР из текущих
+        // Practical subjects and first years count everything; elsewhere the
         if (isPractical || isFirstYear || lesson.type !== "assessment") {
           allNums.push(Number(g));
         }
@@ -377,15 +377,15 @@ export function JournalView({
           {(lessons.length > 0 || canEditHours) && (
             <div className="flex flex-wrap items-center gap-6 rounded-lg border bg-muted/20 px-4 py-2.5 text-sm">
               <span className="text-muted-foreground">
-                Учеников:{" "}
+                {translate("journal.students")}{" "}
                 <strong className="text-foreground">{students.length}</strong>
               </span>
               <span className="text-muted-foreground">
-                Уроков:{" "}
+                {translate("journal.lessons")}{" "}
                 <strong className="text-foreground">{lessons.length}</strong>
               </span>
               <span className="text-muted-foreground">
-                Ср. по классу:{" "}
+                {translate("journal.classAverage")}{" "}
                 <strong
                   className={cn(classAvg !== null ? avgColor(classAvg) : "")}
                 >
@@ -400,7 +400,7 @@ export function JournalView({
               />
               {totalAbsences > 0 && (
                 <span className="text-muted-foreground">
-                  Пропусков:{" "}
+                  {translate("journal.absences")}{" "}
                   <strong className="text-orange-600 dark:text-orange-400">
                     {totalAbsences}
                   </strong>
@@ -411,7 +411,7 @@ export function JournalView({
 
           {lessons.length === 0 && (
             <p className="text-muted-foreground">
-              Уроков пока нет.{!readonly && translate("ui.addTheFirstLesson")}
+              {translate("journal.noLessons")}{!readonly && translate("ui.addTheFirstLesson")}
             </p>
           )}
 
@@ -490,7 +490,7 @@ export function JournalView({
                         "min-w-10 font-semibold text-foreground border-r-0 border-b-2",
                       )}
                     >
-                      Н
+                      {translate("grade.absent.short")}
                     </th>
                   </tr>
                 </thead>
@@ -502,7 +502,7 @@ export function JournalView({
                       (l) => lastVal(l.id + ":" + student.id),
                     );
 
-                    // Текущая: для практических и 1 курса - все, для остальных - кроме ОКР
+                    // Running marks: all of them for practical subjects and first
                     const currentGrades = lessons
                       .filter(
                         (l) => isPractical || isFirstYear || l.type !== "assessment",
@@ -512,7 +512,7 @@ export function JournalView({
 
                     const currentAvg = calcAvg(currentGrades);
 
-                    // ОКР отметки (только если не практический и не 1 курс)
+                    // Assessment marks, kept separate outside those cases
                     const okrGrades =
                       !isPractical && !isFirstYear
                         ? lessons
@@ -524,7 +524,7 @@ export function JournalView({
 
                     const okrVal = okrGrades.length > 0 ? okrGrades[0] : null;
 
-                    // Итог
+                    // Final result
                     let finalGrade: number | null = null;
                     if (isPractical || isFirstYear) {
                       finalGrade = currentAvg;

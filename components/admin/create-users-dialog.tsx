@@ -289,9 +289,14 @@ export function CreateUsersDialog({ groups, specialties, isMasterActor }: Props)
                               >
                                 {row.specialtyIds.length === 0
                                   ? translate("ui.specialtiesNone")
-                                  : `Спец-ти: ${row.specialtyIds
-                                      .map((sid) => specialties.find((s) => s.id === sid)?.abbreviation || "?")
-                                      .join(", ")}`}
+                                  : translate("users.specialtiesPrefix", {
+                                      list: row.specialtyIds
+                                        .map(
+                                          (sid) =>
+                                            specialties.find((s) => s.id === sid)?.abbreviation || "?",
+                                        )
+                                        .join(", "),
+                                    })}
                               </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-80 p-3" align="start">
@@ -389,7 +394,7 @@ export function CreateUsersDialog({ groups, specialties, isMasterActor }: Props)
                 ? translate("ui.creating")
                 : filled === 0
                   ? translate("common.create")
-                  : `Создать ${filled} ${pluralUsers(filled)}`}
+                  : translate("users.createN", { count: filled })}
             </Button>
           </DialogFooter>
         </DialogContent>

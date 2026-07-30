@@ -9,10 +9,10 @@ export function labDeadline(date: Date, deadline: Date | null): Date {
 }
 
 export type LabStatus =
-  | "passed" // зачтено (оценка ≥ 3)
-  | "failing" // оценка < 3 или «Н» — ещё не зачтено
-  | "paid" // без оценки и срок прошёл — платная
-  | "pending"; // без оценки, срок ещё не вышел
+  | "passed" // passed, a mark of 3 or better
+  | "failing" // a mark below 3, or an absence — not passed yet
+  | "paid" // unmarked and past the deadline
+  | "pending"; // unmarked, still within the deadline
 
 export function labStatus(
   grade: string,

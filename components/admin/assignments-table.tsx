@@ -238,7 +238,7 @@ function AssignmentsTableInner({ teachers, groups, subjects }: AssignmentsTableP
           <AlertDialogHeader>
             <AlertDialogTitle>{translate("ui.deleteTheAssignment")}</AlertDialogTitle>
             <AlertDialogDescription>
-              {toDelete?.label}. Это действие нельзя отменить.
+              {translate("assignment.deleteConfirm", { label: toDelete?.label ?? "" })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -264,9 +264,9 @@ function AssignmentsTableInner({ teachers, groups, subjects }: AssignmentsTableP
             <AlertDialogDescription>
               {toDeleteRow?.label}
               {toDeleteRow && toDeleteRow.ids.length > 1
-                ? ` · ${toDeleteRow.ids.length} групп`
+                ? translate("assignment.deleteGroupsCount", { count: toDeleteRow.ids.length })
                 : ""}
-              . Будут удалены все группы этого назначения. Это действие нельзя отменить.
+              {translate("assignment.deleteAllGroups")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

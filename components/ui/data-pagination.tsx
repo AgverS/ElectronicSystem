@@ -37,8 +37,10 @@ export function DataPagination({
   return (
     <div className={cn("flex items-center justify-between text-sm", className)}>
       <p className="text-muted-foreground">
-        Страница {page} из {totalPages} · записи {skip + 1}–
-        {Math.min(skip + limit, total)} из {total.toLocaleString("ru-RU")}
+        {translate("pagination.summary", {
+          page, total: totalPages, from: skip + 1,
+          to: Math.min(skip + limit, total), count: total,
+        })}
       </p>
       <div className="flex items-center gap-1">
         {page > 1 && (

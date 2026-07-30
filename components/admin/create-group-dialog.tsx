@@ -175,11 +175,11 @@ export function CreateGroupDialog({ teachers, specialties }: Props) {
           handleOpenChange(false);
         } else if (failed.length === results.length) {
           setBulkError(
-            `Не удалось создать ни одной группы (${failed[0].error})`,
+            translate("group.createNoneFailed", { error: failed[0].error ?? "" }),
           );
         } else {
           setBulkError(
-            `Создано ${results.length - failed.length} из ${results.length}. Остальные: ${failed[0].error}`,
+            translate("group.createPartial", { done: results.length - failed.length, total: results.length, error: failed[0].error ?? "" }),
           );
           refresh();
         }
@@ -332,7 +332,7 @@ export function CreateGroupDialog({ teachers, specialties }: Props) {
                   <Input
                     value={letter}
                     onChange={(e) => setLetter(e.target.value.slice(0, 1))}
-                    placeholder="А"
+                    placeholder="A"
                     maxLength={1}
                     className="text-center"
                   />
@@ -377,7 +377,7 @@ export function CreateGroupDialog({ teachers, specialties }: Props) {
               {bulkValid && (
                 <div className="rounded-md border bg-muted/30 px-3 py-2">
                   <p className="mb-1 text-xs text-muted-foreground">
-                    Будет создано {preview.length}{" "}
+                    {translate("group.willCreateN", { count: preview.length })}{" "}
                     {pluralGroups(preview.length)}:
                   </p>
                   <p className="text-sm font-medium">{preview.join(", ")}</p>
@@ -406,7 +406,7 @@ export function CreateGroupDialog({ teachers, specialties }: Props) {
                 {pending
                   ? translate("ui.creating")
                   : bulkValid
-                    ? `Создать ${preview.length} ${pluralGroups(preview.length)}`
+                    ? translate("group.createN", { count: preview.length })
                     : translate("common.create")}
               </Button>
             )}

@@ -32,7 +32,7 @@ export function ResetPasswordDialog({ userId, userName }: ResetPasswordDialogPro
     startTransition(async () => {
       try {
         await resetUserPassword(userId);
-        toast.success(`Пароль для ${userName} сброшен`);
+        toast.success(translate("password.resetDone", { name: userName }));
         refresh();
       } catch (err) {
         toast.error(err instanceof Error ? err.message : translate("ui.passwordResetFailed"));
@@ -54,7 +54,7 @@ export function ResetPasswordDialog({ userId, userName }: ResetPasswordDialogPro
         <AlertDialogHeader>
           <AlertDialogTitle>{translate("ui.resetThePassword")}</AlertDialogTitle>
           <AlertDialogDescription>
-            Пароль пользователя {userName} будет удалён. При следующем входе ему потребуется установить новый пароль.
+            {translate("password.resetExplain", { name: userName })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

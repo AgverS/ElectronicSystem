@@ -170,7 +170,7 @@ export function AddLessonDialog({
             {pending
               ? translate("ui.adding")
               : countNum > 1
-                ? `Добавить ${countNum} ${countNum >= 5 ? translate("ui.lessons") : translate("ui.lessons2")}`
+                ? translate("lesson.addN", { count: countNum })
                 : translate("common.add")}
           </Button>
         </form>

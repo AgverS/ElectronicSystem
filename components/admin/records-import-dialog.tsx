@@ -171,7 +171,7 @@ export function RecordsImportDialog({ onImported }: Props) {
   const matched = preview?.filter((r) => r.studentId && r.kind && r.date).length ?? 0;
   const unmatched = preview?.filter((r) => !r.studentId || !r.kind || !r.date).length ?? 0;
 
-  const colOptions = detect?.columns.map((c, i) => ({ label: c || `Столбец ${i + 1}`, value: i })) ?? [];
+  const colOptions = detect?.columns.map((c, i) => ({ label: c || translate("import.columnN", { n: i + 1 }), value: i })) ?? [];
 
   return (
     <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) reset(); }}>
@@ -217,7 +217,7 @@ export function RecordsImportDialog({ onImported }: Props) {
                   className="cursor-pointer"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Столбцы: № приказа · ФИО · тип · дата · основание (порядок определяется автоматически)
+                  {translate("import.columnsHint")}
                 </p>
               </div>
               {error && <ErrorBanner message={error} />}
@@ -327,12 +327,12 @@ export function RecordsImportDialog({ onImported }: Props) {
               <div className="flex items-center gap-3 text-sm">
                 <span className="flex items-center gap-1.5 text-green-700 dark:text-green-400">
                   <IconCheck size={14} />
-                  {matched} совпали
+                  {translate("import.matchedN", { count: matched })}
                 </span>
                 {unmatched > 0 && (
                   <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
                     <IconAlertTriangle size={14} />
-                    {unmatched} не найдены — будут пропущены
+                    {translate("import.unmatchedN", { count: unmatched })}
                   </span>
                 )}
               </div>

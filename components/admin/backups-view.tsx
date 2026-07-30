@@ -153,7 +153,7 @@ export function BackupsView({
             ) : (
               <IconPlus className="mr-2 h-4 w-4" />
             )}
-            Создать бэкап
+            {translate("backup.create")}
           </Button>
         </div>
 
@@ -215,12 +215,10 @@ export function BackupsView({
                                 {translate("ui.restoreData")}
                               </AlertDialogTitle>
                               <AlertDialogDescription>
-                                Вы уверены, что хотите восстановить базу данных
-                                из файла <strong>{backup.filename}</strong>?
+                                {translate("backup.restore.confirm", { file: backup.filename })}
                                 <br />
                                 <span className="text-destructive font-semibold">
-                                  Текущие данные будут заменены данными из
-                                  бэкапа!
+                                  {translate("backup.restore.warning")}
                                 </span>
                               </AlertDialogDescription>
                             </AlertDialogHeader>
@@ -238,7 +236,7 @@ export function BackupsView({
                                 ) : (
                                   <IconRestore className="mr-2 h-4 w-4" />
                                 )}
-                                Восстановить
+                                {translate("common.confirm")}
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
@@ -261,9 +259,7 @@ export function BackupsView({
                                 {translate("ui.deleteTheBackup")}
                               </AlertDialogTitle>
                               <AlertDialogDescription>
-                                Вы уверены, что хотите удалить файл бэкапа{" "}
-                                <strong>{backup.filename}</strong>? Это действие
-                                необратимо.
+                                {translate("backup.delete.confirm", { file: backup.filename })}
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
@@ -349,7 +345,7 @@ export function BackupsView({
 
               {settings.lastBackupAt && (
                 <p className="text-[10px] text-muted-foreground italic">
-                  Последний:{" "}
+                  {translate("backup.last")}{" "}
                   {new Date(settings.lastBackupAt).toLocaleString("ru-RU")}
                 </p>
               )}
@@ -362,7 +358,7 @@ export function BackupsView({
                 {isSavingSettings ? (
                   <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : null}
-                Сохранить
+                {translate("common.save")}
               </Button>
             </form>
           </CardContent>
@@ -377,12 +373,10 @@ export function BackupsView({
           </CardHeader>
           <CardContent className="text-xs text-muted-foreground space-y-2">
             <p>
-              Бэкапы сохраняются в формате SQL (plain text) с командами очистки
-              (DROP TABLE).
+              {translate("backup.format.note")}
             </p>
             <p>
-              При восстановлении все текущие данные будут удалены и заменены
-              данными из выбранного файла.
+              {translate("backup.restore.note")}
             </p>
           </CardContent>
         </Card>

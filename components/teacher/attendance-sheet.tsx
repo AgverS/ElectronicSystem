@@ -13,7 +13,7 @@ interface StudentRow {
   id: string;
   idx: number;
   name: string;
-  perDay: number[]; // индексы 1..daysInMonth
+  perDay: number[]; // indexed 1..daysInMonth
 }
 
 interface AttendanceSheetProps {
@@ -25,16 +25,16 @@ interface AttendanceSheetProps {
   curatorName: string | null;
   daysInMonth: number;
   canEdit: boolean;
-  /** Показывать ли выбор группы (только для админа/мастера). */
+  /** Whether to offer the group picker — administrators only. */
   showGroupSelect: boolean;
   students: StudentRow[];
-  /** Ключи `${studentId}:${day}` уважительных дней. */
+  /** Keys `${studentId}:${day}` for days marked excused. */
   initialExcused: string[];
 }
 
 const key = (studentId: string, day: number) => `${studentId}:${day}`;
 
-// «Абаши Алексей Валерьевич» → «Абаши А. В.»
+// "Amelia Rose Novak" -> "Novak A. R."
 function shortName(name: string): string {
   const parts = name.trim().split(/\s+/);
   if (parts.length < 2) return name;
@@ -65,7 +65,7 @@ export function AttendanceSheet({
     [daysInMonth],
   );
 
-  // Итоги по студенту: всего / уважительные / неуважительные.
+  // Per-student totals: all / excused / unexcused.
   const rows = useMemo(
     () =>
       students.map((s) => {
@@ -106,7 +106,7 @@ export function AttendanceSheet({
     if (pending.has(k)) return;
     const willExcuse = !excused.has(k);
 
-    // Оптимистично обновляем, при ошибке откатываем.
+    // Applied optimistically, rolled back if the write fails.
     setExcused((prev) => {
       const next = new Set(prev);
       if (willExcuse) next.add(k);
@@ -140,7 +140,7 @@ export function AttendanceSheet({
     }
   }
 
-  // Данные для экспорта в Excel.
+  // Rows for the spreadsheet export.
   const csvHeader: (string | number)[] = [
     "№",
     translate("ui.fullName"),
@@ -165,7 +165,7 @@ export function AttendanceSheet({
     grand.excused,
     grand.unexcused,
   ]);
-  const safeName = groupName.replace(/[^0-9A-Za-zА-Яа-я]+/g, "_");
+  const safeName = groupName.replace(/[^0-9A-Za-z\u0400-\u04FF]+/g, "_");
   const fileName = translate("ui.absenceReport") + safeName + "_" + month + ".xlsx";
   const exportTitle = translate("ui.absenceReport2") + groupName + " · " + monthLabel;
 
@@ -179,7 +179,7 @@ export function AttendanceSheet({
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{translate("nav.attendanceReport")}</h1>
           <p className="mt-0.5 font-mono text-xs text-muted-foreground">
-            Группа {groupName} · {monthLabel}
+            {translate("attendance.groupMonth", { group: groupName, month: monthLabel })}
           </p>
         </div>
         <div className="no-print flex flex-wrap items-end gap-2">
@@ -201,13 +201,12 @@ export function AttendanceSheet({
       </div>
 
       <p className="no-print text-xs text-muted-foreground">
-        В ячейке — количество пропущенных уроков (Н) за день по всем предметам.
+        {translate("attendance.legend.intro")}
         {" "}
         <span className="inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full border-[1.5px] border-current px-0.5 align-text-bottom text-[11px] font-semibold leading-none text-green-700 dark:text-green-400">
-          Н
+          {translate("grade.absent.short")}
         </span>{" "}
-        в кружке — пропуск по{" "}
-        <span className="font-medium">{translate("ui.excused")}</span> причине, без кружка —{" "}
+        {translate("attendance.legend.circled", { excused: translate("ui.excused"), unexcused: translate("ui.unexcused") })}
         <span className="font-medium">{translate("ui.unexcused")}</span>.
         {canEdit
           ? translate("ui.clickACellToToggleItTotalsRecalculate")
@@ -274,9 +273,9 @@ export function AttendanceSheet({
                         v > 0
                           ? isExcused
                             ? translate("audit.entity.excused_absence") +
-                            (canEdit ? " — нажмите, чтобы снять" : "")
+                            (canEdit ? translate("attendance.toggle.clear") : "")
                             : translate("ui.unexcusedAbsence") +
-                            (canEdit ? " — нажмите, чтобы отметить уважительным" : "")
+                            (canEdit ? translate("attendance.toggle.excuse") : "")
                           : undefined
                       }
                       className={cn(
@@ -349,7 +348,7 @@ export function AttendanceSheet({
       {/* Signature block — print only */}
       <div className="hidden print:block mt-10 text-sm">
         <div className="flex items-end gap-2 flex-wrap">
-          <span className="whitespace-nowrap">Куратор группы {groupName}:</span>
+          <span className="whitespace-nowrap">{translate("attendance.curatorOf", { group: groupName })}</span>
           <span className="flex-none inline-block w-36 border-b border-black" />
           <span>/</span>
           <span className="flex-none inline-block w-48 border-b border-black text-center text-xs leading-none pb-0.5">
@@ -361,7 +360,7 @@ export function AttendanceSheet({
         </div>
         <div className="flex gap-2 mt-0.5 text-[10px] text-gray-500">
           <span className="w-fit whitespace-nowrap opacity-0">
-            Куратор группы {groupName}:
+            {translate("attendance.curatorOf", { group: groupName })}
           </span>
           <span className="w-36 text-center">{translate("ui.signature")}</span>
           <span className="w-2" />

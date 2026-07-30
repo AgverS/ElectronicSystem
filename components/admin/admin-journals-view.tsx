@@ -269,7 +269,7 @@ function JournalCard({ a }: { a: Assignment }) {
         {a.teachers.map((t) => shortName(t.name)).join(", ")}
       </p>
       <p className="mt-1 text-xs text-muted-foreground">
-        {a.lessons.length} уроков
+        {translate("journals.lessonsN", { count: a.lessons.length })}
       </p>
     </Link>
   );

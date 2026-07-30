@@ -227,7 +227,7 @@ function OverrideDialog({
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div className="flex flex-col gap-1.5">
-              <Label required>С</Label>
+              <Label required>{translate("bells.from")}</Label>
               <Input
                 type="date"
                 value={startDate}
@@ -239,7 +239,7 @@ function OverrideDialog({
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label required>По</Label>
+              <Label required>{translate("bells.to")}</Label>
               <Input
                 type="date"
                 value={endDate}

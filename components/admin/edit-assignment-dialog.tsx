@@ -150,7 +150,7 @@ export function EditAssignmentDialog({
           <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
             <div className="flex flex-col gap-1.5">
               <Label required>
-                Преподаватели
+                {translate("assignment.teachers")}
                 {teacherIds.size > 0 && (
                   <span className="ml-1.5 text-muted-foreground">{translate("ui.selectedInline", { count: teacherIds.size })}</span>
                 )}
@@ -210,7 +210,7 @@ export function EditAssignmentDialog({
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
                 <Label required>
-                  Группы
+                  {translate("assignment.groups")}
                   {groupIds.size > 0 && (
                     <span className="ml-1.5 text-muted-foreground">{translate("ui.selectedInline", { count: groupIds.size })}</span>
                   )}

@@ -67,15 +67,14 @@ export function JournalLabsTotal({
       <IconFlask size={15} className="shrink-0" />
       {total != null ? (
         <span>
-          Лабы:{" "}
+          {translate("journal.labsLabel")}{" "}
           <strong className="text-foreground">
             {issued} / {total}
           </strong>
         </span>
       ) : (
         <span>
-          {translate("ui.set")} <strong className="text-foreground">{issued}</strong> · план не
-          задан
+          {translate("ui.set")} <strong className="text-foreground">{issued}</strong> · {translate("journal.labsNoPlanSet")}
         </span>
       )}
 

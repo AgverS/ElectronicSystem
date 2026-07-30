@@ -133,7 +133,7 @@ export function EditGroupDialog({ group, teachers, specialties }: EditGroupDialo
               placeholder={translate("ui.a101")}
             />
             <p className="text-xs text-muted-foreground">
-              Курс определяется автоматически: {formatCourse(name || group.name)}
+              {translate("group.courseAuto", { course: formatCourse(name || group.name) })}
             </p>
           </div>
           <div className="flex flex-col gap-1">

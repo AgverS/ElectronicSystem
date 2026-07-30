@@ -24,7 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getCalendarFeedUrl, resetCalendarToken } from "@/lib/actions/calendar";
 
-// Общая разметка диалога подписки — переиспользуется персональной и публичной кнопками.
+// Shared dialog body, used by both the personal and the public buttons.
 function SubscribeDialogBody({
   url,
   loading,
@@ -61,8 +61,7 @@ function SubscribeDialogBody({
       <DialogHeader>
         <DialogTitle>{translate("ui.subscribeToTheTimetable")}</DialogTitle>
         <DialogDescription>
-          Добавьте расписание в календарь — оно будет обновляться автоматически
-          (включая замены).
+          {translate("calendar.subscribe.intro")}
         </DialogDescription>
       </DialogHeader>
 
@@ -116,8 +115,7 @@ function SubscribeDialogBody({
                 {translate("ui.ifTheButtonDidNotWorkOnA")}
               </p>
               <p>
-                Google Календарь → «Другие календари» → «+» → «Добавить по
-                URL-адресу» → вставьте скопированную ссылку.
+                {translate("calendar.google.steps")}
               </p>
             </div>
           </TabsContent>
@@ -138,13 +136,11 @@ function SubscribeDialogBody({
               </p>
               <p className="mb-1">
                 <span className="font-medium text-foreground">iPhone/iPad:</span>{" "}
-                Настройки → «Календарь» → «Учётные записи» → «Новая учётная
-                запись» → «Другое» → «Подписной календарь» → вставьте ссылку.
+                {translate("calendar.apple.iphone")}
               </p>
               <p>
                 <span className="font-medium text-foreground">Mac:</span>{" "}
-                Календарь → «Файл» → «Новая подписка на календарь» → вставьте
-                скопированную ссылку.
+                {translate("calendar.apple.mac")}
               </p>
             </div>
           </TabsContent>
@@ -175,7 +171,7 @@ function SubscribeDialogBody({
   );
 }
 
-// Персональная подписка (по токену пользователя).
+// Personal subscription, keyed to the user's own token.
 export function CalendarSubscribe() {
   const [open, setOpen] = useState(false);
   const [url, setUrl] = useState("");
@@ -231,7 +227,7 @@ export type PublicCalendarFilter =
   | { kind: "teacher"; id: string }
   | { kind: "room"; id: string };
 
-// Публичная подписка (по группе / преподавателю / кабинету, без авторизации).
+// Public subscription by group, teacher or room — no sign-in needed.
 export function PublicCalendarSubscribe({
   filter,
 }: {

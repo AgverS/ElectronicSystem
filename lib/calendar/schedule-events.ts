@@ -68,7 +68,7 @@ export function computeGroupEvents(opts: {
 
   for (const day of eachDate(range.start, range.end)) {
     const iso = toISODate(day);
-    const weekday = day.getUTCDay(); // 1..6, 0=Вс
+    const weekday = day.getUTCDay(); // 1..6, 0 = Sunday
     if (weekday === 0) continue;
     const bellMap = resolveBellTimes(day, bell);
 
@@ -130,8 +130,8 @@ export function computeGroupEvents(opts: {
 // Расписание преподавателя (его пары, с учётом замен и отмен).
 export function computeTeacherEvents(opts: {
   teacherId: string;
-  base: BaseEntryInput[]; // пары, где преподаёт этот преподаватель
-  subs: SubInput[]; // замены по его группам ИЛИ где он назначен
+  base: BaseEntryInput[]; // lessons this teacher gives
+  subs: SubInput[]; // cover lessons for their groups, or where they are assigned
   range: { start: Date; end: Date };
   bell: BellContext;
 }): IcsEvent[] {
@@ -203,8 +203,8 @@ export function computeTeacherEvents(opts: {
 // Расписание кабинета (все пары, проходящие в этом кабинете, с учётом замен).
 export function computeRoomEvents(opts: {
   room: string;
-  base: BaseEntryInput[]; // базовые пары в этом кабинете
-  subs: SubInput[]; // замены в этом кабинете ИЛИ по группам этих пар
+  base: BaseEntryInput[]; // scheduled lessons in this room
+  subs: SubInput[]; // cover lessons in this room, or for the groups that use it
   range: { start: Date; end: Date };
   bell: BellContext;
 }): IcsEvent[] {

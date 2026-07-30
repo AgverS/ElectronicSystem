@@ -258,8 +258,9 @@ export function AdminScheduleGrid() {
             {translate("ui.noGroupSelected")}
           </h3>
           <p className="mt-2 text-sm text-muted-foreground max-w-[280px] leading-relaxed">
-            Выберите учебную группу в списке выше, чтобы{" "}
-            {tab === "subs" ? "управлять заменами" : "редактировать расписание"}
+            {translate("schedule.pickGroupAbove", {
+              action: tab === "subs" ? translate("schedule.action.subs") : translate("schedule.action.edit"),
+            })}
             .
           </p>
         </div>
@@ -365,7 +366,7 @@ export function AdminScheduleGrid() {
         <DialogContent>
           <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-0 pr-8">
             <DialogTitle>
-              Урок {dialog.lessonNumber} · {dayLabel}
+              {translate("schedule.lessonOnDay", { number: dialog.lessonNumber, day: dayLabel })}
             </DialogTitle>
             {!dialog.entry && (
               <Button
@@ -422,13 +423,16 @@ export function AdminScheduleGrid() {
               <div className="flex items-start gap-2 rounded-md border border-yellow-200 bg-yellow-50 px-3 py-2 text-sm text-yellow-800 dark:border-yellow-800 dark:bg-yellow-950/30 dark:text-yellow-300">
                 <IconAlertTriangle size={16} className="mt-0.5 shrink-0" />
                 <span>
-                  Преподаватель уже ведёт урок {dialog.lessonNumber} в группе{" "}
-                  <strong>{teacherConflict.group.name}</strong>
-                  {teacherConflict.subgroup
-                    ? ` (подгр. ${teacherConflict.subgroup})`
-                    : ""}
-                  {teacherConflict.room ? `, каб. ${teacherConflict.room}` : ""}
-                  .
+                  {translate("schedule.teacherConflict", {
+                    number: dialog.lessonNumber,
+                    group: teacherConflict.group.name,
+                    subgroup: teacherConflict.subgroup
+                      ? translate("ui.subgroupParen", { subgroup: teacherConflict.subgroup })
+                      : "",
+                    room: teacherConflict.room
+                      ? translate("schedule.conflictRoom", { room: teacherConflict.room })
+                      : "",
+                  })}
                 </span>
               </div>
             )}

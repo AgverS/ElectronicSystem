@@ -39,7 +39,7 @@ export function DeleteButton({ action, label = translate("common.delete") }: Del
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Нет</AlertDialogCancel>
+          <AlertDialogCancel>{translate("common.no")}</AlertDialogCancel>
           <AlertDialogAction
             variant="destructive"
             disabled={pending}

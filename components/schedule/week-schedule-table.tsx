@@ -62,7 +62,7 @@ interface Props {
   weekDates: Date[]; // 6 dates Mon–Sat
   mode: WeekViewMode;
   baseUrl?: string;
-  bellTimesByDay?: BellTimesMap[]; // звонки по каждому дню (выровнено с weekDates)
+  bellTimesByDay?: BellTimesMap[]; // bell times per day, aligned with weekDates
   onNavigate?: (kind: "group" | "teacher" | "room", value: string) => void;
   extraLessons?: ExtraLessonEntry[];
   onAddExtraLesson?: (date: string, lessonNum: number) => void;
@@ -168,7 +168,7 @@ export function WeekScheduleTable({
           <span className="block text-[10px] text-green-600 dark:text-green-400 mt-0.5">{translate("ui.youAreAttending")}</span>
         )}
         {mode === "teacher" && el.rsvpCount > 0 && (
-          <span className="block text-[10px] text-muted-foreground mt-0.5">{el.rsvpCount} чел.</span>
+          <span className="block text-[10px] text-muted-foreground mt-0.5">{translate("attendees.short", { count: el.rsvpCount })}</span>
         )}
       </button>
     );

@@ -105,7 +105,7 @@ export function SpecialtiesManager({ specialties, canManage }: Props) {
                 <Input
                   value={newLetter}
                   onChange={(e) => setNewLetter(e.target.value.slice(0, 1))}
-                  placeholder="Т"
+                  placeholder="S"
                   maxLength={1}
                   className="w-16 text-center"
                   onKeyDown={(e) => { if (e.key === "Enter") handleAdd(); if (e.key === "Escape") setAdding(false); }}

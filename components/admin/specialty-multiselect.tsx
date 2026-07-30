@@ -30,7 +30,7 @@ export function SpecialtyMultiSelect({
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between">
         <Label>
-          Специальности
+          {translate("specialties.label")}
           {selected.size > 0 && (
             <span className="ml-1.5 text-muted-foreground">{translate("ui.selectedInline", { count: selected.size })}</span>
           )}

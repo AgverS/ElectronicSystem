@@ -65,10 +65,10 @@ export function LabHeader({
             ? "text-amber-600 dark:text-amber-400"
             : "text-muted-foreground/60",
       )}
-      title={`Срок сдачи: ${fmtShort(effective)}`}
+      title={translate("lab.deadlineTitle", { date: fmtShort(effective) })}
     >
       <IconCalendarClock size={10} className="shrink-0" />
-      до {fmtShort(effective)}
+      {translate("lab.dueBy", { date: fmtShort(effective) })}
     </span>
   );
 
@@ -98,8 +98,7 @@ export function LabHeader({
                 className="h-8 text-xs"
               />
               <p className="text-[10px] text-muted-foreground">
-                После этой даты незачтённая лаба становится платной. Продлите, если
-                занятие переносилось.
+                {translate("lab.overdueExplain")}
               </p>
               <div className="flex gap-1.5">
                 <Button

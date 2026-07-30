@@ -84,7 +84,7 @@ export function ResultsExportButton({ rows, semesterLabel, studentName }: Result
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = translate("ui.results") + semesterLabel.replace(/[^0-9A-Za-zА-Яа-я]+/g, "_") + ".xlsx";
+    a.download = translate("ui.results") + semesterLabel.replace(/[^0-9A-Za-z\u0400-\u04FF]+/g, "_") + ".xlsx";
     a.click();
     URL.revokeObjectURL(url);
   }

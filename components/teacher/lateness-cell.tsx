@@ -118,7 +118,7 @@ export function LatenessCell({
             </button>
           </div>
           <p className="text-[10px] text-muted-foreground italic">
-            {">"}23 мин = автоматически «Н»
+            {translate("lateness.autoAbsent")}
           </p>
         </div>
       </PopoverContent>

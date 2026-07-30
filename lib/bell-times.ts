@@ -47,8 +47,8 @@ export function weekdayOf(date: Date): number {
 export function dayGroupForWeekday(weekday: number): DayGroup | null {
   if (weekday === 4) return "thu";
   if (weekday === 6) return "sat";
-  if (weekday >= 1 && weekday <= 5) return "main"; // 1,2,3,5 (4 обработан выше)
-  return null; // воскресенье
+  if (weekday >= 1 && weekday <= 5) return "main"; // 1, 2, 3, 5 — Thursday is handled above
+  return null; // Sunday
 }
 
 // Стандартное расписание звонков (по умолчанию, если в БД ещё ничего нет).

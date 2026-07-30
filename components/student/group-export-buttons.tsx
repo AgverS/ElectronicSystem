@@ -79,7 +79,7 @@ export function GroupExportButtons({ groupName, curatorName, students }: GroupEx
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `Список_группы_${groupName}.xlsx`;
+    a.download = translate("group.export.filename", { group: groupName });
     a.click();
     URL.revokeObjectURL(url);
   }

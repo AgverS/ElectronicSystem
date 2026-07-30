@@ -24,7 +24,7 @@ const GRADE_BG: Record<string, string> = {
   "8": "bg-green-100 text-green-700 dark:bg-green-950/60 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-950",
   "9": "bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-950",
   "10": "bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-950",
-  Н: "bg-orange-100 text-orange-700 dark:bg-orange-950/60 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-950",
+  [ABSENT]: "bg-orange-100 text-orange-700 dark:bg-orange-950/60 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-950",
 };
 
 // Without hover — for display badges
@@ -39,7 +39,7 @@ const GRADE_COLOR: Record<string, string> = {
   "8": "bg-green-100 text-green-700 dark:bg-green-950/60 dark:text-green-300",
   "9": "bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300",
   "10": "bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300",
-  Н: "bg-orange-100 text-orange-700 dark:bg-orange-950/60 dark:text-orange-300",
+  [ABSENT]: "bg-orange-100 text-orange-700 dark:bg-orange-950/60 dark:text-orange-300",
 };
 
 const RED_COLOR =
@@ -149,9 +149,12 @@ export function GradeCell({
       "8": "8",
       "9": "9",
       "0": "10",
+      // "a" for absent, plus the letters that sit on the same physical key in
+      // other layouts, so the shortcut works without switching keyboard.
+      a: ABSENT,
       "н": ABSENT,
-      "h": ABSENT,
-      "n": ABSENT,
+      h: ABSENT,
+      n: ABSENT,
     };
     const target = keyMap[e.key.toLowerCase()];
     if (target) {
@@ -214,7 +217,7 @@ export function GradeCell({
         {/* Grade label for retake context */}
         {hasRetakes && (
           <p className="text-[10px] font-medium text-muted-foreground">
-            Пересдача {grades.length - 1}
+            {translate("journal.retakeN", { n: grades.length - 1 })}
           </p>
         )}
 
@@ -243,7 +246,7 @@ export function GradeCell({
               activeValue === ABSENT && "ring-2 ring-ring ring-offset-1",
             )}
           >
-            Н
+            {translate("grade.absent.short")}
           </button>
           <button
             onClick={() => persist("")}
@@ -254,7 +257,7 @@ export function GradeCell({
                 : "text-muted-foreground hover:bg-muted",
             )}
           >
-            {activeRetakeNumber > 0 ? translate("common.delete") : "Нет"}
+            {activeRetakeNumber > 0 ? translate("common.delete") : translate("common.no")}
           </button>
         </div>
 

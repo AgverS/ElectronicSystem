@@ -80,8 +80,11 @@ function TeacherJournalsViewInner({ userRole }: TeacherJournalsViewProps) {
       </h1>
       {data?.data?.length ? (
         <p className="mt-1 font-mono text-xs text-muted-foreground">
-          {groups.length} групп · {data.data.length} журналов ·{" "}
-          {data.data.reduce((s, a) => s + a.lessons.length, 0)} уроков
+          {translate("journals.summaryLine", {
+            groups: groups.length,
+            journals: data.data.length,
+            lessons: data.data.reduce((s, a) => s + a.lessons.length, 0),
+          })}
         </p>
       ) : null}
 
@@ -139,7 +142,7 @@ function TeacherJournalsViewInner({ userRole }: TeacherJournalsViewProps) {
                         </div>
                         <p className="text-xs text-muted-foreground">
                           <span className="font-mono font-medium text-foreground">{g.count}</span>{" "}
-                          предметов
+                          {translate("term.subjects").toLowerCase()}
                         </p>
                       </motion.button>
                     ))}

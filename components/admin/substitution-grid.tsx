@@ -426,7 +426,7 @@ export function SubstitutionGrid({ groupId }: Props) {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              Замена - урок {dialog.lessonNumber} · {dialogDayName}{" "}
+              {translate("substitution.title", { number: dialog.lessonNumber, day: dialogDayName })}{" "}
               {fmtShort(dialogDate)}
             </DialogTitle>
           </DialogHeader>
@@ -434,8 +434,8 @@ export function SubstitutionGrid({ groupId }: Props) {
           {dialog.base && (
             <div className="rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
               <span className="font-medium">{translate("ui.scheduled")}</span>{" "}
-              {dialog.base.subgroup ? `подгр. ${dialog.base.subgroup} · ` : ""}
-              {dialog.base.subject.name} · {dialog.base.teacher.name} · Каб.{" "}
+              {dialog.base.subgroup ? translate("substitution.subgroupPrefix", { subgroup: dialog.base.subgroup }) : ""}
+              {dialog.base.subject.name} · {dialog.base.teacher.name} · {translate("substitution.roomLabel")}{" "}
               {dialog.base.room}
             </div>
           )}
@@ -513,7 +513,7 @@ export function SubstitutionGrid({ groupId }: Props) {
 
             {cancelled && dialog.base?.subgroup && (
               <p className="text-xs text-muted-foreground">
-                Отменяется только подгруппа {dialog.base.subgroup}.
+                {translate("substitution.onlySubgroup", { subgroup: dialog.base.subgroup })}
               </p>
             )}
 

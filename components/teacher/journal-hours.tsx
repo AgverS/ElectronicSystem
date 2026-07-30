@@ -72,7 +72,7 @@ export function JournalHours({
       <IconClockHour4 size={15} className="shrink-0" />
       {plannedHours != null ? (
         <span>
-          Часы:{" "}
+          {translate("journal.hoursLabel")}{" "}
           <strong className="text-foreground">
             {conductedHours} / {plannedHours}
           </strong>

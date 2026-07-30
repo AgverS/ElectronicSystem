@@ -60,7 +60,7 @@ export default function StudentGroupPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{translate("nav.myGroup")}</h1>
           <p className="text-muted-foreground">
-            Список учащихся группы {group.name} ({formatCourse(group.name)})
+            {translate("group.listOf", { group: group.name, course: formatCourse(group.name) })}
           </p>
         </div>
         <GroupExportButtons
@@ -71,9 +71,11 @@ export default function StudentGroupPage() {
       </div>
 
       <div className="hidden print:block text-center space-y-2 mb-8">
-        <h1 className="text-2xl font-bold">Список группы {group.name} ({formatCourse(group.name)})</h1>
+        <h1 className="text-2xl font-bold">
+          {translate("group.listTitle", { group: group.name, course: formatCourse(group.name) })}
+        </h1>
         {group.curator && (
-          <p className="text-lg italic">Куратор: {group.curator.name}</p>
+          <p className="text-lg italic">{translate("group.curatorLine", { name: group.curator.name })}</p>
         )}
       </div>
 
@@ -119,7 +121,7 @@ export default function StudentGroupPage() {
       </Card>
 
       <div className="hidden print:block mt-8 text-sm text-muted-foreground">
-        Дата выгрузки: {new Date().toLocaleDateString()}
+        {translate("group.exportedOn", { date: new Date().toLocaleDateString() })}
       </div>
     </div>
   );

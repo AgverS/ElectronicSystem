@@ -30,7 +30,7 @@ const ROLE_LABELS: Record<Role, string> = {
 };
 
 const GRADE_COLORS: Record<string, string> = {
-  Н: "bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300",
+  [ABSENT]: "bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300",
   "1": "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300",
   "2": "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300",
   "3": "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300",
@@ -107,7 +107,7 @@ export function UserDetailsDialog({ userId, userName, trigger }: UserDetailsDial
           </div>
         ) : (
           <div className="flex flex-col gap-4">
-            {/* Основная инфа */}
+            {/* Core details */}
             <div className="grid grid-cols-2 gap-x-4 gap-y-2 rounded-lg border bg-muted/20 p-3 text-sm">
               <div>
                 <span className="text-xs text-muted-foreground">{translate("ui.fullName2")}</span>
@@ -129,7 +129,7 @@ export function UserDetailsDialog({ userId, userName, trigger }: UserDetailsDial
               )}
             </div>
 
-            {/* Дополнительная инфа для преподавателя / админа */}
+            {/* Extra details for teachers and administrators */}
             {(user.role === Role.TEACHER || user.role === Role.ADMIN) && (
               <div className="flex flex-col gap-3">
                 {user.specialties && user.specialties.length > 0 && (
@@ -171,7 +171,7 @@ export function UserDetailsDialog({ userId, userName, trigger }: UserDetailsDial
               </div>
             )}
 
-            {/* Успеваемость студента по семестрам */}
+            {/* The student's results, semester by semester */}
             {user.role === Role.STUDENT && (
               <div className="mt-2 flex flex-col gap-3">
                 <h3 className="text-sm font-bold tracking-tight">{translate("ui.resultsBySemester")}</h3>

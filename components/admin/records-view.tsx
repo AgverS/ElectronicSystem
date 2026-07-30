@@ -261,7 +261,7 @@ export function RecordsView() {
                             </Badge>
                             {writtenOff ? (
                               <Badge variant="outline" className="text-muted-foreground">
-                                Списано {r.writtenOffAt ? formatRecordDate(r.writtenOffAt) : ""}
+                                {translate("record.writtenOffOn", { date: r.writtenOffAt ? formatRecordDate(r.writtenOffAt) : "" })}
                               </Badge>
                             ) : expired ? (
                               <Badge variant="outline" className="text-muted-foreground">

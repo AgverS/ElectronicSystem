@@ -712,7 +712,11 @@ async function checkSemesterOverlap(startDate: Date, endDate: Date, excludeId?: 
   });
   if (overlap) {
     throw new Error(
-      `Период пересекается с семестром «${overlap.name}» (${overlap.startDate.toLocaleDateString("ru-RU")} - ${overlap.endDate.toLocaleDateString("ru-RU")})`,
+      translate("semester.overlaps", {
+        name: overlap.name,
+        start: overlap.startDate.toISOString().slice(0, 10),
+        end: overlap.endDate.toISOString().slice(0, 10),
+      }),
     );
   }
 }

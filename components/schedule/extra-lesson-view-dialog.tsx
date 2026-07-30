@@ -92,7 +92,9 @@ export function ExtraLessonViewDialog(props: Props) {
         <div className="flex flex-col gap-3 text-sm">
           <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
             <div className="text-muted-foreground">{translate("common.date")}</div>
-            <div className="font-medium">{dateLabel}, урок {lesson.lessonNumber}</div>
+            <div className="font-medium">
+              {translate("extraLesson.dateAndNumber", { date: dateLabel, number: lesson.lessonNumber })}
+            </div>
             <div className="text-muted-foreground">{translate("landing.role.teacher.title")}</div>
             <div className="font-medium">{lesson.teacher.name}</div>
             <div className="text-muted-foreground">{translate("common.room")}</div>
