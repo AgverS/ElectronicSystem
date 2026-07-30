@@ -146,9 +146,7 @@ export function CreateAssignmentDialog({ teachers, groups, subjects }: Props) {
                 <Label required>
                   Преподаватели
                   {teacherIds.size > 0 && (
-                    <span className="ml-1.5 text-muted-foreground">
-                      · выбрано {teacherIds.size}
-                    </span>
+                    <span className="ml-1.5 text-muted-foreground">{translate("ui.selectedInline", { count: teacherIds.size })}</span>
                   )}
                 </Label>
               </div>
@@ -224,9 +222,7 @@ export function CreateAssignmentDialog({ teachers, groups, subjects }: Props) {
                 <Label required>
                   Группы
                   {groupIds.size > 0 && (
-                    <span className="ml-1.5 text-muted-foreground">
-                      · выбрано {groupIds.size}
-                    </span>
+                    <span className="ml-1.5 text-muted-foreground">{translate("ui.selectedInline", { count: groupIds.size })}</span>
                   )}
                 </Label>
                 {filteredGroups.length > 0 && (

@@ -63,7 +63,7 @@ type KindFilter = "" | RecordKind;
 // loaded yet when this module is first imported.
 function KIND_FILTERS(): { value: KindFilter; label: string }[] {
   return [
-  { value: "", label: "Все" },
+  { value: "", label: translate("common.all") },
   { value: RecordKind.REWARD, label: translate("ui.rewards") },
   { value: RecordKind.PENALTY, label: translate("ui.penalties") },
 ];

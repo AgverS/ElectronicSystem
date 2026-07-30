@@ -65,7 +65,7 @@ export function EditSemesterDialog({ semester }: EditSemesterDialogProps) {
     const start = new Date(startDate);
     const academicYear = getAcademicYear(start);
     const num = parseInt(number);
-    const name = num + " семестр " + academicYear;
+    const name = translate("ui.semesterNameBuilt", { number: num, year: academicYear });
 
     startTransition(async () => {
       try {

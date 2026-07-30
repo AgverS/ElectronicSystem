@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx"
+import { translate } from "@/lib/i18n/translate";
 import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
@@ -39,5 +40,5 @@ export function formatSemesterName(semester: { name: string; year: string }, gro
   const semNumMatch = semester.name.match(/^\d/);
   const semNum = semNumMatch ? semNumMatch[0] : "";
   
-  return course + " курс, " + semNum + " семестр (" + semester.year + ")";
+  return translate("semester.fullName", { course, number: semNum, year: semester.year });
 }

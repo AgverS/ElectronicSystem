@@ -87,7 +87,7 @@ export function TableToolbar({
           onValueChange={(v) => setParam(f.key, v)}
           options={f.options}
           placeholder={f.placeholder}
-          allLabel={f.allLabel ?? "Все"}
+          allLabel={f.allLabel ?? translate("common.all")}
           className="w-44"
         />
       ))}

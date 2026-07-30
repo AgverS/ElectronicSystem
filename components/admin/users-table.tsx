@@ -168,7 +168,7 @@ function UsersTableInner({
 
       {selected.size > 0 && (
         <div className="flex items-center gap-3 rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2 text-sm">
-          <span className="text-muted-foreground">Выбрано: {selected.size}</span>
+          <span className="text-muted-foreground">{translate("ui.selectedN", { count: selected.size })}</span>
           <Button
             variant="destructive"
             size="sm"
@@ -329,7 +329,7 @@ function UsersTableInner({
       <AlertDialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Удалить {selected.size} пользователей?</AlertDialogTitle>
+            <AlertDialogTitle>{translate("ui.deleteNUsers", { count: selected.size })}</AlertDialogTitle>
             <AlertDialogDescription>{translate("ui.thisCannotBeUndone")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

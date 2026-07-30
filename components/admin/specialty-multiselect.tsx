@@ -32,9 +32,7 @@ export function SpecialtyMultiSelect({
         <Label>
           Специальности
           {selected.size > 0 && (
-            <span className="ml-1.5 text-muted-foreground">
-              · выбрано {selected.size}
-            </span>
+            <span className="ml-1.5 text-muted-foreground">{translate("ui.selectedInline", { count: selected.size })}</span>
           )}
         </Label>
         {onToggleAll && specialties.length > 0 && (

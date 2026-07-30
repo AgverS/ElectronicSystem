@@ -129,7 +129,7 @@ export function BellOverridesManager({ overrides }: { overrides: Override[] }) {
                 </p>
               </div>
               <span className="shrink-0 rounded-md bg-muted px-2 py-1 font-mono text-xs tabular-nums text-muted-foreground">
-                {o.slots.length} пар
+                {translate("ui.periodsN", { count: o.slots.length })}
               </span>
               <div className="flex shrink-0 items-center gap-1">
                 <IconBtn tooltip={translate("common.edit")} onClick={() => openEdit(o)}>

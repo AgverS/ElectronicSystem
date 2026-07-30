@@ -22,10 +22,10 @@ function collectFiles(formData: FormData): File[] {
     .filter((f): f is File => f instanceof File && f.size > 0);
   for (const file of files) {
     if (!ALLOWED_MIME.has(file.type)) {
-      throw new Error(`Недопустимый формат файла: ${file.name}`);
+      throw new Error(translate("ui.fileTypeNotAllowed", { name: file.name }));
     }
     if (file.size > MAX_FILE_SIZE) {
-      throw new Error(`Файл слишком большой (макс. 10 МБ): ${file.name}`);
+      throw new Error(translate("ui.fileTooLarge", { name: file.name }));
     }
   }
   return files;

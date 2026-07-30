@@ -732,7 +732,7 @@ export async function createSemester(data: {
   });
   if (existing)
     throw new Error(
-      `Семестр №${data.number} для года ${data.year} уже существует`,
+      translate("ui.semesterExists", { number: data.number, year: data.year }),
     );
 
   const sDate = new Date(data.startDate);
@@ -788,7 +788,7 @@ export async function updateSemester(
   });
   if (existing && existing.id !== id)
     throw new Error(
-      `Семестр №${data.number} для года ${data.year} уже существует`,
+      translate("ui.semesterExists", { number: data.number, year: data.year }),
     );
 
   const sDate = new Date(data.startDate);
@@ -1071,12 +1071,12 @@ function cleanSlots(
   for (const r of clean) {
     if (!Number.isFinite(r.number) || r.number < 1 || r.number > 50)
       throw new Error(translate("ui.thePeriodNumberMustBeBetween1And"));
-    if (seen.has(r.number)) throw new Error(`Пара №${r.number} указана дважды`);
+    if (seen.has(r.number)) throw new Error(translate("ui.periodTwice", { number: r.number }));
     seen.add(r.number);
     if (!TIME_RE.test(r.startTime) || !TIME_RE.test(r.endTime))
-      throw new Error(`Неверное время у пары №${r.number} (формат ЧЧ:ММ)`);
+      throw new Error(translate("ui.periodBadTime", { number: r.number }));
     if (timeToMinutes(r.startTime) >= timeToMinutes(r.endTime))
-      throw new Error(`У пары №${r.number} начало должно быть раньше конца`);
+      throw new Error(translate("ui.periodStartAfterEnd", { number: r.number }));
   }
   return clean.sort((a, b) => a.number - b.number);
 }
@@ -1098,7 +1098,7 @@ export async function saveBellTimes(
   >();
   for (const r of rows) {
     if (!BELL_DAY_GROUPS.includes(r.dayGroup))
-      throw new Error(`Неизвестная группа дней: ${r.dayGroup}`);
+      throw new Error(translate("ui.unknownDayGroup", { group: r.dayGroup }));
     const arr = byGroup.get(r.dayGroup) ?? [];
     arr.push({ number: r.number, startTime: r.startTime, endTime: r.endTime });
     byGroup.set(r.dayGroup, arr);

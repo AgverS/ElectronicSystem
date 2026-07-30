@@ -61,7 +61,7 @@ export function CreateSemesterDialog() {
     const start = new Date(startDate);
     const academicYear = getAcademicYear(start);
     const num = parseInt(number, 10);
-    const name = num + " семестр " + academicYear;
+    const name = translate("ui.semesterNameBuilt", { number: num, year: academicYear });
 
     startTransition(async () => {
       try {

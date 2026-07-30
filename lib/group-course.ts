@@ -1,3 +1,4 @@
+import { translate } from "@/lib/i18n/translate";
 /**
  * Курс группы вычисляется автоматически из её названия.
  *
@@ -45,5 +46,5 @@ export function courseFromGroupName(name: string, now: Date = new Date()): numbe
 /** Отображение курса: «3 курс» или «—». */
 export function formatCourse(name: string, now: Date = new Date()): string {
   const course = courseFromGroupName(name, now);
-  return course === null ? "—" : `${course} курс`;
+  return course === null ? "—" : translate("ui.courseValue", { course });
 }

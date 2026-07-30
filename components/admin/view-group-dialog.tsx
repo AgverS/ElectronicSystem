@@ -63,7 +63,7 @@ export function ViewGroupDialog({ groupId, groupName }: Props) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Состав группы {groupName}</DialogTitle>
+          <DialogTitle>{translate("ui.groupMembersOf", { name: groupName })}</DialogTitle>
         </DialogHeader>
 
         <div className="max-h-[60vh] overflow-y-auto">

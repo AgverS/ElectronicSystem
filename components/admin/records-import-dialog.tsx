@@ -404,7 +404,7 @@ export function RecordsImportDialog({ onImported }: Props) {
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-950">
                 <IconCheck size={24} className="text-green-600 dark:text-green-400" />
               </div>
-              <p className="font-medium">Импортировано {importedCount} записей</p>
+              <p className="font-medium">{translate("ui.importedN", { count: importedCount })}</p>
               <Button size="sm" onClick={() => { reset(); setOpen(false); }}>{translate("common.close")}</Button>
             </div>
           )}

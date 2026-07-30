@@ -49,7 +49,7 @@ function subKey(groupId: string, iso: string, lesson: number, subgroup: string) 
 }
 
 function subgroupSuffix(sg: string) {
-  return sg ? ` (подгр. ${sg})` : "";
+  return sg ? translate("ui.subgroupParen", { subgroup: sg }) : "";
 }
 
 // Расписание группы (для ученика).
@@ -119,7 +119,7 @@ export function computeGroupEvents(opts: {
         endTime: time.endTime,
         summary: `${lessonNumber}. ${summary}${subgroupSuffix(subgroup)}`,
         location: room ? translate("ui.roomShort", { room: room }) : undefined,
-        description: teacherName ? `Преподаватель: ${teacherName}` : undefined,
+        description: teacherName ? translate("ui.teacherLabel", { name: teacherName }) : undefined,
       });
     }
   }
@@ -241,7 +241,7 @@ export function computeRoomEvents(opts: {
         startTime: time.startTime,
         endTime: time.endTime,
         summary: `${b.lessonNumber}. ${subject} — ${b.group.name}${subgroupSuffix(b.subgroup)}`,
-        description: teacherName ? `Преподаватель: ${teacherName}` : undefined,
+        description: teacherName ? translate("ui.teacherLabel", { name: teacherName }) : undefined,
       });
     }
 
@@ -260,7 +260,7 @@ export function computeRoomEvents(opts: {
         startTime: time.startTime,
         endTime: time.endTime,
         summary: `${s.lessonNumber}. ${s.subject?.name ?? translate("audit.entity.schedule_substitution")} — ${s.group.name}${subgroupSuffix(s.subgroup)}`,
-        description: s.teacher?.name ? `Преподаватель: ${s.teacher.name}` : undefined,
+        description: s.teacher?.name ? translate("ui.teacherLabel", { name: s.teacher.name }) : undefined,
       });
     }
   }

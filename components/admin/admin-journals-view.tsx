@@ -198,7 +198,7 @@ function AdminJournalsViewInner({
                           </p>
                         </div>
                         <p className="text-xs text-muted-foreground">
-                          {g.assignments.length} предметов
+                          {translate("ui.subjectsN", { count: g.assignments.length })}
                         </p>
                       </motion.button>
                     ))}
