@@ -10,9 +10,10 @@
 import { DemoEngine, emptyDataset, type Dataset, type Row } from "./engine";
 import { MODEL_NAMES, modelDef, JOIN_TABLES, type ModelName } from "./schema";
 import type { ModelTypes } from "./types";
+import { STORAGE_KEYS } from "./storage";
 import { buildSeed } from "./seed";
 
-const STORAGE_KEY = "electronic-system-demo-db";
+const STORAGE_KEY = STORAGE_KEYS.database;
 /** Bump to invalidate saved snapshots when the seed or schema changes. */
 const STORAGE_VERSION = 1;
 

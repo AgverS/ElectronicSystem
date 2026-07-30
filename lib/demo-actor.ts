@@ -12,12 +12,13 @@ import { prisma } from "@/lib/prisma";
 import { translate } from "@/lib/i18n/translate";
 import type { Role } from "@/lib/prisma-client";
 import type { User } from "@/lib/demo-db/types";
+import { STORAGE_KEYS } from "@/lib/demo-db/storage";
 
-const PERSONA_STORAGE_KEY = "electronic-system-demo-persona";
+
 
 export async function getCurrentUser(): Promise<User | null> {
   if (typeof window === "undefined") return null;
-  const id = window.localStorage.getItem(PERSONA_STORAGE_KEY);
+  const id = window.localStorage.getItem(STORAGE_KEYS.persona);
   if (!id) return null;
   return prisma.user.findUnique({ where: { id } });
 }

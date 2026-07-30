@@ -3,9 +3,10 @@
 import * as React from "react";
 import { DEFAULT_LOCALE, detectLocale, isLocale, type Locale } from "./config";
 import en from "./locales/en";
+import { STORAGE_KEYS } from "@/lib/demo-db/storage";
 import { interpolate, setActiveMessages, type Messages } from "./translate";
 
-const STORAGE_KEY = "electronic-system-demo-locale";
+const STORAGE_KEY = STORAGE_KEYS.locale;
 
 export type { Messages };
 

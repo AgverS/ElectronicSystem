@@ -3,6 +3,7 @@ import { translate } from "@/lib/i18n/translate";
 import { requireRole } from "@/lib/demo-actor";
 import { Role } from "@/lib/prisma-client";
 import { logAction } from "@/lib/audit";
+import { STORAGE_KEYS } from "@/lib/demo-db/storage";
 
 /**
  * Backups, as the demo can honestly provide them.
@@ -14,7 +15,7 @@ import { logAction } from "@/lib/audit";
  * the feature demonstrable rather than a stub.
  */
 
-const SNAPSHOT_KEY = "electronic-system-demo-backups";
+const SNAPSHOT_KEY = STORAGE_KEYS.backups;
 
 interface Snapshot {
   filename: string;

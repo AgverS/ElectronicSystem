@@ -7,6 +7,7 @@
  */
 
 import { db, resetDemoData } from "./client";
+import { STORAGE_KEYS, ALL_STORAGE_KEYS } from "./storage";
 
 let failures = 0;
 let checks = 0;
@@ -23,6 +24,26 @@ function section(name: string) {
 }
 
 async function main() {
+  section("browser storage");
+  // Storage is shared across a whole origin, so two demos published under one
+  // domain would collide unless every key is namespaced per deployment.
+  check(
+    "storage keys are unique",
+    new Set(ALL_STORAGE_KEYS).size === ALL_STORAGE_KEYS.length,
+    ALL_STORAGE_KEYS,
+  );
+  check(
+    "every key carries the demo prefix",
+    ALL_STORAGE_KEYS.every((k) => k.startsWith("ej-demo")),
+    ALL_STORAGE_KEYS,
+  );
+  check(
+    "the namespace follows the deployment's base path",
+    STORAGE_KEYS.database ===
+      `ej-demo${process.env.NEXT_PUBLIC_BASE_PATH ? `.${process.env.NEXT_PUBLIC_BASE_PATH.replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-+|-+$/g, "")}` : ""}.database`,
+    STORAGE_KEYS.database,
+  );
+
   section("seed volume");
   const [users, groups, subjects, lessons, grades, entries] = await Promise.all([
     db.user.count(),

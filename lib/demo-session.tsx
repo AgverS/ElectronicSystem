@@ -12,6 +12,7 @@
 import * as React from "react";
 import { prisma } from "@/lib/prisma";
 import { Role } from "@/lib/prisma-client";
+import { STORAGE_KEYS } from "@/lib/demo-db/storage";
 
 export interface Persona {
   id: string;
@@ -30,7 +31,7 @@ export interface DemoUser extends Persona {
   reportBlocked: boolean;
 }
 
-const STORAGE_KEY = "electronic-system-demo-persona";
+const STORAGE_KEY = STORAGE_KEYS.persona;
 
 interface SessionValue {
   user: DemoUser | null;

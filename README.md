@@ -21,6 +21,13 @@ add lessons, change grades, edit the timetable — and nobody else sees it.
 **Nothing to configure.** No environment variables, no connection strings, no
 secrets. Build it and drop the output on any static host.
 
+**Isolated from anything else on the same domain.** Browser storage is shared
+across a whole origin rather than per directory, so two demos published under
+one account — `example.github.io/one/` and `example.github.io/two/` — would
+otherwise overwrite each other. Every key this demo owns is namespaced by the
+base path it is served from (see `lib/demo-db/storage.ts`). If two builds ever
+share a base path, set `NEXT_PUBLIC_DEMO_ID` to tell them apart.
+
 ### Where the data layer came from
 
 The original application ran on PostgreSQL through Prisma. Rather than rewrite
