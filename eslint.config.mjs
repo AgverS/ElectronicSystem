@@ -14,6 +14,7 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Generated Prisma client output — not hand-written source.
     "lib/prisma-client/**",
+    "lib/generated/**",
   ]),
   {
     // The demo database is a query engine over untyped rows: a row is
