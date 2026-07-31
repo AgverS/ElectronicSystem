@@ -30,3 +30,9 @@ pnpm-debug.log*
 
 # static export
 /out/
+
+# local environment
+.env
+
+# generated Prisma client
+/lib/generated/

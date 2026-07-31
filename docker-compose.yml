@@ -1,0 +1,68 @@
+# Everything here is named so this stack can run alongside the kbpej stack
+# without touching it: its own project name, container names, volume names,
+# database name and host ports.
+#
+#                    kbpej              this project
+#   project          kbpej              ejdemo
+#   containers       ej_*               ejdemo_*
+#   database         ej                 ej_demo
+#   Postgres port    5433               5434
+#   app port         80                 8080
+#
+# Redis and the separate nginx container from kbpej are not here: rate limiting
+# lived on the sign-in page, which this build does not have, and nginx was
+# already running inside the app image. Fewer moving parts, less to go wrong.
+
+name: ejdemo
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ejdemo_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ejdemo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-ej_demo}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      # Bound to localhost only — the database is not exposed to the network.
+      - "127.0.0.1:${POSTGRES_PORT:-5434}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ejdemo} -d ${POSTGRES_DB:-ej_demo}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks: [ejdemo_network]
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ejdemo_app
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-ejdemo}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-ej_demo}
+      UPLOAD_DIR: /app/uploads
+    volumes:
+      - uploads:/app/uploads
+    ports:
+      - "${APP_PORT:-8080}:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [ejdemo_network]
+
+volumes:
+  postgres_data:
+    name: ejdemo_postgres_data
+  uploads:
+    name: ejdemo_uploads
+
+networks:
+  ejdemo_network:
+    name: ejdemo_network
+    driver: bridge
